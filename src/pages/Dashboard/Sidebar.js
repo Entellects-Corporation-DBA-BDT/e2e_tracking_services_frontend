@@ -10,6 +10,7 @@ function Sidebar() {
   const navigate = useNavigate();
 
   const [resources, setResources] = useState([]);
+  const [resourcesCount, setResourcesCount] = useState(null)
 
   useEffect(() => {
     loadResources();
@@ -24,14 +25,15 @@ function Sidebar() {
       );
 
       setResources(visibleResources);
+      setResourcesCount(data.length)
+      
     } catch (error) {
       console.error(error);
     }
   };
 
   const getClassName = ({ isActive }) =>
-    `e2e_sidebar_menu_item ${
-      isActive ? "e2e_sidebar_active" : ""
+    `e2e_sidebar_menu_item ${isActive ? "e2e_sidebar_active" : ""
     }`;
 
   const handleLogout = () => {
@@ -42,7 +44,18 @@ function Sidebar() {
   return (
     <div className="e2e_sidebar_container">
       <div>
+        {resourcesCount < 10 && <div className="aiRobotContainer1">
+          <img
+            src="../../robot.png"   // your robot image
+            alt="AI Robot"
+            className="aiRobot"
+          />
 
+          <div className="robotShadow"></div>
+
+          <div className="robotGlow"></div>
+        </div>
+}
         <div className="e2e_sidebar_logo_section">
           <img
             src="/logo.png"
@@ -53,7 +66,9 @@ function Sidebar() {
           <div>
             <h2>E2E TRACKING</h2>
             <p>SERVICES</p>
+
           </div>
+
         </div>
 
         <div className="e2e_sidebar_menu">

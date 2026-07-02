@@ -23,99 +23,87 @@ import {
    SKILLS
 ========================= */
 
-const skills = [
-  {
-    name: "Swain",
-    value: 85,
-    color: "#4285F4",
-    icon: <FaCode />,
-  },
-  {
-    name: "Steven",
-    value: 72,
-    color: "#F9A826",
-    icon: <FaCode />,
-  },
-  {
-    name: "Jones",
-    value: 61,
-    color: "#52C56B",
-    icon: <FaDatabase />,
-  },
-  {
-    name: "Jasmine",
-    value: 54,
-    color: "#8E54FF",
-    icon: <FaPython />,
-  },
-  {
-    name: "Lilly",
-    value: 43,
-    color: "#FF5B6E",
-    icon: <FaAws />,
-  },
-];
-
 function DashboardGraphs() {
   const COLORS = [
-  "#4285F4",
-  "#8E54FF",
-  "#F9A826",
-  "#FF5B6E",
-  "#52C56B",
-  "#00C2A8",
-  "#7D5FFF",
-  "#FF7F50",
-];
+    "#4285F4",
+    "#8E54FF",
+    "#F9A826",
+    "#FF5B6E",
+    "#52C56B",
+    "#00C2A8",
+    "#7D5FFF",
+    "#FF7F50",
+  ];
 
-const [startDate, setStartDate] = useState("2026-04-01");
-const [endDate, setEndDate] = useState("2026-06-30");
-const [category, setCategory] = useState("benchsales");
+  const [startDate, setStartDate] = useState("2026-04-01");
+  const [endDate, setEndDate] = useState("2026-06-30");
+  const [category, setCategory] = useState("benchsales");
 
-const [candidateData, setCandidateData] = useState([]);
-const [total, setTotal] = useState(0);
-const [loading, setLoading] = useState(false);
+  const [candidateData, setCandidateData] = useState([]);
+  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [skills, setSkills] = useState([]);
 
-const loadSubmissionAnalytics = async () => {
-  try {
-    setLoading(true);
+  const loadSubmissionAnalytics = async () => {
+    try {
+      setLoading(true);
 
-    const res = await getSubmissionAnalytics(
-  startDate,
-  endDate,
-  category
-);
+      const res = await getSubmissionAnalytics(
+        startDate,
+        endDate,
+        category
+      );
 
-console.log("API Response:", res);
+      console.log("API Response:", res);
 
-    const formatted = res.data.map((item, index) => ({
-      name: item.label,
-      value: item.value,
-      color: COLORS[index % COLORS.length],
-    }));
+      const formatted = res.data.map((item, index) => ({
+        name: item.label,
+        value: item.value,
+        color: COLORS[index % COLORS.length],
+      }));
 
-    setCandidateData(formatted);
-    setTotal(res.total);
-  } catch (error) {
-    console.error(error);
-  } finally {
-    setLoading(false);
-  }
-};
+      setCandidateData(formatted);
+      setTotal(res.total);
+      const ICONS = [
+        <FaCode />,
+        <FaDatabase />,
+        <FaPython />,
+        <FaAws />,
+        <FaCode />,
+        <FaDatabase />,
+        <FaPython />,
+        <FaAws />,
+        <FaCode />,
+      ];
+      const skillData = res.data.map((item, index) => ({
+        name: item.label,
+        value: Number(((item.value / res.total) * 100).toFixed(1)),
+        submissions: item.value,
+        color: COLORS[index % COLORS.length],
+        icon: ICONS[index % ICONS.length],
+      }));
 
-useEffect(() => {
-  loadSubmissionAnalytics();
-}, [startDate, endDate, category]);
+      setSkills(skillData);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadSubmissionAnalytics();
+  }, [startDate, endDate, category]);
 
   return (
 
-    <div className="e2e_dashboard_grid">        
+    <div className="e2e_dashboard_grid">
       {/* =========================
           CANDIDATES OVERVIEW
       ========================= */}
       <div className="e2e_card">
         <h3 className="e2e_card_title">Submissions Overview</h3>
-        <div className="e2e_chart_layout"> 
+        <div className="e2e_chart_layout">
           <div className="e2e_chart_wrapper">
             <ResponsiveContainer width="100%" height={180}>
               <PieChart>
@@ -201,62 +189,64 @@ useEffect(() => {
                       background: item.color,
                     }}
                   ></div>
-                  
+
                 </div>
-                <span>{item.value}%</span>
+                <span>
+                  {item.value}% ({item.submissions})
+                </span>
               </div>
             </div>
           ))}
         </div>
       </div>
-<div className="e2e_card">
-  <div className="e2e_graph_filter_header">
-    <h3 className="e2e_card_title">Submission Analytics</h3>
-  </div>
-  <div className="e2e_graph_filters">
-    <div className="e2e_graph_filter_item">
-      <label>Start Date</label>
-      <input
-      type="date"
-  className="e2e_graph_input"
-  value={startDate}
-  onChange={(e) => setStartDate(e.target.value)}
-/>
-    </div>
-    <div className="e2e_graph_filter_item">
-      <label>End Date</label>
-      <input
-  type="date"
-  className="e2e_graph_input"
-  value={endDate}
-  onChange={(e) => setEndDate(e.target.value)}
-/>
-    </div>
-    <div className="e2e_graph_filter_item">
-      <label>Category</label>
-      <select
-  className="e2e_graph_select"
-  value={category}
-  onChange={(e) => setCategory(e.target.value)}
->
-  <option value="benchsales">Recruiting</option>
-  <option value="recruiting">Bench Sales</option>
-  <option value="hotlist">Hot List</option>
-  <option value="jobs">Jobs</option>
-  <option value="primevendors">Prime Vendors</option>
-  <option value="clients">Clients</option>
-  <option value="candidates">Candidates</option>
-</select>
-    </div>
-    <button
-  className="e2e_graph_apply_btn"
-  onClick={loadSubmissionAnalytics}
->
-  Apply Filter
-</button>
-  </div>
+      <div className="e2e_card">
+        <div className="e2e_graph_filter_header">
+          <h3 className="e2e_card_title">Submission Analytics</h3>
+        </div>
+        <div className="e2e_graph_filters">
+          <div className="e2e_graph_filter_item">
+            <label>Start Date</label>
+            <input
+              type="date"
+              className="e2e_graph_input"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+            />
+          </div>
+          <div className="e2e_graph_filter_item">
+            <label>End Date</label>
+            <input
+              type="date"
+              className="e2e_graph_input"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+            />
+          </div>
+          <div className="e2e_graph_filter_item">
+            <label>Category</label>
+            <select
+              className="e2e_graph_select"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+            >
+              <option value="benchsales">Recruiting</option>
+              <option value="recruiting">Bench Sales</option>
+              <option value="hotlist">Hot List</option>
+              <option value="jobs">Jobs</option>
+              <option value="primevendors">Prime Vendors</option>
+              <option value="clients">Clients</option>
+              <option value="candidates">Candidates</option>
+            </select>
+          </div>
+          <button
+            className="e2e_graph_apply_btn"
+            onClick={loadSubmissionAnalytics}
+          >
+            Apply Filter
+          </button>
+        </div>
 
-</div>
+      </div>
 
     </div>
 

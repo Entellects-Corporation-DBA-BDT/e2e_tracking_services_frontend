@@ -115,7 +115,7 @@ function LoginForm() {
               Password
             </label>
             <div className="inputWrapper">
-              <FaLock className="inputIcon" />
+              {/* <FaLock className="inputIcon" /> */}
               <input
                 type={showPassword ? "text" : "password"}
                 placeholder="Enter your password"

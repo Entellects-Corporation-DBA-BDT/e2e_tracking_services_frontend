@@ -1,15 +1,16 @@
-import React from 'react';
-// import './styles/Loader.css';
+import React from "react";
+import "./Loader.css"
 
 const Loader = () => {
   return (
-    <div className="tfm-loader-wrapper">
-      <div className="tfm-loader-spinner">
-        <div className="circle project"></div>
-        <div className="circle team"></div>
-        <div className="circle task"></div>
+    <div className="e2e-loader-wrapper">
+      <div className="e2e-loader-spinner">
+        <div className="circle"></div>
       </div>
-      <span className="tfm-loader-text">Loading your workspace...</span>
+
+      <span className="tfm-loader-text">
+        Loading E2E Tracking
+      </span>
     </div>
   );
 };

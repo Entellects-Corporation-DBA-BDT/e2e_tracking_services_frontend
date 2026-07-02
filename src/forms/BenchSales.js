@@ -15,13 +15,13 @@ import {
 
 import "./BenchSales.css";
 
-const BenchSales = ({ onClose, applicationId, isEdit = false, refreshData}) => {
+const BenchSales = ({ onClose, applicationId, isEdit = false, refreshData }) => {
   const today = new Intl.DateTimeFormat("en-CA", {
-  timeZone: "America/New_York",
-  year: "numeric",
-  month: "2-digit",
-  day: "2-digit",
-}).format(new Date());
+    timeZone: "America/New_York",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
   const [formData, setFormData] = useState({
     date_created: today,
     candidate_name: "",
@@ -36,13 +36,14 @@ const BenchSales = ({ onClose, applicationId, isEdit = false, refreshData}) => {
     remarks: "",
   });
 
-
   const [files, setFiles] = useState({
     resume_file: null,
     r2r_file: null,
     driving_file: null,
     visa_file: null,
   });
+
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -62,82 +63,89 @@ const BenchSales = ({ onClose, applicationId, isEdit = false, refreshData}) => {
     if (!isEdit || !applicationId) return;
 
     const fetchApplication = async () => {
-        try {
-            const res = await getBenchSalesById(applicationId);
+      try {
+        const res = await getBenchSalesById(applicationId);
 
-            setFormData({
-                date_created: res.data.date_created || today,
-                candidate_name: res.data.candidate_name || "",
-                vendor: res.data.vendor || "",
-                poc: res.data.poc || "",
-                feedback: res.data.feedback || "",
-                client: res.data.client || "",
-                emp_loc: res.data.emp_loc || "",
-                rate: res.data.rate || "",
-                role: res.data.role || "",
-                candidate_loc: res.data.candidate_loc || "",
-                remarks: res.data.remarks || "",
-            });
+        setFormData({
+          date_created: res.data.date_created || today,
+          candidate_name: res.data.candidate_name || "",
+          vendor: res.data.vendor || "",
+          poc: res.data.poc || "",
+          feedback: res.data.feedback || "",
+          client: res.data.client || "",
+          emp_loc: res.data.emp_loc || "",
+          rate: res.data.rate || "",
+          role: res.data.role || "",
+          candidate_loc: res.data.candidate_loc || "",
+          remarks: res.data.remarks || "",
+        });
 
-        } catch (err) {
-            console.log(err);
-        }
+      } catch (err) {
+        console.log(err);
+      }
     };
 
     fetchApplication();
 
-}, [applicationId, isEdit]);
+  }, [applicationId, isEdit]);
 
   const handleSubmit = async () => {
-    console.log(formData)
+
+    if (loading) return; // Prevent multiple clicks
+
+    setLoading(true);
+
     try {
 
-        const payload = new FormData();
+      const payload = new FormData();
 
-        Object.keys(formData).forEach(key => {
-            payload.append(key, formData[key]);
-        });
+      Object.keys(formData).forEach((key) => {
+        payload.append(key, formData[key]);
+      });
 
-        Object.keys(files).forEach(key => {
-            if (files[key]) {
-                payload.append(key, files[key]);
-            }
-        });
-
-        let response;
-
-        if (isEdit) {
-    response = await updateBenchSalesApplication(
-        applicationId,
-        payload
-    );
-} else {
-    response = await createBenchSalesApplication(payload);
-}
-
-        if (response.success) {
-            alert(
-                isEdit
-                    ? "Application Updated Successfully"
-                    : "Application Created Successfully"
-            );
-            refreshData?.();
-
-            onClose?.();
-
-        } else {
-            alert(response.message);
+      Object.keys(files).forEach((key) => {
+        if (files[key]) {
+          payload.append(key, files[key]);
         }
+      });
+
+      let response;
+
+      if (isEdit) {
+        response = await updateBenchSalesApplication(
+          applicationId,
+          payload
+        );
+      } else {
+        response = await createBenchSalesApplication(payload);
+      }
+
+      if (response.success) {
+        alert(
+          isEdit
+            ? "Application Updated Successfully"
+            : "Application Created Successfully"
+        );
+
+        refreshData?.();
+        onClose?.();
+      } else {
+        alert(response.message);
+      }
 
     } catch (error) {
-        console.error(error);
 
-        alert(
-            error?.response?.data?.message ||
-            "Operation failed"
-        );
+      console.error(error);
+
+      alert(
+        error?.response?.data?.message ||
+        "Operation failed"
+      );
+
+    } finally {
+      setLoading(false);
     }
-};
+  };
 
 
   return (
@@ -208,7 +216,7 @@ const BenchSales = ({ onClose, applicationId, isEdit = false, refreshData}) => {
 
         <div className="inputGroup">
           <label>Rate / Hour ($)</label>
-          <input type="number" name="rate"  placeholder="$ 50" value={formData.rate}
+          <input type="number" name="rate" placeholder="$ 50" value={formData.rate}
             onChange={handleChange} />
         </div>
 
@@ -336,18 +344,25 @@ const BenchSales = ({ onClose, applicationId, isEdit = false, refreshData}) => {
 
       {/* Footer */}
       <div className="modalFooter">
-        <button className="cancelBtn">
+        <button
+          className="cancelBtn"
+          onClick={onClose}
+          disabled={loading}
+        >
           Cancel
         </button>
 
         <button
-    className="saveBtn"
-    onClick={handleSubmit}
->
-    {isEdit
-        ? "Update Application"
-        : "Save Application"}
-</button>
+          className="saveBtn"
+          onClick={handleSubmit}
+          disabled={loading}
+        >
+          {loading && <span className="btnLoader"></span>}
+
+          {loading
+            ? (isEdit ? "Updating..." : "Saving...")
+            : (isEdit ? "Update Application" : "Save Application")}
+        </button>
       </div>
     </div>
     // </div>

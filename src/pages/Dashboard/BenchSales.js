@@ -82,7 +82,7 @@ function BenchSales() {
 
 
   if (initialLoading) {
-    return <Loader />;
+    return <Loader  fullPage />;
   }
 
   return (
@@ -92,8 +92,10 @@ function BenchSales() {
         <div className="e2e_recruiting_left">
           <h2>
             BenchSales Application List
+            <button className="performence-button" onClick={() => {
+                          setOpenForm("performence");
+                        }}>Performance</button>
           </h2>
-
           <div className="e2e_recruiting_heading_line"></div>
         </div>
 
@@ -108,7 +110,6 @@ function BenchSales() {
           </button>
         </div>
       </div>
-
       <div className="e2e_recruiting_filters">
         <div className="e2e_recruiting_filter_right">
           <input
@@ -123,6 +124,7 @@ function BenchSales() {
               setCurrentPage(1);
             }}
           />
+          
         </div>
 
         <select

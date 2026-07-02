@@ -147,6 +147,18 @@ function Homepage() {
         </div>
       </div>
 
+      <div className="aiRobotContainer">
+    <img
+        src="robot.png"   // your robot image
+        alt="AI Robot"
+        className="aiRobot"
+    />
+
+    <div className="robotShadow"></div>
+
+    <div className="robotGlow"></div>
+</div>
+
       {/* RIGHT SECTION */}
       <div className="rightSection">
         <LoginForm />

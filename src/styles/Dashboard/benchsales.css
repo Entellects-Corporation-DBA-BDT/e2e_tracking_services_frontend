@@ -189,6 +189,36 @@
   cursor:pointer;
 }
 
+.performence-button{
+border:none;
+  height:42px;
+  padding:0 15px;
+  border-radius:12px;
+
+  font-size:13px;
+
+  font-weight:700;
+
+  color:white;
+
+  cursor:pointer;
+
+  background:
+    linear-gradient(
+      135deg,
+      #aa16ff,
+      #2563eb
+    );
+
+  transition:0.3s ease;
+  margin-left: 10px;
+}
+
+.performence-button:hover{
+
+  transform:translateY(-3px);
+}
+
 .e2e_benchsales_filter_right{
 
   display:flex;

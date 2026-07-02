@@ -1,4 +1,3 @@
-
 .benchModal {
   width: 95%;
   max-width: 1200px;
@@ -20,6 +19,7 @@
 .benchModal::-webkit-scrollbar {
   display: none;
 }
+
 .benchHeader {
   display: flex;
   justify-content: space-between;
@@ -48,7 +48,7 @@
 
 .formGrid {
   display: grid;
-  grid-template-columns: repeat(3,1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px;
 }
 
@@ -100,7 +100,7 @@
 
 .uploadGrid {
   display: grid;
-  grid-template-columns: repeat(2,1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 20px;
   margin-top: 30px;
 }
@@ -153,25 +153,47 @@
   color: white;
   padding: 14px 30px;
   border-radius: 12px;
-  background: linear-gradient(
-      135deg,
+  background: linear-gradient(135deg,
       #4f46e5,
-      #6d28d9
-  );
+      #6d28d9);
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
 }
 
-@media(max-width:992px){
+.btnLoader {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #fff;
+  border-top: 2px solid transparent;
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+}
 
-  .formGrid{
-      grid-template-columns:1fr;
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.saveBtn:disabled {
+  opacity: .8;
+  cursor: not-allowed;
+}
+
+@media(max-width:992px) {
+
+  .formGrid {
+    grid-template-columns: 1fr;
   }
 
-  .fullWidth{
-      grid-column:span 1;
+  .fullWidth {
+    grid-column: span 1;
   }
 
-  .uploadGrid{
-      grid-template-columns:1fr;
+  .uploadGrid {
+    grid-template-columns: 1fr;
   }
 }

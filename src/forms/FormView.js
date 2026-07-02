@@ -3,6 +3,7 @@ import ApplicationView from "./ApplicationView";
 import BenchSales from "./BenchSales";
 import "./index.css"
 import DeleteConfirmation from "./DeleteConfirmation";
+import RecruiterPerformance from "../pages/Dashboard/RecruiterPerformance.";
 
 const FormView = ({
   formTitle,
@@ -39,6 +40,16 @@ const FormView = ({
       case "benchEdit":
         return (
           <BenchSales
+            onClose={() => setOpenForm(null)}
+            applicationId={applicationId}
+            isEdit={true}
+            refreshData={refreshData}
+          />
+        );
+
+        case "performence":
+        return (
+          <RecruiterPerformance
             onClose={() => setOpenForm(null)}
             applicationId={applicationId}
             isEdit={true}

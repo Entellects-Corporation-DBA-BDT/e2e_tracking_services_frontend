@@ -121,9 +121,16 @@ export const updateBenchSalesApplication = async (id, data) => {
 
 
 export const deleteBenchSalesApplication = async (id) => {
-    const response = await axiosInstance.delete(
-        `/benchsales/delete/${id}`
-    );
+  const response = await axiosInstance.delete(
+    `/benchsales/delete/${id}`
+  );
 
-    return response.data;
+  return response.data;
+};
+
+export const getPerformanceDashboard = async () => {
+  const response = await axiosInstance.get(
+    "/benchsales/dashboard/performance"
+  );
+  return response.data;
 };
