@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Routes, Route } from "react-router-dom";
-import { getDashboardSummary } from "../../api/applicationApi";
+import { getDashboardSummary, getRecentActivities } from "../../api/applicationApi";
 
 import Sidebar from "./Sidebar";
 import Navbar from "./Navbar";
@@ -32,54 +32,33 @@ import {
 function Dashboard() {
   const [cards, setCards] = useState([]);
 
-  const dummyTableData = [
-    {
-      id: 1,
-      submissionDate: "28 May 2026",
-      recruiterName: "Kiran",
-      candidateName: "Rahul Kumar",
-    },
-    {
-      id: 2,
-      submissionDate: "28 May 2026",
-      recruiterName: "Anjali",
-      candidateName: "Suresh Reddy",
-    },
-    {
-      id: 3,
-      submissionDate: "27 May 2026",
-      recruiterName: "Priya",
-      candidateName: "Vamsi Krishna",
-    },
-    {
-      id: 4,
-      submissionDate: "27 May 2026",
-      recruiterName: "Rohit",
-      candidateName: "Mahesh Babu",
-    },
-  ];
+  const [activities, setActivities] = useState([]);
 
   const [tableData, setTableData] =
-    useState(dummyTableData);
+    useState(activities);
 
   useEffect(() => {
-  const fetchDashboardSummary = async () => {
+
+  const loadDashboard = async () => {
+
     try {
-      const summary =
-        await getDashboardSummary();
+
+      const [summary, activityResponse] =
+        await Promise.all([
+          getDashboardSummary(),
+          getRecentActivities()
+        ]);
 
       setCards([
         {
           title: "Today's Submissions",
-          count:
-            summary.today_submissions || 0,
+          count: summary.today_submissions || 0,
           growth: "8%",
           icon: <FaBriefcase />,
         },
         {
           title: "Weekly Submissions",
-          count:
-            summary.weekly_submissions || 0,
+          count: summary.weekly_submissions || 0,
           growth: "10%",
           icon: <FaChartLine />,
         },
@@ -96,15 +75,21 @@ function Dashboard() {
           icon: <FaUserTie />,
         },
       ]);
+
+      if (activityResponse.success) {
+        setActivities(activityResponse.data);
+      }
+
     } catch (error) {
-      console.error(
-        "Failed to load dashboard summary",
-        error
-      );
+
+      console.error(error);
+
     }
+
   };
 
-  fetchDashboardSummary();
+  loadDashboard();
+
 }, []);
 
 
@@ -135,8 +120,8 @@ function Dashboard() {
                   <DashboardGraphs />
 
                   <DashboardTable
-                    tableData={tableData}
-                  />
+  activities={activities}
+/>
                 </>
               }
             />

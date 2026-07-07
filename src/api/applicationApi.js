@@ -134,3 +134,29 @@ export const getPerformanceDashboard = async () => {
   );
   return response.data;
 };
+
+export const updateApplicationProcess = async (id, processId) => {
+  const response = await axiosInstance.put(
+    `/benchsales/process/${id}`,
+    {
+      process_id: processId,
+    }
+  );
+
+  return response.data;
+};
+
+
+/*
+|--------------------------------------------------------------------------
+| Recent Activities`
+|--------------------------------------------------------------------------
+*/
+
+export const getRecentActivities = async () => {
+  const response = await axiosInstance.get(
+    "/application/dashboard/recent-activities"
+  );
+
+  return response.data;
+};

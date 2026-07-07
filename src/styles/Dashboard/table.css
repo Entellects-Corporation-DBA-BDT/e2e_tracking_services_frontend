@@ -343,3 +343,128 @@
   }
 
 }
+
+
+.activity-container{
+
+    background:#fff;
+
+    border-radius:20px;
+
+    padding:25px;
+
+    box-shadow:0 8px 30px rgba(0,0,0,.06);
+}
+
+.activity-list{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:18px;
+
+    margin-top:25px;
+}
+
+.activity-card{
+
+    display:flex;
+
+    align-items:flex-start;
+
+    gap:18px;
+
+    padding:18px;
+
+    border-radius:18px;
+
+    transition:.3s;
+
+    border:1px solid #edf2f7;
+}
+
+.activity-card:hover{
+
+    transform:translateY(-3px);
+
+    box-shadow:0 12px 25px rgba(0,0,0,.08);
+}
+
+.activity-icon{
+
+    width:55px;
+
+    height:55px;
+
+    border-radius:50%;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-size:24px;
+
+    background:#eef2ff;
+}
+
+.activity-content{
+
+    flex:1;
+}
+
+.activity-message{
+
+    font-size:16px;
+
+    font-weight:700;
+
+    color:#1e293b;
+}
+
+.candidate-list{
+
+    display:flex;
+
+    flex-wrap:wrap;
+
+    gap:8px;
+
+    margin-top:12px;
+}
+
+.candidate-chip{
+
+    background:#eff6ff;
+
+    color:#2563eb;
+
+    padding:6px 12px;
+
+    border-radius:20px;
+
+    font-size:13px;
+
+    font-weight:600;
+}
+
+.activity-date{
+
+    color:#64748b;
+
+    font-size:13px;
+
+    white-space:nowrap;
+}
+
+.activity-card.interview{
+
+    border-left:6px solid #f59e0b;
+}
+
+.activity-card.placement{
+
+    border-left:6px solid #10b981;
+}

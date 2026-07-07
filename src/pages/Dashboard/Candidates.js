@@ -6,18 +6,13 @@ import NewCandidateForm from "../../forms/NewCandidateForm";
 function Candidates() {
 
   const [loading, setLoading] = useState(true);
-const [showCandidatePopup, setShowCandidatePopup] =
-  useState(false);
+  const [showCandidatePopup, setShowCandidatePopup] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-
   const [entries, setEntries] = useState(10);
-
   const [tableData, setTableData] = useState([]);
 
   useEffect(() => {
-
     setTimeout(() => {
-
       setTableData([
 
         {
@@ -105,15 +100,15 @@ const [showCandidatePopup, setShowCandidatePopup] =
         </div>
 
         <button
-  className="e2e_candidates_add_btn"
-  onClick={() =>
-    setShowCandidatePopup(true)
-  }
->
+          className="e2e_candidates_add_btn"
+          onClick={() =>
+            setShowCandidatePopup(true)
+          }
+        >
 
-  + Add New
+          + Add New
 
-</button>
+        </button>
 
       </div>
 
@@ -311,13 +306,13 @@ const [showCandidatePopup, setShowCandidatePopup] =
         </table>
 
       </div>
-{showCandidatePopup && (
-  <NewCandidateForm
-    closePopup={() =>
-      setShowCandidatePopup(false)
-    }
-  />
-)}
+      {showCandidatePopup && (
+        <NewCandidateForm
+          closePopup={() =>
+            setShowCandidatePopup(false)
+          }
+        />
+      )}
     </div>
 
   );

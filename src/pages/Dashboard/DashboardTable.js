@@ -1,6 +1,6 @@
 import "../../styles/Dashboard/table.css";
 
-function DashboardTable({ tableData }) {
+function DashboardTable({ activities }) {
 
   /* ACTION FUNCTIONS */
 
@@ -24,82 +24,69 @@ function DashboardTable({ tableData }) {
 
   return (
 
-    <div className="e2e_table_container">
+    <div className="activity-container">
 
-      <div className="e2e_table_header">
+    <div className="activity-header">
+        <h3>Recent Activities</h3>
+    </div>
 
-        <h3>Recent Submissions</h3>
+    <div className="activity-list">
 
-      </div>
+        {activities.map((item,index)=>(
 
-      <table className="e2e_dashboard_table">
+            <div
+                key={index}
+                className={`activity-card ${item.type}`}
+            >
 
-        <thead>
+                <div className="activity-left">
 
-          <tr>
+                    <div className="activity-icon">
 
-            <th>Sno</th>
+                        {item.type==="placement" ? "🏆" : "🎯"}
 
-            <th>Submission Date</th>
+                    </div>
 
-            <th>Recruiter Name</th>
+                </div>
 
-            <th>Candidate Name</th>
+                <div className="activity-content">
 
-            <th>Action</th>
+                    <div className="activity-message">
 
-          </tr>
+                        {item.message}
 
-        </thead>
+                    </div>
 
-        <tbody>
+                    <div className="candidate-list">
 
-          {tableData.map((item, index) => (
+                        {item.candidate_names.map((name,i)=>(
 
-            <tr key={item.id}>
+                            <span
+                                key={i}
+                                className="candidate-chip"
+                            >
+                                {name}
+                            </span>
 
-              <td>{index + 1}</td>
+                        ))}
 
-              <td>{item.submissionDate}</td>
+                    </div>
 
-              <td>{item.recruiterName}</td>
+                </div>
 
-              <td>{item.candidateName}</td>
+                <div className="activity-date">
 
-              <td className="e2e_action_buttons">
+                    {item.date}
 
-                <button
-                  className="e2e_view_btn"
-                  onClick={() => handleView(item)}
-                >
-                  View
-                </button>
+                </div>
 
-                <button
-                  className="e2e_edit_btn"
-                  onClick={() => handleEdit(item)}
-                >
-                  Edit
-                </button>
+            </div>
 
-                <button
-                  className="e2e_delete_btn"
-                  onClick={() => handleDelete(item.id)}
-                >
-                  Delete
-                </button>
-
-              </td>
-
-            </tr>
-
-          ))}
-
-        </tbody>
-
-      </table>
+        ))}
 
     </div>
+
+</div>
 
   );
 }

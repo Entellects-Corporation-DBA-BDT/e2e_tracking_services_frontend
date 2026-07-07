@@ -11,12 +11,15 @@ import {
   FaCalendarAlt,
 } from "react-icons/fa";
 
-import { getBenchSalesById } from "../api/applicationApi";
+import { getBenchSalesById, updateApplicationProcess } from "../api/applicationApi";
 import "./ApplicationView.css";
 
 const ApplicationView = ({ applicationId  }) => {
     const [application, setApplication] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [updating, setUpdating] = useState(false);
+const [showConfirm, setShowConfirm] = useState(false);
+const [nextProcess, setNextProcess] = useState(null);
 
   useEffect(() => {
     fetchApplication();
@@ -58,6 +61,29 @@ const ApplicationView = ({ applicationId  }) => {
     return <FaFilePdf />;
   };
 
+
+  const handleProcessUpdate = async () => {
+  try {
+
+    setUpdating(true);
+
+    const res = await updateApplicationProcess(
+      application.id,
+      nextProcess
+    );
+
+    if (res.success) {
+      fetchApplication();
+      setShowConfirm(false);
+    }
+
+  } catch (err) {
+    console.error(err);
+  } finally {
+    setUpdating(false);
+  }
+};
+
   return (
     <div className="application-view">
       {/* Header */}
@@ -71,9 +97,53 @@ const ApplicationView = ({ applicationId  }) => {
           <p>{application.role}</p>
         </div>
 
-        <div className="status-badge">
-          Submitted
-        </div>
+        <div className="candidate-status">
+
+  <div
+    className={`status-badge process-${application.process_id}`}
+  >
+    {application.process_id === 1 && "Submitted"}
+
+    {application.process_id === 2 &&
+      "Interview Scheduled"}
+
+    {application.process_id === 3 &&
+      "Placed"}
+  </div>
+
+  {application.process_id !== 3 && (
+    <button
+      className="process-btn"
+      disabled={updating}
+      onClick={() => {
+
+  if (application.process_id === 1) {
+    setNextProcess(2);
+  } else {
+    setNextProcess(3);
+  }
+
+  setShowConfirm(true);
+}}
+    >
+      {updating
+        ? "Updating..."
+        : application.process_id === 1
+        ? "Schedule Interview"
+        : "Mark as Placed"}
+    </button>
+  )}
+
+  {application.process_id === 3 && (
+    <button
+      className="process-btn completed"
+      disabled
+    >
+      ✓ Candidate Placed
+    </button>
+  )}
+
+</div>
       </div>
 
       {/* Submission Info */}
@@ -218,6 +288,60 @@ const ApplicationView = ({ applicationId  }) => {
           </a>
         </div>
       </div>
+      {
+showConfirm && (
+
+<div className="confirm-overlay">
+
+    <div className="confirm-modal">
+
+        <div className="confirm-icon">
+            ⚠️
+        </div>
+
+        <h2>
+            {nextProcess === 2
+                ? "Schedule Interview?"
+                : "Mark Candidate as Placed?"}
+        </h2>
+
+        <p>
+
+            {nextProcess === 2
+                ? `Are you sure you want to move "${application.candidate_name}" to Interview Scheduled?`
+                : `Are you sure you want to mark "${application.candidate_name}" as Placed?`}
+
+        </p>
+
+        <div className="confirm-buttons">
+
+            <button
+                className="cancel-btn"
+                onClick={() => setShowConfirm(false)}
+            >
+                Cancel
+            </button>
+
+            <button
+                className="confirm-btn"
+                disabled={updating}
+                onClick={handleProcessUpdate}
+            >
+                {updating
+                    ? "Updating..."
+                    : nextProcess === 2
+                    ? "Schedule Interview"
+                    : "Mark as Placed"}
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+)
+}
     </div>
   );
 };
