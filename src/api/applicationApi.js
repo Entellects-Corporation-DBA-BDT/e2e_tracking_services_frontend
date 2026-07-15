@@ -62,31 +62,39 @@ export const createBenchSalesApplication = async (formData) => {
 };
 
 
-export const getDashboardSummary = async () => {
+export const getDashboardSummary = async (params = {}) => {
   const response = await axiosInstance.get(
-    "/application/dashboard/summary"
+    "/application/dashboard/summary",
+    { params }
   );
 
-  return response.data.data;
+  return response.data?.data ?? response.data;
 };
 
-export const getSubmissionAnalytics = async (
-  startDate,
-  endDate,
-  category = "benchsales"
-) => {
+export const getSubmissionAnalytics = async (params = {}) => {
   const response = await axiosInstance.get(
     `/application/dashboard/submissions`,
-    {
-      params: {
-        start_date: startDate,
-        end_date: endDate,
-        category,
-      },
-    }
+    { params }
   );
 
-  return response.data;
+  const payload = response.data;
+
+  if (Array.isArray(payload)) {
+    return { data: payload };
+  }
+
+  if (Array.isArray(payload?.data)) {
+    return {
+      data: payload.data,
+      total: payload.total,
+    };
+  }
+
+  if (payload?.data && typeof payload.data === "object") {
+    return payload.data;
+  }
+
+  return payload || { data: [], total: 0 };
 };
 
 export const createApplication = async (formData) => {

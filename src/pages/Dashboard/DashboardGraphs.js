@@ -1,7 +1,6 @@
 import "../../styles/Dashboard/graphs.css";
 
-import { useEffect, useState } from "react";
-import { getSubmissionAnalytics } from "../../api/applicationApi";
+import { memo, useMemo } from "react";
 import {
   ResponsiveContainer,
   PieChart,
@@ -18,82 +17,79 @@ import {
   FaArrowRight,
 } from "react-icons/fa";
 
+const COLORS = [
+  "#4285F4",
+  "#8E54FF",
+  "#F9A826",
+  "#FF5B6E",
+  "#52C56B",
+  "#00C2A8",
+  "#7D5FFF",
+  "#FF7F50",
+];
+
+const SKILL_ICONS = [
+  <FaCode />,
+  <FaDatabase />,
+  <FaPython />,
+  <FaAws />,
+];
+
+const EMPTY_ANALYTICS = [];
+
 
 /* =========================
    SKILLS
 ========================= */
 
-function DashboardGraphs() {
-  const COLORS = [
-    "#4285F4",
-    "#8E54FF",
-    "#F9A826",
-    "#FF5B6E",
-    "#52C56B",
-    "#00C2A8",
-    "#7D5FFF",
-    "#FF7F50",
-  ];
+function DashboardGraphs({
+  analytics = {},
+  selectedFilter,
+  startDate,
+  endDate,
+  category,
+  onStartDateChange,
+  onEndDateChange,
+  onFilterChange,
+  onCategoryChange,
+  onApplyDateFilter,
+}) {
+  const analyticsData = Array.isArray(analytics)
+    ? analytics
+    : Array.isArray(analytics.data)
+      ? analytics.data
+      : Array.isArray(analytics.analytics)
+        ? analytics.analytics
+        : Array.isArray(analytics.submissions)
+          ? analytics.submissions
+          : EMPTY_ANALYTICS;
 
-  const [startDate, setStartDate] = useState("2026-04-01");
-  const [endDate, setEndDate] = useState("2026-06-30");
-  const [category, setCategory] = useState("benchsales");
+  const total = Number(analytics.total) || analyticsData.reduce(
+    (sum, item) => sum + (Number(item.value) || 0),
+    0
+  );
 
-  const [candidateData, setCandidateData] = useState([]);
-  const [total, setTotal] = useState(0);
-  const [loading, setLoading] = useState(false);
-  const [skills, setSkills] = useState([]);
-
-  const loadSubmissionAnalytics = async () => {
-    try {
-      setLoading(true);
-
-      const res = await getSubmissionAnalytics(
-        startDate,
-        endDate,
-        category
-      );
-
-      console.log("API Response:", res);
-
-      const formatted = res.data.map((item, index) => ({
+  const candidateData = useMemo(
+    () => analyticsData.map((item, index) => ({
         name: item.label,
-        value: item.value,
+        value: Number(item.value) || 0,
         color: COLORS[index % COLORS.length],
-      }));
+      })),
+    [analyticsData]
+  );
 
-      setCandidateData(formatted);
-      setTotal(res.total);
-      const ICONS = [
-        <FaCode />,
-        <FaDatabase />,
-        <FaPython />,
-        <FaAws />,
-        <FaCode />,
-        <FaDatabase />,
-        <FaPython />,
-        <FaAws />,
-        <FaCode />,
-      ];
-      const skillData = res.data.map((item, index) => ({
+  const skills = useMemo(
+    () => analyticsData.map((item, index) => ({
         name: item.label,
-        value: Number(((item.value / res.total) * 100).toFixed(1)),
-        submissions: item.value,
+        value: total
+          ? Number((((Number(item.value) || 0) / total) * 100).toFixed(1))
+          : 0,
+        submissions: Number(item.value) || 0,
         color: COLORS[index % COLORS.length],
-        icon: ICONS[index % ICONS.length],
-      }));
-
-      setSkills(skillData);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadSubmissionAnalytics();
-  }, [startDate, endDate, category]);
+        icon: SKILL_ICONS[index % SKILL_ICONS.length],
+      })),
+    [analyticsData, total]
+  );
 
   return (
 
@@ -205,29 +201,48 @@ function DashboardGraphs() {
         </div>
         <div className="e2e_graph_filters">
           <div className="e2e_graph_filter_item">
-            <label>Start Date</label>
-            <input
-              type="date"
-              className="e2e_graph_input"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-            />
+            <label>Time Period</label>
+            <select
+              className="e2e_graph_select"
+              value={selectedFilter}
+              onChange={(e) => onFilterChange(e.target.value)}
+            >
+              <option value="today">Today</option>
+              <option value="this_week">This Week</option>
+              <option value="this_month">This Month</option>
+              <option value="custom">Custom Range</option>
+            </select>
           </div>
-          <div className="e2e_graph_filter_item">
-            <label>End Date</label>
-            <input
-              type="date"
-              className="e2e_graph_input"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-            />
-          </div>
+          {selectedFilter === "custom" && (
+            <>
+              <div className="e2e_graph_filter_item">
+                <label>Start Date</label>
+                <input
+                  type="date"
+                  className="e2e_graph_input"
+                  value={startDate}
+                  max={endDate || undefined}
+                  onChange={(e) => onStartDateChange(e.target.value)}
+                />
+              </div>
+              <div className="e2e_graph_filter_item">
+                <label>End Date</label>
+                <input
+                  type="date"
+                  className="e2e_graph_input"
+                  value={endDate}
+                  min={startDate || undefined}
+                  onChange={(e) => onEndDateChange(e.target.value)}
+                />
+              </div>
+            </>
+          )}
           <div className="e2e_graph_filter_item">
             <label>Category</label>
             <select
               className="e2e_graph_select"
               value={category}
-              onChange={(e) => setCategory(e.target.value)}
+              onChange={(e) => onCategoryChange(e.target.value)}
             >
               <option value="benchsales">Recruiting</option>
               <option value="recruiting">Bench Sales</option>
@@ -238,12 +253,16 @@ function DashboardGraphs() {
               <option value="candidates">Candidates</option>
             </select>
           </div>
-          <button
-            className="e2e_graph_apply_btn"
-            onClick={loadSubmissionAnalytics}
-          >
-            Apply Filter
-          </button>
+          {selectedFilter === "custom" && (
+            <button
+              type="button"
+              className="e2e_graph_apply_btn"
+              disabled={!startDate || !endDate || startDate > endDate}
+              onClick={onApplyDateFilter}
+            >
+              Apply Filter
+            </button>
+          )}
         </div>
 
       </div>
@@ -253,4 +272,4 @@ function DashboardGraphs() {
   );
 }
 
-export default DashboardGraphs;
+export default memo(DashboardGraphs);

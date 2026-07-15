@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import {
   FaUser,
   FaBuilding,
@@ -10,16 +10,15 @@ import {
   FaPassport,
   FaCalendarAlt,
 } from "react-icons/fa";
-
 import { getBenchSalesById, updateApplicationProcess } from "../api/applicationApi";
 import "./ApplicationView.css";
 
-const ApplicationView = ({ applicationId  }) => {
-    const [application, setApplication] = useState(null);
+const ApplicationView = ({ applicationId }) => {
+  const [application, setApplication] = useState(null);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
-const [showConfirm, setShowConfirm] = useState(false);
-const [nextProcess, setNextProcess] = useState(null);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [nextProcess, setNextProcess] = useState(null);
 
   useEffect(() => {
     fetchApplication();
@@ -28,9 +27,7 @@ const [nextProcess, setNextProcess] = useState(null);
   const fetchApplication = async () => {
     try {
       setLoading(true);
-
       const response = await getBenchSalesById(applicationId);
-
       if (response.success) {
         setApplication(response.data);
       }
@@ -51,38 +48,32 @@ const [nextProcess, setNextProcess] = useState(null);
 
   const getFileIcon = (file) => {
     if (!file) return <FaFilePdf />;
-
     const ext = file.split(".").pop().toLowerCase();
-
     if (["doc", "docx"].includes(ext)) {
       return <FaFileWord />;
     }
-
     return <FaFilePdf />;
   };
 
-
   const handleProcessUpdate = async () => {
-  try {
+    try {
+      setUpdating(true);
+      const res = await updateApplicationProcess(
+        application.id,
+        nextProcess
+      );
 
-    setUpdating(true);
+      if (res.success) {
+        fetchApplication();
+        setShowConfirm(false);
+      }
 
-    const res = await updateApplicationProcess(
-      application.id,
-      nextProcess
-    );
-
-    if (res.success) {
-      fetchApplication();
-      setShowConfirm(false);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setUpdating(false);
     }
-
-  } catch (err) {
-    console.error(err);
-  } finally {
-    setUpdating(false);
-  }
-};
+  };
 
   return (
     <div className="application-view">
@@ -91,65 +82,53 @@ const [nextProcess, setNextProcess] = useState(null);
         <div className="candidate-avatar">
           <FaUser />
         </div>
-
         <div className="candidate-info">
           <h2>{application.candidate_name}</h2>
           <p>{application.role}</p>
         </div>
 
         <div className="candidate-status">
+          <div className={`status-badge process-${application.process_id}`}>
+            {application.process_id === 1 && "Submitted"}
+            {application.process_id === 2 && "Interview Scheduled"}
+            {application.process_id === 3 && "Placed"}
+          </div>
+          {application.process_id !== 3 && (
+            <button
+              className="process-btn"
+              disabled={updating}
+              onClick={() => {
+                if (application.process_id === 1) {
+                  setNextProcess(2);
+                } else {
+                  setNextProcess(3);
+                }
+                setShowConfirm(true);
+              }}
+            >
+              {updating
+                ? "Updating..."
+                : application.process_id === 1
+                  ? "Schedule Interview"
+                  : "Mark as Placed"}
+            </button>
+          )}
 
-  <div
-    className={`status-badge process-${application.process_id}`}
-  >
-    {application.process_id === 1 && "Submitted"}
+          {application.process_id === 3 && (
+            <button
+              className="process-btn completed"
+              disabled
+            >
+              ✓ Candidate Placed
+            </button>
+          )}
 
-    {application.process_id === 2 &&
-      "Interview Scheduled"}
-
-    {application.process_id === 3 &&
-      "Placed"}
-  </div>
-
-  {application.process_id !== 3 && (
-    <button
-      className="process-btn"
-      disabled={updating}
-      onClick={() => {
-
-  if (application.process_id === 1) {
-    setNextProcess(2);
-  } else {
-    setNextProcess(3);
-  }
-
-  setShowConfirm(true);
-}}
-    >
-      {updating
-        ? "Updating..."
-        : application.process_id === 1
-        ? "Schedule Interview"
-        : "Mark as Placed"}
-    </button>
-  )}
-
-  {application.process_id === 3 && (
-    <button
-      className="process-btn completed"
-      disabled
-    >
-      ✓ Candidate Placed
-    </button>
-  )}
-
-</div>
+        </div>
       </div>
 
       {/* Submission Info */}
       <div className="view-card">
         <h3>Submission Information</h3>
-
         <div className="info-grid">
           <div className="info-item">
             <FaCalendarAlt />
@@ -158,7 +137,6 @@ const [nextProcess, setNextProcess] = useState(null);
               <span>{application.date_created}</span>
             </div>
           </div>
-
           <div className="info-item">
             <FaBuilding />
             <div>
@@ -245,7 +223,6 @@ const [nextProcess, setNextProcess] = useState(null);
       {/* Documents */}
       <div className="view-card">
         <h3>Documents</h3>
-
         <div className="document-grid">
           <a
             href={application.resume}
@@ -256,7 +233,6 @@ const [nextProcess, setNextProcess] = useState(null);
             {getFileIcon(application.resume)}
             <span>Resume</span>
           </a>
-
           <a
             href={application.r2r}
             target="_blank"
@@ -266,7 +242,6 @@ const [nextProcess, setNextProcess] = useState(null);
             {getFileIcon(application.r2r)}
             <span>R2R</span>
           </a>
-
           <a
             href={application.driving_license}
             target="_blank"
@@ -276,7 +251,6 @@ const [nextProcess, setNextProcess] = useState(null);
             <FaIdCard />
             <span>Driving License</span>
           </a>
-
           <a
             href={application.visa_copy}
             target="_blank"
@@ -288,60 +262,44 @@ const [nextProcess, setNextProcess] = useState(null);
           </a>
         </div>
       </div>
-      {
-showConfirm && (
-
-<div className="confirm-overlay">
-
-    <div className="confirm-modal">
-
-        <div className="confirm-icon">
-            ⚠️
-        </div>
-
-        <h2>
-            {nextProcess === 2
+      {showConfirm && (
+        <div className="confirm-overlay">
+          <div className="confirm-modal">
+            <div className="confirm-icon">⚠️</div>
+            <h2>
+              {nextProcess === 2
                 ? "Schedule Interview?"
                 : "Mark Candidate as Placed?"}
-        </h2>
-
-        <p>
-
-            {nextProcess === 2
+            </h2>
+            <p>
+              {nextProcess === 2
                 ? `Are you sure you want to move "${application.candidate_name}" to Interview Scheduled?`
                 : `Are you sure you want to mark "${application.candidate_name}" as Placed?`}
+            </p>
 
-        </p>
-
-        <div className="confirm-buttons">
-
-            <button
+            <div className="confirm-buttons">
+              <button
                 className="cancel-btn"
                 onClick={() => setShowConfirm(false)}
-            >
+              >
                 Cancel
-            </button>
-
-            <button
+              </button>
+              <button
                 className="confirm-btn"
                 disabled={updating}
                 onClick={handleProcessUpdate}
-            >
+              >
                 {updating
-                    ? "Updating..."
-                    : nextProcess === 2
+                  ? "Updating..."
+                  : nextProcess === 2
                     ? "Schedule Interview"
                     : "Mark as Placed"}
-            </button>
-
+              </button>
+            </div>
+          </div>
         </div>
-
-    </div>
-
-</div>
-
-)
-}
+      )
+      }
     </div>
   );
 };

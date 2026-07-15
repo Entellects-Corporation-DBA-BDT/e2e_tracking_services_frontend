@@ -1,0 +1,1236 @@
+/* =====================================================
+   E2E TRACKING - CANDIDATE FORM
+   PART 3.1
+===================================================== */
+
+:root{
+    --primary:#2563EB;
+    --secondary:#4F46E5;
+    --success:#10B981;
+    --danger:#EF4444;
+    --warning:#F59E0B;
+    --bg:#F4F7FE;
+    --card:#FFFFFF;
+    --border:#E2E8F0;
+    --text:#1E293B;
+    --text-light:#64748B;
+
+
+
+    --shadow-hover:
+        0 20px 45px rgba(37,99,235,.16);
+}
+
+/* =====================================================
+   PAGE
+===================================================== */
+
+.candidate-page{
+    width:98%;
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    padding:0px;
+    animation:pageFade .45s ease;
+}
+
+/* =====================================================
+   CARD
+===================================================== */
+
+.candidate-card{
+    width:980px;
+    max-width:100%;
+    /* height:760px; */
+    max-height: 500PX;
+    background:var(--card);
+    border-radius:22px;
+    overflow-y:auto;
+    overflow-x:hidden;
+    box-shadow:var(--shadow);
+    transition:.35s;
+    position:relative;
+    scrollbar-width:none;
+    -ms-overflow-style:none;
+}
+
+.candidate-card::-webkit-scrollbar{
+    display:none;
+
+}
+
+.candidate-card:hover{
+    box-shadow:var(--shadow-hover);
+}
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+.candidate-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:10px;
+    color:#fff;
+    background:
+        linear-gradient(
+            135deg,
+            #2563EB,
+            #4F46E5
+        );
+    position:sticky;
+    top:0;
+    z-index:30;
+}
+
+.candidate-header::after{
+    content:"";
+    position:absolute;
+    width:210px;
+    height:210px;
+    border-radius:50%;
+    right:-80px;
+    top:-120px;
+    background: rgba(255,255,255,.08);
+}
+
+.candidate-header h2{
+    font-size:24px;
+    font-weight:700;
+    margin:0;
+    letter-spacing:.3px;
+}
+
+.candidate-header p{
+    margin-top:8px;
+    font-size:15px;
+    opacity:.9;
+}
+
+.candidate-header-icon{
+    width:50px;
+    height:50PX;
+    border-radius:20px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:rgba(255,255,255,.15);
+    backdrop-filter:blur(15px);
+    font-size:24px;
+    animation:floatIcon 3s ease infinite;
+}
+
+/* =====================================================
+   FORM
+===================================================== */
+
+form{
+    padding:6px;
+}
+
+/* =====================================================
+   SECTION
+===================================================== */
+
+.section{
+    margin-bottom:24px;
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:14px;
+    transition:.3s;
+}
+
+.section:hover{
+    transform:translateY(-2px);
+    box-shadow: 0 12px 28px rgba(37,99,235,.08);
+}
+
+/* =====================================================
+   SECTION TITLE
+===================================================== */
+
+.section-title{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-bottom:22px;
+    font-size:19px;
+    font-weight:700;
+    color:var(--text);
+    position:relative;
+    padding-bottom:14px;
+}
+
+.section-title svg{
+    font-size:22px;
+    color:var(--primary);
+}
+
+.section-title::after{
+    content:"";
+    position:absolute;
+    bottom:0;
+    left:0;
+    width:70px;
+    height:4px;
+    border-radius:10px;
+    background:
+        linear-gradient(
+            90deg,
+            var(--primary),
+            var(--secondary)
+        );
+}
+
+/* =====================================================
+   GRID
+===================================================== */
+
+.candidate-grid{
+    display:grid;
+    grid-template-columns:  repeat(3,minmax(280px,1fr));
+    gap:12px;
+}
+
+/* =====================================================
+   FORM GROUP
+===================================================== */
+
+.form-group{
+    display:flex;
+    flex-direction:column;
+    margin-bottom:20px;
+}
+
+.form-group label{
+    font-size:14px;
+    font-weight:600;
+    color:var(--text);
+    margin-bottom:10px;
+    letter-spacing:.3px;
+}
+
+/* =====================================================
+   FIELD INFO
+===================================================== */
+
+.field-info{
+    margin-top:8px;
+    color:var(--text-light);
+    font-size:13px;
+}
+
+/* =====================================================
+   SMALL ERROR
+===================================================== */
+
+.form-group small{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    margin-top:8px;
+    color:var(--danger);
+    font-size:13px;
+    font-weight:500;
+}
+
+/* =====================================================
+   ANIMATIONS
+===================================================== */
+
+@keyframes pageFade{
+    from{
+        opacity:0;
+        transform:translateY(25px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+@keyframes floatIcon{
+    0%{
+        transform:translateY(0);
+    }
+    50%{
+        transform:translateY(-6px);
+    }
+    100%{
+        transform:translateY(0);
+    }
+
+}
+
+/* =====================================================
+   PART 3.2
+   INPUTS • SELECT • TEXTAREA
+===================================================== */
+
+/* INPUT CONTAINER */
+
+.input-box{
+    position:relative;
+    display:flex;
+    align-items:center;
+    width:100%;
+}
+
+/* INPUT ICON */
+
+.input-box svg{
+    position:absolute;
+    left:16px;
+    top:50%;
+    transform:translateY(-50%);
+    color:#94A3B8;
+    font-size:18px;
+    transition:.3s;
+    pointer-events:none;
+    z-index:2;
+}
+
+/* INPUT */
+
+.input-box input{
+    width:100%;
+    height:34px;
+    border:1px solid var(--border);
+    border-radius:8px;
+    background:#fff;
+    padding:0 18px 0 48px;
+    font-size:15px;
+    color:var(--text);
+    outline:none;
+    transition:all .30s ease;
+}
+
+/* SELECT */
+
+.input-box select{
+    width:100%;
+    height:34px;
+    border:1px solid var(--border);
+    border-radius:8px;
+    background:#fff;
+    padding:0 18px 0 48px;
+    font-size:15px;
+    color:var(--text);
+    outline:none;
+    cursor:pointer;
+    appearance:none;
+    -webkit-appearance:none;
+    transition:all .30s ease;
+}
+
+/* TEXTAREA WRAPPER */
+
+.textarea-box{
+    align-items:flex-start;
+}
+
+/* TEXTAREA ICON */
+
+.textarea-icon{
+    position:absolute;
+    left:16px;
+    top:18px !important;
+    transform:none !important;
+    color:#94A3B8;
+    font-size:18px;
+}
+
+/* TEXTAREA */
+
+.textarea-box textarea{
+    width:100%;
+    height:40px;
+    resize:vertical;
+    border:1px solid var(--border);
+    border-radius:14px;
+    background:#fff;
+    padding:16px 18px 16px 48px;
+    font-size:15px;
+    line-height:1.7;
+    color:var(--text);
+    outline:none;
+    transition:.30s;
+    font-family:inherit;
+}
+
+/* REMARKS TEXTAREA */
+
+.form-group textarea{
+    width:100%;
+    min-height:140px;
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:16px;
+    resize:vertical;
+    font-size:15px;
+    line-height:1.7;
+    color:var(--text);
+    outline:none;
+    transition:.30s;
+    font-family:inherit;
+
+}
+
+/* PLACEHOLDER */
+
+.input-box input::placeholder,
+.textarea-box textarea::placeholder,
+.form-group textarea::placeholder{
+    color:#94A3B8;
+}
+
+/* HOVER */
+
+.input-box input:hover,
+.input-box select:hover,
+.textarea-box textarea:hover,
+.form-group textarea:hover{
+    border-color:#BFDBFE;
+}
+
+/* FOCUS */
+.input-box input:focus,
+.input-box select:focus,
+.textarea-box textarea:focus,
+.form-group textarea:focus{
+    border-color:var(--primary);
+    box-shadow:0 0 0 5px rgba(37,99,235,.12);
+}
+
+/* ICON COLOR ON FOCUS */
+
+.input-box:focus-within svg{
+    color:var(--primary);
+}
+
+/* ERROR INPUT */
+.input-error input,
+.input-error select,
+.input-error textarea{
+    border-color:var(--danger);
+    box-shadow:0 0 0 4px rgba(239,68,68,.12);
+
+}
+
+/* REQUIRED STAR */
+.required{
+    color:var(--danger);
+    margin-left:4px;
+}
+
+/* CHARACTER COUNTER */
+
+.remarks-count{
+    margin-top:8px;
+    text-align:right;
+    color:var(--text-light);
+    font-size:13px;
+}
+
+/* DISABLED */
+
+input:disabled,
+textarea:disabled,
+select:disabled{
+    background:#F8FAFC;
+    color:#94A3B8;
+    cursor:not-allowed;
+}
+
+/* AUTOFILL */
+input:-webkit-autofill{
+    -webkit-box-shadow:0 0 0px 1000px white inset;
+    -webkit-text-fill-color:var(--text);
+}
+
+/* LABEL ANIMATION */
+
+.form-group label{
+    transition:.25s;
+}
+
+.form-group:hover label{
+    color:var(--primary);
+}
+
+/* SMOOTH FIELD APPEAR */
+
+.form-group{
+    animation:fieldFade .45s ease;
+}
+
+@keyframes fieldFade{
+    from{
+        opacity:0;
+        transform:translateY(10px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+/* MOBILE */
+
+@media(max-width:768px){
+    .candidate-grid{
+        grid-template-columns:1fr;
+    }
+
+    .input-box input,
+    .input-box select{
+        height:50px;
+    }
+}
+
+/* =====================================================
+   PART 3.3
+   RESUME UPLOAD
+===================================================== */
+
+/* Resume Upload Container */
+.upload-box{
+    width:100%;
+    min-height:260px;
+    border:2px dashed #3B82F6;
+    border-radius:20px;
+    background:linear-gradient(180deg, #F8FBFF, #EFF6FF);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    cursor:pointer;
+    transition:all .35s ease;
+    position:relative;
+    overflow:hidden;
+}
+
+/* Background Glow */
+
+.upload-box::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:radial-gradient(circle at top right, rgba(59,130,246,.12), transparent 55%);
+    opacity:0;
+    transition:.35s;
+}
+
+.upload-box:hover{
+    transform:translateY(-4px);
+    border-color:var(--secondary);
+    box-shadow:0 18px 45px rgba(37,99,235,.15);
+}
+
+.upload-box:hover::before{
+    opacity:1;
+}
+
+/* Drag Active */
+
+.upload-box.active{
+    border-color:var(--success);
+    background:#ECFDF5;
+    transform:scale(1.01);
+}
+
+/* Upload Content */
+
+.upload-content{
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+    z-index:2;
+    padding:35px;
+}
+
+/* Upload Circle */
+
+.upload-circle{
+    width:82px;
+    height:82px;
+    border-radius:50%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:linear-gradient(135deg, var(--primary), var(--secondary));
+    color:#fff;
+    font-size:34px;
+    margin-bottom:22px;
+    animation:uploadFloat 3s ease infinite;
+}
+
+/* Upload Heading */
+
+.upload-content h3{
+    font-size:22px;
+    font-weight:700;
+    color:var(--text);
+    margin-bottom:10px;
+}
+
+/* Upload Description */
+
+.upload-content p{
+    color:var(--text-light);
+    font-size:15px;
+    margin-bottom:6px;
+
+}
+
+/* Browse Text */
+
+.upload-content span{
+
+    color:var(--primary);
+
+    font-weight:600;
+
+    font-size:14px;
+
+}
+
+/* Selected File */
+
+.selected-file{
+
+    margin-top:24px;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    background:#fff;
+
+    border:1px solid #D1FAE5;
+
+    color:var(--success);
+
+    padding:14px 20px;
+
+    border-radius:14px;
+
+    box-shadow:0 8px 20px rgba(16,185,129,.08);
+
+    font-weight:600;
+
+    max-width:100%;
+
+    word-break:break-word;
+
+}
+
+.selected-file svg{
+
+    font-size:20px;
+
+}
+
+/* Error Message */
+
+.upload-content small{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    margin-top:18px;
+
+    color:var(--danger);
+
+    font-size:14px;
+
+    font-weight:600;
+
+}
+
+/* =====================================================
+   CURRENT RESUME CARD
+===================================================== */
+
+.current-resume{
+
+    margin-bottom:22px;
+
+    border:1px solid var(--border);
+
+    border-left:5px solid var(--primary);
+
+    border-radius:16px;
+
+    background:#fff;
+
+    padding:18px 22px;
+
+    transition:.3s;
+
+}
+
+.current-resume:hover{
+
+    transform:translateY(-2px);
+
+    box-shadow:0 10px 25px rgba(37,99,235,.08);
+
+}
+
+.resume-left{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:16px;
+
+}
+
+.resume-left svg{
+
+    font-size:28px;
+
+    color:var(--success);
+
+}
+
+.resume-left h4{
+
+    margin:0;
+
+    color:var(--text);
+
+    font-size:17px;
+
+    font-weight:700;
+
+}
+
+.resume-left span{
+
+    display:block;
+
+    margin-top:5px;
+
+    color:var(--text-light);
+
+    font-size:14px;
+
+    word-break:break-all;
+
+}
+
+/* =====================================================
+   UPLOAD FLOAT ANIMATION
+===================================================== */
+
+@keyframes uploadFloat{
+
+    0%{
+
+        transform:translateY(0);
+
+    }
+
+    50%{
+
+        transform:translateY(-8px);
+
+    }
+
+    100%{
+
+        transform:translateY(0);
+
+    }
+
+}
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media(max-width:768px){
+
+    .upload-box{
+
+        min-height:220px;
+
+    }
+
+    .upload-circle{
+
+        width:68px;
+
+        height:68px;
+
+        font-size:28px;
+
+    }
+
+    .upload-content h3{
+
+        font-size:19px;
+
+    }
+
+}
+
+/* =====================================================
+   PART 3.4
+   FOOTER • BUTTONS • LOADER • RESPONSIVE
+===================================================== */
+
+/* ==========================
+   FOOTER
+========================== */
+
+.candidate-footer{
+
+    position:sticky;
+
+    bottom:0;
+
+    background:#fff;
+
+    padding:20px 28px;
+
+    margin:30px -28px -28px;
+
+    border-top:1px solid var(--border);
+
+    display:flex;
+
+    justify-content:flex-end;
+
+    align-items:center;
+
+    gap:16px;
+
+    z-index:20;
+
+}
+
+/* ==========================
+   BUTTONS
+========================== */
+
+.cancel-btn{
+
+    min-width:150px;
+
+    height:48px;
+
+    border:1px solid var(--border);
+
+    background:#fff;
+
+    color:var(--text);
+
+    border-radius:14px;
+
+    font-size:15px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:all .30s ease;
+
+}
+
+.cancel-btn:hover{
+
+    background:#F8FAFC;
+
+    border-color:#CBD5E1;
+
+    transform:translateY(-2px);
+
+}
+
+.save-btn{
+
+    min-width:190px;
+
+    height:48px;
+
+    border:none;
+
+    border-radius:14px;
+
+    background:linear-gradient(
+        135deg,
+        var(--primary),
+        var(--secondary)
+    );
+
+    color:#fff;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    gap:10px;
+
+    font-size:15px;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+    transition:all .30s ease;
+
+    box-shadow:
+        0 10px 25px rgba(37,99,235,.25);
+
+}
+
+.save-btn:hover{
+
+    transform:translateY(-3px);
+
+    box-shadow:
+        0 18px 40px rgba(37,99,235,.35);
+
+}
+
+.save-btn:active{
+
+    transform:scale(.98);
+
+}
+
+.save-btn:disabled{
+
+    opacity:.7;
+
+    cursor:not-allowed;
+
+    transform:none;
+
+}
+
+/* ==========================
+   LOADER
+========================== */
+
+.loader{
+
+    width:18px;
+
+    height:18px;
+
+    border:2px solid rgba(255,255,255,.35);
+
+    border-top:2px solid #fff;
+
+    border-radius:50%;
+
+    animation:spin .8s linear infinite;
+
+}
+
+@keyframes spin{
+
+    from{
+
+        transform:rotate(0deg);
+
+    }
+
+    to{
+
+        transform:rotate(360deg);
+
+    }
+
+}
+
+/* ==========================
+   SMOOTH SCROLL
+========================== */
+
+.candidate-card{
+
+    scroll-behavior:smooth;
+
+}
+
+/* Optional visible scrollbar */
+
+.candidate-card::-webkit-scrollbar{
+
+    width:8px;
+
+}
+
+.candidate-card::-webkit-scrollbar-track{
+
+    background:#F8FAFC;
+
+}
+
+.candidate-card::-webkit-scrollbar-thumb{
+
+    background:#CBD5E1;
+
+    border-radius:10px;
+
+}
+
+.candidate-card::-webkit-scrollbar-thumb:hover{
+
+    background:#94A3B8;
+
+}
+
+/* ==========================
+   FADE-IN ANIMATION
+========================== */
+
+.section{
+
+    animation:sectionFade .45s ease both;
+
+}
+
+.section:nth-child(2){
+
+    animation-delay:.05s;
+
+}
+
+.section:nth-child(3){
+
+    animation-delay:.10s;
+
+}
+
+.section:nth-child(4){
+
+    animation-delay:.15s;
+
+}
+
+@keyframes sectionFade{
+
+    from{
+
+        opacity:0;
+
+        transform:translateY(18px);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:translateY(0);
+
+    }
+
+}
+
+/* ==========================
+   RESPONSIVE
+========================== */
+
+@media (max-width:992px){
+
+    .candidate-card{
+
+        width:100%;
+
+        height:calc(100vh - 40px);
+
+        border-radius:18px;
+
+    }
+
+    .candidate-header{
+
+        padding:24px;
+
+    }
+
+    .candidate-header h2{
+
+        font-size:28px;
+
+    }
+
+}
+
+@media (max-width:768px){
+
+    .candidate-page{
+
+        padding:12px;
+
+    }
+
+    .candidate-header{
+
+        flex-direction:column;
+
+        align-items:flex-start;
+
+        gap:16px;
+
+    }
+
+    .candidate-header-icon{
+
+        width:64px;
+
+        height:64px;
+
+        font-size:30px;
+
+    }
+
+    .candidate-grid{
+
+        grid-template-columns:1fr;
+
+    }
+
+    .candidate-footer{
+
+        flex-direction:column-reverse;
+
+        align-items:stretch;
+
+        gap:12px;
+
+    }
+
+    .cancel-btn,
+
+    .save-btn{
+
+        width:100%;
+
+    }
+
+}
+
+@media (max-width:480px){
+
+    form{
+
+        padding:18px;
+
+    }
+
+    .section{
+
+        padding:18px;
+
+    }
+
+    .candidate-header h2{
+
+        font-size:24px;
+
+    }
+
+    .candidate-header p{
+
+        font-size:13px;
+
+    }
+
+    .section-title{
+
+        font-size:17px;
+
+    }
+
+}
+
+/* ==========================
+   BUTTON RIPPLE EFFECT
+========================== */
+
+.save-btn,
+
+.cancel-btn{
+
+    position:relative;
+
+    overflow:hidden;
+
+}
+
+.save-btn::after,
+
+.cancel-btn::after{
+
+    content:"";
+
+    position:absolute;
+
+    width:0;
+
+    height:0;
+
+    background:rgba(255,255,255,.25);
+
+    border-radius:50%;
+
+    transform:translate(-50%,-50%);
+
+    transition:width .5s,height .5s;
+
+    left:50%;
+
+    top:50%;
+
+}
+
+.save-btn:active::after,
+
+.cancel-btn:active::after{
+
+    width:320px;
+
+    height:320px;
+
+}
+
+/* ==========================
+   CARD HOVER
+========================== */
+
+.candidate-card{
+
+    transition:transform .35s ease,
+
+               box-shadow .35s ease;
+
+}
+
+.candidate-card:hover{
+
+    transform:translateY(-3px);
+
+}
+
+/* ==========================
+   FINISH
+========================== */

@@ -1,6 +1,56 @@
 import "../../styles/Dashboard/cards.css";
+import { memo, useMemo } from "react";
+import {
+  FaUsers,
+  FaBriefcase,
+  FaUserTie,
+  FaChartLine,
+} from "react-icons/fa";
 
-function DashboardCards({ cards }) {
+const STANDARD_METRICS = ["submissions", "interviews", "placements"];
+
+const formatMetricTitle = (key) => key
+  .split("_")
+  .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+  .join(" ");
+
+function DashboardCards({ summary = {} }) {
+  const cards = useMemo(() => {
+    const secondaryMetric = summary.active_candidates !== undefined
+      ? "active_candidates"
+      : Object.keys(summary).find((key) => (
+        !STANDARD_METRICS.includes(key)
+        && !key.endsWith("_growth")
+        && typeof summary[key] === "number"
+      )) || "active_candidates";
+
+    return [
+      {
+        key: "submissions",
+        title: "Submissions",
+        icon: <FaBriefcase />,
+      },
+      {
+        key: secondaryMetric,
+        title: formatMetricTitle(secondaryMetric),
+        icon: <FaChartLine />,
+      },
+      {
+        key: "interviews",
+        title: "Interviews",
+        icon: <FaUsers />,
+      },
+      {
+        key: "placements",
+        title: "Placements",
+        icon: <FaUserTie />,
+      },
+    ].map((card) => ({
+      ...card,
+      count: summary[card.key] ?? 0,
+      growth: summary[`${card.key}_growth`] ?? "",
+    }));
+  }, [summary]);
 
   return (
 
@@ -33,7 +83,7 @@ function DashboardCards({ cards }) {
 
           <div className="e2e_card_bottom">
 
-            <span>{item.growth}</span>
+            {item.growth !== "" && <span>{item.growth}</span>}
 
           </div>
 
@@ -45,4 +95,4 @@ function DashboardCards({ cards }) {
   );
 }
 
-export default DashboardCards;
+export default memo(DashboardCards);

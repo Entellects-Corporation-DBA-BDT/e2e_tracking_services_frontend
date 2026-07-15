@@ -4,6 +4,8 @@ import BenchSales from "./BenchSales";
 import "./index.css"
 import DeleteConfirmation from "./DeleteConfirmation";
 import RecruiterPerformance from "../pages/Dashboard/RecruiterPerformance.";
+import JobView from "./JobView";
+import CandidateForm from "./CandidateForm";
 
 const FormView = ({
   formTitle,
@@ -13,7 +15,9 @@ const FormView = ({
   applicationId,
   isEdit = false,
   title,
-  message
+  message,
+  jobId,
+  candidateId
 }) => {
 
   const renderForms = () => {
@@ -56,12 +60,39 @@ const FormView = ({
             refreshData={refreshData}
           />
         );
+        case "candidate":
+    return (
+        <CandidateForm
+            onClose={() => setOpenForm(null)}
+            candidateId={candidateId}
+            refreshData={refreshData}
+        />
+    );
+
+    case "candidateEdit":
+    return (
+        <CandidateForm
+            onClose={() => setOpenForm(null)}
+            candidateId={candidateId}
+            isEdit={true}
+            refreshData={refreshData}
+        />
+    );
 
       case "benchDelete":
         return (
           <DeleteConfirmation
             onClose={() => setOpenForm(null)}
             applicationId={applicationId}
+          />
+        );
+
+        case "jobView":
+        return (
+          <JobView
+            onClose={() => setOpenForm(null)}
+            jobId={jobId}
+
           />
         );
 

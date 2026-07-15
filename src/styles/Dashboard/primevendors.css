@@ -277,6 +277,23 @@
   font-size:13px;
 }
 
+.e2e_prime_page_size {
+  width:82px;
+  height:40px;
+  border:1px solid #dbe2ea;
+  border-radius:12px;
+  background:#fff;
+}
+
+.e2e_prime_error {
+  margin-bottom:14px;
+  padding:12px 14px;
+  border-radius:10px;
+  background:#fef2f2;
+  color:#b91c1c;
+  font-size:13px;
+}
+
 /* =================================
    TABLE
 ================================= */
@@ -388,14 +405,12 @@
 
 .e2e_prime_th_recruiter,
 .e2e_prime_td_recruiter{
-  padding-right: 12%;
-  width:40%;
+  width:20%;
 }
 
 .e2e_prime_th_phone,
 .e2e_prime_td_phone{
-  padding-right: 8%;
-  width:30%;
+  width:25%;
 }
 
 .e2e_prime_th_action,
@@ -455,6 +470,12 @@
   color:#0f172a;
 
   margin-left:5px;
+}
+
+.e2e_prime_empty {
+  padding:30px;
+  text-align:center;
+  color:#64748b;
 }
 
 /* ACTIONS */

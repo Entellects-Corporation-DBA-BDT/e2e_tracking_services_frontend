@@ -1,124 +1,95 @@
 import { useEffect, useState } from "react";
-import NewJobListForm from "../../forms/NewJoblistForm";
 import "../../styles/Dashboard/jobs.css";
-
 import Loader from "./Loader";
+import Pagination from "./Pagination";
+import FormView from "../../forms/FormView";
+import getUserDataFromCookies from "../../utils/getUserDataFromCookies";
+import { useNavigate } from "react-router-dom";
+
+import { getJobsData } from "../../api/jobApi";
+
+const user = getUserDataFromCookies();
+const loginUserId = user?.user_id;
 
 function Jobs() {
+  const [openForm, setOpenForm] = useState(false);
 
-  const [loading, setLoading] =
-    useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
 
-  const [searchTerm, setSearchTerm] =
-    useState("");
-const [showJobPopup, setShowJobPopup] =
-  useState(false);
-  const [entries, setEntries] =
-    useState(10);
+  const [entries, setEntries] = useState(5);
 
-  const [category, setCategory] =
-    useState("Job/Candidates");
+  const [tableData, setTableData] = useState([]);
 
-  const [tableData, setTableData] =
-    useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const [totalPages, setTotalPages] = useState(1);
+
+  const [initialLoading, setInitialLoading] = useState(true);
+
+  const [tableLoading, setTableLoading] = useState(false);
+
+  const [selectedJobId, setSelectedJobId] = useState(null);
+  const navigate = useNavigate();
+
+  const fetchJobs = async () => {
+    try {
+      if (initialLoading) {
+        setInitialLoading(true);
+      } else {
+        setTableLoading(true);
+      }
+
+      const response = await getJobsData(
+        currentPage,
+        entries,
+        debouncedSearch
+      );
+
+      setTableData(response.data || []);
+      setTotalPages(response.total_pages || 1);
+    } catch (err) {
+      console.error("Error fetching jobs:", err);
+    } finally {
+      setInitialLoading(false);
+      setTableLoading(false);
+    }
+  };
 
   useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+    }, 500);
 
-    setTimeout(() => {
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
-      setTableData([
+  useEffect(() => {
+    fetchJobs();
+  }, [currentPage, entries, debouncedSearch]);
 
-        {
-          id:1,
-          date:"2021-12-27",
-          requirement:"Nagapratima Chappidi",
-          client:"cnpratima@gmail.com",
-          applied:"Jobs",
-        },
+  const convertDate = (date) => {
+    const d = new Date(date);
 
-        {
-          id:2,
-          date:"2021-12-27",
-          requirement:"Nagapratima Chappidi",
-          client:"cnpratima@gmail.com",
-          applied:"Job/Candidates",
-        },
+    const day = String(d.getDate()).padStart(2, "0");
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const year = d.getFullYear();
 
-        {
-          id:3,
-          date:"2021-12-23",
-          requirement:"Nisha Gajjar",
-          client:"nbpatel440@gmail.com",
-          applied:"Jobs",
-        },
+    return `${day}-${month}-${year}`;
+  };
 
-        {
-          id:4,
-          date:"2021-12-23",
-          requirement:"Nisha Gajjar",
-          client:"nbpatel440@gmail.com",
-          applied:"Job/Candidates",
-        },
-
-        {
-          id:5,
-          date:"2021-12-17",
-          requirement:"Todd Asmussen",
-          client:"todd.asmussen@outlook.com",
-          applied:"Jobs",
-        },
-
-      ]);
-
-      setLoading(false);
-
-    }, 1000);
-
-  }, []);
-
-  /* FILTER */
-
-  const filteredData = tableData
-
-    .filter(
-
-      (item)=>
-
-        item.requirement
-          .toLowerCase()
-          .includes(
-            searchTerm.toLowerCase()
-          )
-
-        ||
-
-        item.client
-          .toLowerCase()
-          .includes(
-            searchTerm.toLowerCase()
-          )
-    )
-
-    .slice(0, entries);
-
-  if(loading){
-
-    return <Loader />;
+  if (initialLoading) {
+    return <Loader fullPage />;
   }
 
   return (
-
     <div className="e2e_jobs_page">
-
-      {/* TOP */}
 
       <div className="e2e_jobs_top">
 
         <div className="e2e_jobs_left">
 
-          <h2>
-            Jobs Application List
-          </h2>
+          <h2>Jobs List</h2>
 
           <div className="e2e_jobs_heading_line"></div>
 
@@ -127,38 +98,49 @@ const [showJobPopup, setShowJobPopup] =
         <div className="e2e_jobs_right">
 
           <button
-  onClick={() =>
-    setShowJobPopup(true)
-  }
->
-  + Add New
-</button>
+            onClick={() => setOpenForm("job")}
+          >
+            + Add New
+          </button>
 
         </div>
 
       </div>
 
-      {/* FILTERS */}
-
       <div className="e2e_jobs_filters">
+
         <div className="e2e_jobs_filter_right">
 
           <input
             type="text"
             placeholder="Search..."
             value={searchTerm}
-            onChange={(e)=>
-              setSearchTerm(
-                e.target.value
-              )
-            }
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setCurrentPage(1);
+            }}
           />
 
         </div>
 
-      </div>
+        <select
+          value={entries}
+          className="e2e_pagination_number"
+          onChange={(e) => {
+            setEntries(Number(e.target.value));
+            setCurrentPage(1);
+          }}
+        >
 
-      {/* TABLE */}
+          <option value={5}>5</option>
+          <option value={10}>10</option>
+          <option value={25}>25</option>
+          <option value={50}>50</option>
+          <option value={100}>100</option>
+
+        </select>
+
+      </div>
 
       <div className="e2e_jobs_table_wrapper">
 
@@ -170,21 +152,16 @@ const [showJobPopup, setShowJobPopup] =
 
               <th>#</th>
 
-              <th>
-                Requirement Date
-              </th>
+              <th>Job Details</th>
 
-              <th>
-                Requirement Name
-              </th>
+              <th>Location</th>
 
-              <th>
-                Client Name
-              </th>
+              <th>Date of Posted</th>
 
-              <th>
-                Action
-              </th>
+
+              <th>Status</th>
+
+              <th>Action</th>
 
             </tr>
 
@@ -192,81 +169,153 @@ const [showJobPopup, setShowJobPopup] =
 
           <tbody>
 
-            {filteredData.map(
-              (item,index)=>(
+            {tableLoading ? (
 
-              <tr key={item.id}>
+              <tr>
 
-                <td>
-                  {index+1}
-                </td>
-
-                <td>
-
-                  <div className="e2e_jobs_details">
-
-                    <p>
-                      Name :
-                      <strong>
-                        {item.date}
-                      </strong>
-                    </p>
-
-                    <p>
-                      Applied for :
-                      <strong>
-                        {item.applied}
-                      </strong>
-                    </p>
-
-                  </div>
-
-                </td>
-
-                <td>
-                  {item.requirement}
-                </td>
-
-                <td>
-                  {item.client}
-                </td>
-
-                <td>
-
-                  <div className="e2e_jobs_actions">
-
-                    <button className="viewBtn">
-                      View
-                    </button>
-
-                    <button className="editBtn">
-                      Edit
-                    </button>
-
-                    <button className="deleteBtn">
-                      Delete
-                    </button>
-
-                  </div>
-
+                <td
+                  colSpan="7"
+                  style={{
+                    textAlign: "center",
+                    padding: "30px",
+                  }}
+                >
+                  Loading...
                 </td>
 
               </tr>
 
-            ))}
+            ) : tableData.length > 0 ? (
+
+              tableData.map((item, index) => (
+
+                <tr key={item.id}>
+
+                  <td>{index + 1}</td>
+
+                  <td>
+
+                    <div className="e2e_jobs_details">
+
+                      <p>
+
+
+                        <strong>
+
+                          {item.position}
+
+                        </strong>
+
+                      </p>
+
+                      <p>
+
+                        <strong>
+
+                          {item.technology}
+
+                        </strong>
+
+                      </p>
+
+                    </div>
+
+                  </td>
+                  <td>
+
+                    {item.location}
+
+                  </td>
+
+                  <td>
+
+                    {convertDate(item.created_at)}
+
+                  </td>
+
+
+                  <td>
+
+                    {item.status}
+
+                  </td>
+
+                  <td>
+
+                    <div className="e2e_jobs_actions">
+
+                      <button
+                        className="viewBtn"
+                        onClick={() => navigate(`/dashboard/jobview/${item.id}`)}
+                      >
+                        View
+                      </button>
+
+                      <button
+                        className="editBtn"
+                        onClick={() => {
+                          setSelectedJobId(item.id);
+                          setOpenForm("jobEdit");
+                        }}
+                      >
+                        Edit
+                      </button>
+
+                      <button
+                        className="deleteBtn"
+                        onClick={() => {
+                          setSelectedJobId(item.id);
+                          setOpenForm("jobDelete");
+                        }}
+                      >
+                        Delete
+                      </button>
+
+                    </div>
+
+                  </td>
+
+                </tr>
+
+              ))
+
+            ) : (
+
+              <tr>
+
+                <td
+                  colSpan="7"
+                  style={{
+                    textAlign: "center",
+                    padding: "30px",
+                  }}
+                >
+                  No Records Found
+                </td>
+
+              </tr>
+
+            )}
 
           </tbody>
 
         </table>
 
       </div>
-{showJobPopup && (
-  <NewJobListForm
-    closePopup={() =>
-      setShowJobPopup(false)
-    }
-  />
-)}
+
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+      />
+
+      <FormView
+        openForm={openForm}
+        setOpenForm={setOpenForm}
+        jobId={selectedJobId}
+        refreshData={fetchJobs}
+      />
+
     </div>
   );
 }

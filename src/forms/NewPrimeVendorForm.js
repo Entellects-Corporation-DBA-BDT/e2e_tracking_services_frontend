@@ -1,226 +1,202 @@
-import React from "react";
+import { useEffect, useState } from "react";
+import { FiUploadCloud, FiX } from "react-icons/fi";
+import {
+  createPrimeVendor,
+  getPrimeVendorById,
+  updatePrimeVendor,
+} from "../api/primeVendorApi";
 import "../styles/primevendorform.css";
 
-function PrimeVendorForm({ closePopup }) {
+const EMPTY_VENDOR = {
+  vcompany: "",
+  rname: "",
+  phone: "",
+  documents: "",
+  email: "",
+  fax: "",
+  caddress: "",
+  blocation: "",
+  feedback: "",
+};
+
+function PrimeVendorForm({ closePopup, vendorId = null, mode = "create", refreshData }) {
+  const isView = mode === "view";
+  const isEdit = mode === "edit";
+  const [formData, setFormData] = useState(EMPTY_VENDOR);
+  const [documentFile, setDocumentFile] = useState(null);
+  const [loading, setLoading] = useState(isView || isEdit);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (!vendorId || (!isView && !isEdit)) return;
+    let active = true;
+
+    const fetchVendor = async () => {
+      try {
+        setLoading(true);
+        setError("");
+        const response = await getPrimeVendorById(vendorId);
+
+        if (active && response.success) {
+          const vendor = response.data || {};
+          setFormData(
+            Object.keys(EMPTY_VENDOR).reduce(
+              (values, key) => ({ ...values, [key]: vendor[key] || "" }),
+              {}
+            )
+          );
+        } else if (active) {
+          setError(response.message || "Prime vendor could not be loaded.");
+        }
+      } catch (requestError) {
+        if (active) {
+          setError(
+            requestError?.response?.data?.message || "Prime vendor could not be loaded."
+          );
+        }
+      } finally {
+        if (active) setLoading(false);
+      }
+    };
+
+    fetchVendor();
+    return () => { active = false; };
+  }, [vendorId, isEdit, isView]);
+
+  const handleChange = ({ target: { name, value } }) => {
+    setFormData((current) => ({ ...current, [name]: value }));
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    if (saving || isView) return;
+
+    if (!formData.vcompany.trim()) {
+      setError("Vendor company is required.");
+      return;
+    }
+
+    try {
+      setSaving(true);
+      setError("");
+      let payload = { ...formData };
+
+      if (documentFile) {
+        payload = new FormData();
+        Object.entries(formData).forEach(([key, value]) => {
+          if (key !== "documents") payload.append(key, value);
+        });
+        payload.append("documents", documentFile);
+      }
+
+      const response = isEdit
+        ? await updatePrimeVendor(vendorId, payload)
+        : await createPrimeVendor(payload);
+
+      if (!response.success) {
+        setError(response.message || "The operation failed.");
+        return;
+      }
+
+      refreshData?.();
+      closePopup?.();
+    } catch (requestError) {
+      setError(
+        requestError?.response?.data?.message ||
+          `Failed to ${isEdit ? "update" : "create"} prime vendor.`
+      );
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const title = isView ? "Prime Vendor Details" : isEdit ? "Edit Prime Vendor" : "Add Prime Vendor";
+
   return (
-    <div className="joblist_form_overlay">
-      <div className="joblist_form_modal">
-
-        {/* Header */}
-        <div className="joblist_form_header">
-          <h2 className="joblist_form_title">
-            Candidate Submission
-          </h2>
-
-          <button
-            className="joblist_form_close_btn"
-            onClick={closePopup}
-          >
-            ✕
+    <div className="primevendor_form_overlay" onMouseDown={closePopup}>
+      <div
+        className="primevendor_form_modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="primevendor-form-title"
+        onMouseDown={(event) => event.stopPropagation()}
+      >
+        <div className="primevendor_form_header">
+          <div>
+            <h2 id="primevendor-form-title">{title}</h2>
+            <p>{isView ? "Vendor profile information" : "Enter vendor and recruiter details"}</p>
+          </div>
+          <button type="button" className="primevendor_close_btn" onClick={closePopup} aria-label="Close">
+            <FiX />
           </button>
         </div>
 
-        {/* Grid */}
-        <div className="joblist_form_grid">
+        {loading ? (
+          <div className="primevendor_form_state">Loading...</div>
+        ) : (
+          <form onSubmit={handleSubmit}>
+            {error && <div className="primevendor_form_error">{error}</div>}
+            <div className="primevendor_form_grid">
+              <Field label="Vendor Company *" id="prime-vcompany">
+                <input id="prime-vcompany" name="vcompany" value={formData.vcompany} onChange={handleChange} placeholder="Enter vendor company" required disabled={isView} />
+              </Field>
+              <Field label="Recruiter Name" id="prime-rname">
+                <input id="prime-rname" name="rname" value={formData.rname} onChange={handleChange} placeholder="Enter recruiter name" disabled={isView} />
+              </Field>
+              <Field label="Phone Number" id="prime-phone">
+                <input id="prime-phone" name="phone" type="tel" value={formData.phone} onChange={handleChange} placeholder="Enter phone number" disabled={isView} />
+              </Field>
+              <Field label="Email" id="prime-email">
+                <input id="prime-email" name="email" type="email" value={formData.email} onChange={handleChange} placeholder="Enter email address" disabled={isView} />
+              </Field>
+              <Field label="Fax" id="prime-fax">
+                <input id="prime-fax" name="fax" value={formData.fax} onChange={handleChange} placeholder="Enter fax number" disabled={isView} />
+              </Field>
+              <Field label="Business Location" id="prime-location">
+                <input id="prime-location" name="blocation" value={formData.blocation} onChange={handleChange} placeholder="Enter business location" disabled={isView} />
+              </Field>
+              <Field label="Company Address" id="prime-address" fullWidth>
+                <textarea id="prime-address" name="caddress" rows="3" value={formData.caddress} onChange={handleChange} placeholder="Enter company address" disabled={isView} />
+              </Field>
+              <Field label="Feedback" id="prime-feedback" fullWidth>
+                <textarea id="prime-feedback" name="feedback" rows="3" value={formData.feedback} onChange={handleChange} placeholder="Enter feedback" disabled={isView} />
+              </Field>
+            </div>
 
-          <div className="joblist_form_group">
-            <label className="joblist_form_label">
-              Category
-            </label>
+            <div className="primevendor_document_section">
+              <label>Documents</label>
+              {formData.documents && <p className="primevendor_existing_document">Current: {formData.documents}</p>}
+              {!isView && (
+                <label className="primevendor_upload" htmlFor="prime-documents">
+                  <FiUploadCloud size={24} />
+                  <span>{documentFile?.name || "Choose a document"}</span>
+                  <input id="prime-documents" name="documents" type="file" onChange={(event) => setDocumentFile(event.target.files?.[0] || null)} hidden />
+                </label>
+              )}
+              {isView && !formData.documents && <p>No document available</p>}
+            </div>
 
-            <select className="joblist_form_select">
-              <option>Please select here</option>
-              <option>Prime Vendor</option>
-              <option>Implementation Partner</option>
-              <option>Direct Client</option>
-            </select>
-          </div>
-
-          <div></div>
-          <div></div>
-
-          <div className="joblist_form_group">
-            <label className="joblist_form_label">
-              Recruiter Name
-            </label>
-
-            <select className="joblist_form_select">
-              <option>Please select here</option>
-            </select>
-          </div>
-
-          <div className="joblist_form_group">
-            <label className="joblist_form_label">
-              Submission Date
-            </label>
-
-            <input
-              type="date"
-              className="joblist_form_input"
-            />
-          </div>
-
-          <div className="joblist_form_group">
-            <label className="joblist_form_label">
-              Candidate Name
-            </label>
-
-            <input
-              type="text"
-              className="joblist_form_input"
-            />
-          </div>
-
-          <div className="joblist_form_group">
-            <label className="joblist_form_label">
-              Client Name
-            </label>
-
-            <input
-              type="text"
-              className="joblist_form_input"
-            />
-          </div>
-
-          <div className="joblist_form_group">
-            <label className="joblist_form_label">
-              POC Name
-            </label>
-
-            <input
-              type="text"
-              className="joblist_form_input"
-            />
-          </div>
-
-          <div className="joblist_form_group">
-            <label className="joblist_form_label">
-              Feedback
-            </label>
-
-            <input
-              type="text"
-              className="joblist_form_input"
-            />
-          </div>
-
-        </div>
-
-        {/* Remarks */}
-
-        <div className="joblist_form_remarks_section">
-          <label className="joblist_form_label">
-            Remarks
-          </label>
-
-          <textarea
-            className="joblist_form_textarea"
-            placeholder="(Optional)"
-          />
-        </div>
-
-        {/* Files */}
-
-        <div className="joblist_form_upload_section">
-
-  <div className="joblist_form_upload_card">
-    <input
-      type="file"
-      id="resume"
-      className="joblist_hidden_file"
-    />
-
-    <label
-      htmlFor="resume"
-      className="joblist_upload_label"
-    >
-      📄 Upload Resume
-    </label>
-  </div>
-
-  <div className="joblist_form_upload_card">
-    <input
-      type="file"
-      id="r2r"
-      className="joblist_hidden_file"
-    />
-
-    <label
-      htmlFor="r2r"
-      className="joblist_upload_label"
-    >
-      Upload R2R
-    </label>
-  </div>
-
-  <div className="joblist_form_upload_card">
-    <input
-      type="file"
-      id="license"
-      className="joblist_hidden_file"
-    />
-
-    <label
-      htmlFor="license"
-      className="joblist_upload_label"
-    >
-       Driving License
-    </label>
-  </div>
-
-  <div className="joblist_form_upload_card">
-    <input
-      type="file"
-      id="visa"
-      className="joblist_hidden_file"
-    />
-
-    <label
-      htmlFor="visa"
-      className="joblist_upload_label"
-    >
-      Visa Copy
-    </label>
-  </div>
-
-  <div className="joblist_form_upload_card">
-    <input
-      type="file"
-      id="msa"
-      className="joblist_hidden_file"
-    />
-
-    <label
-      htmlFor="msa"
-      className="joblist_upload_label"
-    >
-       MSA Copy
-    </label>
-  </div>
-
-</div>
-
-        {/* Footer */}
-
-        <div className="joblist_form_button_section">
-
-          <button
-            className="joblist_form_cancel_btn"
-            onClick={closePopup}
-          >
-            Cancel
-          </button>
-
-          <button
-            className="joblist_form_save_btn"
-          >
-            Save
-          </button>
-
-        </div>
-
+            <div className="primevendor_form_actions">
+              <button type="button" className="primevendor_cancel_btn" onClick={closePopup}>{isView ? "Close" : "Cancel"}</button>
+              {!isView && (
+                <button type="submit" className="primevendor_save_btn" disabled={saving}>
+                  {saving ? "Saving..." : isEdit ? "Update Vendor" : "Save Vendor"}
+                </button>
+              )}
+            </div>
+          </form>
+        )}
       </div>
-      
+    </div>
+  );
+}
+
+function Field({ label, id, fullWidth = false, children }) {
+  return (
+    <div className={`primevendor_form_group${fullWidth ? " primevendor_full_width" : ""}`}>
+      <label htmlFor={id}>{label}</label>
+      {children}
     </div>
   );
 }

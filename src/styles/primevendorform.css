@@ -1,343 +1,142 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
-
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family:'Outfit',sans-serif;
+.primevendor_form_overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(15, 23, 42, 0.58);
+  backdrop-filter: blur(5px);
 }
 
-/* =========================
-   OVERLAY
-========================= */
+.primevendor_form_modal {
+  width: min(900px, 96vw);
+  max-height: 92vh;
+  overflow-y: auto;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.2);
 
-.joblist_form_overlay{
-  position:fixed;
-  inset:0;
-  background:rgba(15,23,42,.55);
-  backdrop-filter:blur(6px);
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  z-index:9999;
-  padding:20px;
+  /* Hide scrollbar */
+  -ms-overflow-style: none;  /* IE & Edge */
+  scrollbar-width: none;     /* Firefox */
 }
 
-/* =========================
-   MODAL
-========================= */
-
-.joblist_form_modal{
-  width:70%;
-  max-width:900px;
-  height:85vh;
-  overflow-y:auto;
-  background:#ffffff;
-  border-radius:18px;
-  box-shadow:0 25px 70px rgba(0,0,0,.18);
-  animation:joblist_popup_show .25s ease;
+/* Chrome, Safari, Opera */
+.primevendor_form_modal::-webkit-scrollbar {
+  display: none;
 }
 
-/* =========================
-   HEADER
-========================= */
-
-.joblist_form_header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:18px 25px;
-  border-bottom:1px solid #edf2f7;
-  background:#fff;
-  position:sticky;
-  top:0;
-  z-index:100;
+.primevendor_form_header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 26px;
+  border-bottom: 1px solid #e2e8f0;
+  background: #fff;
 }
 
-.joblist_form_title{
-  font-size:24px;
-  font-weight:700;
-  color:#111827;
+.primevendor_form_header h2 { margin: 0; color: #0f172a; font-size: 22px; }
+.primevendor_form_header p { margin: 5px 0 0; color: #64748b; font-size: 13px; }
+
+.primevendor_close_btn {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: #f1f5f9;
+  color: #334155;
+  cursor: pointer;
 }
 
-.joblist_form_close_btn{
-  width:38px;
-  height:38px;
-  border:none;
-  border-radius:50%;
-  background:#f3f4f6;
-  cursor:pointer;
-  font-size:18px;
-  transition:.3s;
+.primevendor_close_btn:hover { background: #fee2e2; color: #dc2626; }
+
+.primevendor_form_grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px 24px;
+  padding: 24px 26px;
 }
 
-.joblist_form_close_btn:hover{
-  background:#ef4444;
-  color:#fff;
+.primevendor_form_group { display: flex; flex-direction: column; gap: 7px; }
+.primevendor_full_width { grid-column: 1 / -1; }
+.primevendor_form_group label,
+.primevendor_document_section > label { color: #334155; font-size: 13px; font-weight: 700; }
+
+.primevendor_form_group input,
+.primevendor_form_group textarea {
+  width: 100%;
+  border: 1px solid #dbe2ea;
+  border-radius: 10px;
+  padding: 11px 13px;
+  outline: none;
+  background: #fff;
+  color: #0f172a;
+  font: inherit;
 }
 
-/* =========================
-   FORM GRID
-========================= */
+.primevendor_form_group input:focus,
+.primevendor_form_group textarea:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
+.primevendor_form_group input:disabled,
+.primevendor_form_group textarea:disabled { background: #f8fafc; color: #334155; opacity: 1; }
+.primevendor_form_group textarea { resize: vertical; }
 
-.joblist_form_grid{
-  padding:25px;
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:20px 28px;
+.primevendor_document_section { padding: 0 26px 24px; }
+.primevendor_document_section p { margin: 8px 0; color: #64748b; font-size: 13px; word-break: break-word; }
+.primevendor_existing_document { color: #334155 !important; }
+
+.primevendor_upload {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 9px;
+  padding: 15px;
+  border: 1px dashed #93c5fd;
+  border-radius: 12px;
+  background: #eff6ff;
+  color: #2563eb;
+  cursor: pointer;
 }
 
-.joblist_form_group{
-  display:flex;
-  flex-direction:column;
+.primevendor_form_actions {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 18px 26px;
+  border-top: 1px solid #e2e8f0;
+  background: #fff;
 }
 
-.joblist_form_label{
-  font-size:15px;
-  font-weight:500;
-  color:#4b5563;
-  margin-bottom:8px;
+.primevendor_form_actions button { min-width: 120px; height: 42px; border: 0; border-radius: 10px; font-weight: 700; cursor: pointer; }
+.primevendor_cancel_btn { background: #e2e8f0; color: #334155; }
+.primevendor_save_btn { background: #2563eb; color: #fff; }
+.primevendor_save_btn:disabled { cursor: not-allowed; opacity: 0.65; }
+.primevendor_form_state { padding: 60px 26px; text-align: center; color: #64748b; }
+.primevendor_form_error { margin: 18px 26px 0; padding: 11px 13px; border-radius: 9px; background: #fef2f2; color: #b91c1c; font-size: 13px; }
+.delete-modal .primevendor_form_error { margin: 12px 0 0; }
+.primevendor_form_overlay .delete-modal {
+  box-sizing: border-box;
+  width: min(420px, 100%);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.2);
 }
 
-.joblist_form_input,
-.joblist_form_select{
-  width:100%;
-  height:42px;
-  border:1px solid #d6dde5;
-  border-radius:6px;
-  padding:0 12px;
-  background:#fafafa;
-  font-size:14px;
-  transition:.3s;
-}
-
-.joblist_form_input:focus,
-.joblist_form_select:focus{
-  outline:none;
-  border-color:#2563eb;
-  background:#fff;
-  box-shadow:0 0 0 4px rgba(37,99,235,.08);
-}
-
-/* =========================
-   REMARKS
-========================= */
-
-.joblist_form_remarks_section{
-  padding:0 25px 20px;
-}
-
-.joblist_form_textarea{
-  width:100%;
-  height:110px;
-  border:1px solid #d6dde5;
-  border-radius:6px;
-  padding:12px;
-  resize:none;
-  background:#fafafa;
-  font-size:14px;
-  transition:.3s;
-}
-
-.joblist_form_textarea:focus{
-  outline:none;
-  border-color:#2563eb;
-  background:#fff;
-  box-shadow:0 0 0 4px rgba(37,99,235,.08);
-}
-
-/* =========================
-   FILE UPLOAD SECTION
-========================= */
-
-.joblist_form_upload_wrapper{
-  padding:0 25px 25px;
-  display:flex;
-  flex-direction:column;
-  gap:14px;
-}
-
-.joblist_form_file_row{
-  display:flex;
-  align-items:center;
-  width:100%;
-}
-
-.joblist_form_file_label{
-  min-width:120px;
-  height:38px;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  background:#e5e7eb;
-  border:1px solid #cfd6de;
-  border-right:none;
-  border-radius:4px 0 0 4px;
-  font-size:14px;
-  font-weight:500;
-  color:#374151;
-}
-
-.joblist_form_file_input{
-  flex:1;
-  height:38px;
-  border:1px solid #cfd6de;
-  border-left:none;
-  padding:6px 10px;
-  font-size:14px;
-  background:#fff;
-  border-radius:0 4px 4px 0;
-}
-
-.joblist_form_file_input:focus{
-  outline:none;
-}
-
-/* =========================
-   BUTTON SECTION
-========================= */
-
-.joblist_form_button_section{
-  display:flex;
-  justify-content:flex-end;
-  gap:12px;
-  padding:18px 25px;
-  border-top:1px solid #edf2f7;
-  background:#fff;
-  position:sticky;
-  bottom:0;
-}
-
-.joblist_form_cancel_btn{
-  min-width:120px;
-  height:42px;
-  border:none;
-  border-radius:10px;
-  background:#e5e7eb;
-  color:#111827;
-  font-size:14px;
-  font-weight:600;
-  cursor:pointer;
-  transition:.3s;
-}
-
-.joblist_form_cancel_btn:hover{
-  background:#d1d5db;
-}
-
-.joblist_form_save_btn{
-  min-width:120px;
-  height:42px;
-  border:none;
-  border-radius:10px;
-  background:#2563eb;
-  color:#fff;
-  font-size:14px;
-  font-weight:600;
-  cursor:pointer;
-  transition:.3s;
-}
-
-.joblist_form_save_btn:hover{
-  background:#1d4ed8;
-}
-
-/* =========================
-   SCROLLBAR
-========================= */
-
-.joblist_form_modal::-webkit-scrollbar{
-  width:8px;
-}
-
-.joblist_form_modal::-webkit-scrollbar-thumb{
-  background:#2563eb;
-  border-radius:50px;
-}
-
-.joblist_form_modal::-webkit-scrollbar-track{
-  background:#f3f4f6;
-}
-
-/* =========================
-   DATE FIELD
-========================= */
-
-input[type="date"].joblist_form_input{
-  padding:0 12px;
-}
-
-/* =========================
-   ANIMATION
-========================= */
-
-@keyframes joblist_popup_show{
-  from{
-    opacity:0;
-    transform:scale(.95);
-  }
-  to{
-    opacity:1;
-    transform:scale(1);
-  }
-}
-
-/* =========================
-   RESPONSIVE
-========================= */
-
-@media(max-width:992px){
-
-  .joblist_form_modal{
-    width:90%;
-  }
-
-  .joblist_form_grid{
-    grid-template-columns:repeat(2,1fr);
-  }
-}
-
-@media(max-width:768px){
-
-  .joblist_form_modal{
-    width:95%;
-    height:92vh;
-  }
-
-  .joblist_form_grid{
-    grid-template-columns:1fr;
-    gap:16px;
-  }
-
-  .joblist_form_file_row{
-    flex-direction:column;
-    align-items:stretch;
-  }
-
-  .joblist_form_file_label{
-    width:100%;
-    border-radius:6px 6px 0 0;
-    border-right:1px solid #cfd6de;
-  }
-
-  .joblist_form_file_input{
-    width:100%;
-    border-left:1px solid #cfd6de;
-    border-top:none;
-    border-radius:0 0 6px 6px;
-  }
-
-  .joblist_form_button_section{
-    flex-direction:column;
-  }
-
-  .joblist_form_save_btn,
-  .joblist_form_cancel_btn{
-    width:100%;
-  }
-}
-.joblist_form_overlay{
-  position:fixed;
-  inset:0;
-  z-index:99999;
+@media (max-width: 680px) {
+  .primevendor_form_overlay { padding: 8px; }
+  .primevendor_form_modal { max-height: 96vh; }
+  .primevendor_form_grid { grid-template-columns: 1fr; padding: 20px; }
+  .primevendor_full_width { grid-column: auto; }
+  .primevendor_form_header, .primevendor_form_actions { padding: 16px 20px; }
+  .primevendor_document_section { padding: 0 20px 20px; }
+  .primevendor_form_actions { flex-direction: column-reverse; }
+  .primevendor_form_actions button { width: 100%; }
 }
