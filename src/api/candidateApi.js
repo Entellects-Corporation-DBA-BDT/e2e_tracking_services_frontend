@@ -54,7 +54,9 @@ export const createCandidate = async (formData) => {
 */
 
 export const updateCandidate = async (id, formData) => {
-  const response = await axiosInstance.put(
+  // PHP does not populate $_POST/$_FILES for multipart PUT requests.
+  // The backend explicitly accepts POST for multipart candidate updates.
+  const response = await axiosInstance.post(
     `/candidate/update/${id}`,
     formData
   );
@@ -71,6 +73,28 @@ export const updateCandidate = async (id, formData) => {
 export const deleteCandidate = async (id) => {
   const response = await axiosInstance.delete(
     `/candidate/delete/${id}`
+  );
+
+  return response.data;
+};
+
+/*
+|--------------------------------------------------------------------------
+| Candidate-to-Job AI Matching
+|--------------------------------------------------------------------------
+*/
+
+export const matchSuitableJobs = async (candidateId) => {
+  const response = await axiosInstance.post(
+    `/matching/candidate/start/${candidateId}`
+  );
+
+  return response.data;
+};
+
+export const getMatchedJobs = async (candidateId) => {
+  const response = await axiosInstance.get(
+    `/matching/candidate/${candidateId}`
   );
 
   return response.data;

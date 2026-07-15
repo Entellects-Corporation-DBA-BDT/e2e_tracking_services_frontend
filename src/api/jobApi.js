@@ -43,12 +43,7 @@ export const getJobById = async (id) => {
 export const createJob = async (formData) => {
   const response = await axiosInstance.post(
     "/jobs/create",
-    formData,
-    {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    }
+    formData
   );
 
   return response.data;
@@ -63,12 +58,7 @@ export const createJob = async (formData) => {
 export const updateJob = async (id, formData) => {
   const response = await axiosInstance.put(
     `/jobs/update/${id}`,
-    formData,
-    {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    }
+    formData
   );
 
   return response.data;

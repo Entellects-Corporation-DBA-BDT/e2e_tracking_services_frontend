@@ -30,6 +30,7 @@ function Jobs() {
   const [tableLoading, setTableLoading] = useState(false);
 
   const [selectedJobId, setSelectedJobId] = useState(null);
+  const [selectedJobName, setSelectedJobName] = useState("");
   const navigate = useNavigate();
 
   const fetchJobs = async () => {
@@ -255,6 +256,7 @@ function Jobs() {
                         className="editBtn"
                         onClick={() => {
                           setSelectedJobId(item.id);
+                          setSelectedJobName(item.position);
                           setOpenForm("jobEdit");
                         }}
                       >
@@ -265,6 +267,7 @@ function Jobs() {
                         className="deleteBtn"
                         onClick={() => {
                           setSelectedJobId(item.id);
+                          setSelectedJobName(item.position);
                           setOpenForm("jobDelete");
                         }}
                       >
@@ -313,6 +316,7 @@ function Jobs() {
         openForm={openForm}
         setOpenForm={setOpenForm}
         jobId={selectedJobId}
+        recordName={selectedJobName}
         refreshData={fetchJobs}
       />
 

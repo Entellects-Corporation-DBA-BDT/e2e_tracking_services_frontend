@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "../../styles/Dashboard/candidates.css";
 import Loader from "./Loader";
 import Pagination from "./Pagination";
@@ -11,6 +12,7 @@ const user = getUserDataFromCookies();
 const loginUserId = user?.user_id;
 
 function Candidates() {
+  const navigate = useNavigate();
   const [openForm, setOpenForm] = useState(false);
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -30,6 +32,7 @@ function Candidates() {
 
   const [selectedCandidateId, setSelectedCandidateId] =
     useState(null);
+  const [selectedCandidateName, setSelectedCandidateName] = useState("");
 
   const fetchCandidates = async () => {
     try {
@@ -214,10 +217,7 @@ function Candidates() {
 
                       <button
                         className="e2e_candidates_view_btn"
-                        onClick={() => {
-                          setSelectedCandidateId(item.id);
-                          setOpenForm("candidateView");
-                        }}
+                        onClick={() => navigate(`/dashboard/candidates/${item.id}`)}
                       >
                         View
                       </button>
@@ -226,6 +226,7 @@ function Candidates() {
                         className="e2e_candidates_edit_btn"
                         onClick={() => {
                           setSelectedCandidateId(item.id);
+                          setSelectedCandidateName(item.name);
                           setOpenForm("candidateEdit");
                         }}
                       >
@@ -236,6 +237,7 @@ function Candidates() {
                         className="e2e_candidates_delete_btn"
                         onClick={() => {
                           setSelectedCandidateId(item.id);
+                          setSelectedCandidateName(item.name);
                           setOpenForm("candidateDelete");
                         }}
                       >
@@ -284,6 +286,7 @@ function Candidates() {
         openForm={openForm}
         setOpenForm={setOpenForm}
         candidateId={selectedCandidateId}
+        recordName={selectedCandidateName}
         refreshData={fetchCandidates}
       />
 

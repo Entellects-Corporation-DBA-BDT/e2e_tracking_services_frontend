@@ -15,6 +15,7 @@ import DashboardGraphs from "./DashboardGraphs";
 import DashboardTable from "./DashboardTable";
 import Loader from "./Loader";
 import Candidates from "./Candidates";
+import CandidateView from "../../forms/CandidateView";
 import PrimeVendors from "./PrimeVendors";
 import Recruiting from "./Recruiting";
 import BenchSales from "./BenchSales";
@@ -272,6 +273,10 @@ function Dashboard() {
             <Route
               path="candidates"
               element={<Candidates />}
+            />
+            <Route
+              path="candidates/:candidateId"
+              element={<CandidateView />}
             />
             <Route
               path="training"

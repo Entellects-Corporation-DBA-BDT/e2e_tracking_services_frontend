@@ -6,6 +6,10 @@ import DeleteConfirmation from "./DeleteConfirmation";
 import RecruiterPerformance from "../pages/Dashboard/RecruiterPerformance.";
 import JobView from "./JobView";
 import CandidateForm from "./CandidateForm";
+import JobForm from "./JobForm";
+import RecordDeleteConfirmation from "./RecordDeleteConfirmation";
+import { deleteCandidate } from "../api/candidateApi";
+import { deleteJob } from "../api/jobApi";
 
 const FormView = ({
   formTitle,
@@ -17,12 +21,13 @@ const FormView = ({
   title,
   message,
   jobId,
-  candidateId
+  candidateId,
+  recordName
 }) => {
 
-  const renderForms = () => {
-    console.log(openForm);
+  const usesOwnHeader = openForm === "job" || openForm === "jobEdit";
 
+  const renderForms = () => {
     switch (openForm) {
       case "bench":
         return (
@@ -79,6 +84,46 @@ const FormView = ({
         />
     );
 
+    case "candidateDelete":
+      return (
+        <RecordDeleteConfirmation
+          entityName="Candidate"
+          recordName={recordName}
+          onDelete={() => deleteCandidate(candidateId)}
+          onClose={() => setOpenForm(null)}
+          refreshData={refreshData}
+        />
+      );
+
+    case "job":
+      return (
+        <JobForm
+          onClose={() => setOpenForm(null)}
+          refreshData={refreshData}
+        />
+      );
+
+    case "jobEdit":
+      return (
+        <JobForm
+          jobId={jobId}
+          isEdit
+          onClose={() => setOpenForm(null)}
+          refreshData={refreshData}
+        />
+      );
+
+    case "jobDelete":
+      return (
+        <RecordDeleteConfirmation
+          entityName="Job"
+          recordName={recordName}
+          onDelete={() => deleteJob(jobId)}
+          onClose={() => setOpenForm(null)}
+          refreshData={refreshData}
+        />
+      );
+
       case "benchDelete":
         return (
           <DeleteConfirmation
@@ -105,13 +150,15 @@ const FormView = ({
     <>
       {openForm && (
         <div className="tf-form-popup-overlay">
-          <div className="tf-form-popup">
-            <div className="tf-form-popup-header">
-              <h1 className="form-title">{formTitle}</h1>
-              <button className="tfm-close-button" onClick={() => setOpenForm(null)}>
-                X
-              </button>
-            </div>
+          <div className={`tf-form-popup${usesOwnHeader ? " tf-form-popup-wide" : ""}`}>
+            {!usesOwnHeader && (
+              <div className="tf-form-popup-header">
+                <h1 className="form-title">{formTitle}</h1>
+                <button className="tfm-close-button" onClick={() => setOpenForm(null)}>
+                  X
+                </button>
+              </div>
+            )}
             {renderForms()}
           </div>
         </div>

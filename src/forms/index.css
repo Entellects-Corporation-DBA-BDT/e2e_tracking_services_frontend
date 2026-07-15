@@ -61,3 +61,11 @@
         padding: 20px;
     }
 }
+
+.tf-form-popup.tf-form-popup-wide {
+    width: min(920px, 95vw);
+    max-width: 95vw;
+    max-height: 92vh;
+    padding: 0;
+    overflow: hidden;
+}

@@ -205,6 +205,7 @@ Feature API functions live under `src/api/` and use the shared Axios instance. P
 | `/dashboard/vendors` | Prime-vendor management |
 | `/dashboard/clients` | Client management |
 | `/dashboard/candidates` | Candidate management |
+| `/dashboard/candidates/:candidateId` | Candidate details and AI-ranked suitable jobs |
 | `/dashboard/training` | Training management |
 | `/dashboard/candidate-onboarding` | Candidate onboarding |
 | `/dashboard/employee-status` | Employee-status reporting |

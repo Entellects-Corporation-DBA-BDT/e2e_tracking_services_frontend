@@ -37,6 +37,8 @@ const CandidateForm = ({
 
     const [errors, setErrors] = useState({});
 
+    const [submitError, setSubmitError] = useState("");
+
     const [formData, setFormData] = useState({
 
         name: "",
@@ -200,6 +202,8 @@ const CandidateForm = ({
 
         setLoading(true);
 
+        setSubmitError("");
+
         try {
 
             const payload = new FormData();
@@ -212,7 +216,7 @@ const CandidateForm = ({
 
             if (resume) {
 
-                payload.append("resume", resume);
+                payload.append("resume_file", resume);
 
             }
 
@@ -232,7 +236,11 @@ const CandidateForm = ({
 
         } catch (err) {
 
-            console.log(err);
+            setSubmitError(
+                err?.response?.data?.message ||
+                err?.message ||
+                `Failed to ${isEdit ? "update" : "create"} candidate.`
+            );
 
         } finally {
 
@@ -259,6 +267,12 @@ const CandidateForm = ({
                 </div>
 
                 <form onSubmit={handleSubmit}>
+
+                    {submitError && (
+                        <div role="alert" className="candidate-submit-error">
+                            <FiAlertCircle /> {submitError}
+                        </div>
+                    )}
                   
                                       <div className="section">
 
