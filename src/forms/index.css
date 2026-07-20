@@ -9,6 +9,9 @@
     align-items: center;
     justify-content: center;
     z-index: 1001;
+    padding: 20px;
+    box-sizing: border-box;
+    overscroll-behavior: contain;
 }
 
 .tf-form-popup {
@@ -22,6 +25,7 @@
     position: relative;
     max-width: 70%;
     max-height: 80%;
+    overflow: hidden;
 }
 
 .tf-form-popup-header{
@@ -50,15 +54,84 @@
 }
 
 @media (max-width: 768px) {
+    .tf-form-popup-overlay {
+        align-items: flex-end;
+        padding: 8px 8px max(8px, env(safe-area-inset-bottom));
+        background: rgba(15, 23, 42, .72);
+        backdrop-filter: blur(4px);
+    }
+
     .tf-form-popup {
-        padding: 1rem;
+        width: 100%;
+        max-width: 100%;
+        height: min(94dvh, 94vh);
+        max-height: min(94dvh, 94vh);
+        padding: 12px;
+        border-radius: 22px 22px 14px 14px;
+        justify-content: flex-start;
+        align-items: stretch;
+        animation: mobileFormSheetIn .25s ease both;
+    }
+
+    .tf-form-popup::before {
+        content: "";
+        width: 42px;
+        height: 4px;
+        flex: 0 0 4px;
+        margin: 0 auto 8px;
+        border-radius: 999px;
+        background: #cbd5e1;
+    }
+
+    .tf-form-popup-header {
+        position: sticky;
+        z-index: 10;
+        top: 0;
+        flex: 0 0 auto;
+        min-height: 48px;
+        padding: 4px 4px 10px;
+        background: #fff;
+    }
+
+    .form-title {
+        padding-right: 48px;
+        font-size: 21px;
+        line-height: 1.25;
+    }
+
+    .tfm-close-button {
+        top: 12px;
+        right: 14px;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #fff1f2;
+        font-size: 0;
+    }
+
+    .tfm-close-button::after {
+        content: "×";
+        font-size: 25px;
+        line-height: 1;
+    }
+
+    .tf-form-popup > :last-child:not(.tf-form-popup-header) {
+        min-height: 0;
+        max-width: 100%;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        scrollbar-width: none;
+    }
+
+    .tf-form-popup > :last-child::-webkit-scrollbar {
+        display: none;
     }
 }
 
 @media (max-width: 600px) {
     .tf-form-popup {
-        width: 90%;
-        padding: 20px;
+        width: 100%;
+        padding: 12px;
     }
 }
 
@@ -68,4 +141,19 @@
     max-height: 92vh;
     padding: 0;
     overflow: hidden;
+}
+
+@media (max-width: 768px) {
+    .tf-form-popup.tf-form-popup-wide {
+        width: 100%;
+        max-width: 100%;
+        height: min(94dvh, 94vh);
+        max-height: min(94dvh, 94vh);
+        padding: 0;
+    }
+}
+
+@keyframes mobileFormSheetIn {
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
 }

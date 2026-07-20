@@ -11,6 +11,7 @@ import {
   FaComments,
   FaLaptopCode,
   FaIdBadge,
+  FaBell,
 } from "react-icons/fa";
 
 export const sidebarConfig = {
@@ -45,6 +46,10 @@ export const sidebarConfig = {
   candidates: {
     icon: <FaUserTie className="menuIcon violetIcon" />,
     route: "/dashboard/candidates",
+  },
+  document_reminders: {
+    icon: <FaBell className="menuIcon orangeIcon" />,
+    route: "/dashboard/document-reminders",
   },
   training: {
     icon: <FaGraduationCap className="menuIcon yellowIcon" />,

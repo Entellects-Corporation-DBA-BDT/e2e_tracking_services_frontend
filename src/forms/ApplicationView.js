@@ -10,10 +10,10 @@ import {
   FaPassport,
   FaCalendarAlt,
 } from "react-icons/fa";
-import { getBenchSalesById, updateApplicationProcess } from "../api/applicationApi";
+import { getBenchSalesById, getRecruiterApplicationById, updateApplicationProcess, updateRecruiterApplicationProcess } from "../api/applicationApi";
 import "./ApplicationView.css";
 
-const ApplicationView = ({ applicationId }) => {
+const ApplicationView = ({ applicationId, module = "bench" }) => {
   const [application, setApplication] = useState(null);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
@@ -27,7 +27,9 @@ const ApplicationView = ({ applicationId }) => {
   const fetchApplication = async () => {
     try {
       setLoading(true);
-      const response = await getBenchSalesById(applicationId);
+      const response = module === "recruiter"
+        ? await getRecruiterApplicationById(applicationId)
+        : await getBenchSalesById(applicationId);
       if (response.success) {
         setApplication(response.data);
       }
@@ -58,7 +60,8 @@ const ApplicationView = ({ applicationId }) => {
   const handleProcessUpdate = async () => {
     try {
       setUpdating(true);
-      const res = await updateApplicationProcess(
+      const updateProcess = module === "recruiter" ? updateRecruiterApplicationProcess : updateApplicationProcess;
+      const res = await updateProcess(
         application.id,
         nextProcess
       );

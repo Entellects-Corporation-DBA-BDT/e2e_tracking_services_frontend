@@ -3,6 +3,8 @@
 .e2e_sidebar_container {
   width: 260px;
   height: 100vh;
+  height: 100dvh;
+  box-sizing: border-box;
 
   background: #ffffff;
 
@@ -24,6 +26,25 @@
   overflow: hidden;
 
   animation: sidebarFade 0.7s ease;
+}
+
+/* Scroll only the navigation content; keep Logout visible. */
+.e2e_sidebar_content {
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 0 4px 12px 0;
+  mask-image: linear-gradient(to bottom, transparent 0, #000 10px, #000 calc(100% - 12px), transparent 100%);
+}
+
+.e2e_sidebar_content::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
 }
 
 /* TOP SECTION */
@@ -210,7 +231,9 @@
 /* LOGOUT */
 
 .e2e_sidebar_logout {
+  width: 100%;
   min-height: 46px;
+  flex: 0 0 auto;
 
   display: flex;
   align-items: center;
@@ -228,23 +251,148 @@
   font-size: 14px;
   font-weight: 600;
 
-  transition: 0.3s;
+  transition: color 0.25s ease, background 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
 
-  border-top: 1px solid #ececf4;
+  border: 1px solid #fee2e2;
+  background: linear-gradient(135deg, #fff 0%, #fff7f7 100%);
 
   margin-top: 10px;
 
-  padding-top: 14px;
+  justify-content: flex-start;
+  font-family: inherit;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 5px 16px rgba(15, 23, 42, 0.06);
 }
 
 .e2e_sidebar_logout:hover {
-  color: #ff4d6d;
+  color: #dc2626;
+  background: linear-gradient(135deg, #fff1f2, #ffe4e6);
+  border-color: #fecdd3;
+  transform: translateY(-2px);
+  box-shadow: 0 9px 20px rgba(220, 38, 38, 0.14);
+}
 
-  transform: translateX(4px);
+.e2e_sidebar_logout:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.e2e_sidebar_logout:focus-visible {
+  outline: 3px solid rgba(239, 68, 68, 0.22);
+  outline-offset: 2px;
+}
+
+.e2e_sidebar_logout:hover .logoutIcon {
+  transform: translateX(3px) rotate(-8deg);
 }
 
 .logoutIcon {
   font-size: 16px;
+  transition: transform 0.25s ease;
+}
+
+.e2e_logout_dialog_backdrop {
+  position: fixed;
+  z-index: 2147483647;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: rgba(15, 23, 42, 0.66);
+  backdrop-filter: blur(6px);
+  animation: logoutBackdropIn 0.2s ease both;
+}
+
+.e2e_logout_dialog {
+  width: min(390px, 100%);
+  padding: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 28px 70px rgba(15, 23, 42, 0.28);
+  color: #0f172a;
+  text-align: center;
+  animation: logoutDialogIn 0.25s cubic-bezier(.2,.8,.2,1) both;
+}
+
+.e2e_logout_dialog_icon {
+  width: 58px;
+  height: 58px;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 16px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #fff1f2, #ffe4e6);
+  color: #dc2626;
+  font-size: 23px;
+}
+
+.e2e_logout_dialog h2 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.e2e_logout_dialog p {
+  margin: 9px 0 24px;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.e2e_logout_dialog_actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.e2e_logout_dialog_actions button {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+}
+
+.e2e_logout_cancel {
+  border: 1px solid #dbe2ea;
+  background: #fff;
+  color: #475569;
+}
+
+.e2e_logout_confirm {
+  border: 1px solid #dc2626;
+  background: #dc2626;
+  color: #fff;
+  box-shadow: 0 7px 16px rgba(220, 38, 38, .2);
+}
+
+.e2e_logout_dialog_actions button:hover {
+  transform: translateY(-2px);
+}
+
+.e2e_logout_cancel:hover { background: #f8fafc; }
+.e2e_logout_confirm:hover { background: #b91c1c; }
+.e2e_logout_dialog_actions button:active { transform: scale(.98); }
+.e2e_logout_dialog_actions button:focus-visible { outline: 3px solid rgba(79,70,229,.2); outline-offset: 2px; }
+
+@keyframes logoutBackdropIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes logoutDialogIn {
+  from { opacity: 0; transform: translateY(16px) scale(.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media(max-width:480px) {
+  .e2e_logout_dialog_backdrop { align-items: end; padding: 8px 8px max(8px, env(safe-area-inset-bottom)); }
+  .e2e_logout_dialog { padding: 24px 18px 18px; border-radius: 22px 22px 14px 14px; }
+  .e2e_logout_dialog_actions { grid-template-columns: 1fr; }
+  .e2e_logout_confirm { order: -1; }
 }
 
 /* ANIMATIONS */

@@ -10,6 +10,9 @@ import JobForm from "./JobForm";
 import RecordDeleteConfirmation from "./RecordDeleteConfirmation";
 import { deleteCandidate } from "../api/candidateApi";
 import { deleteJob } from "../api/jobApi";
+import RecruiterApplicationForm from "./RecruiterApplicationForm";
+import { deleteRecruiterApplication } from "../api/applicationApi";
+import RecruiterApplicationView from "./RecruiterApplicationView";
 
 const FormView = ({
   formTitle,
@@ -36,6 +39,18 @@ const FormView = ({
             refreshData={refreshData}
           />
         );
+
+      case "recruiter":
+        return <RecruiterApplicationForm onClose={() => setOpenForm(null)} refreshData={refreshData} />;
+
+      case "recruiterView":
+        return <RecruiterApplicationView applicationId={applicationId} />;
+
+      case "recruiterEdit":
+        return <RecruiterApplicationForm onClose={() => setOpenForm(null)} applicationId={applicationId} isEdit refreshData={refreshData} />;
+
+      case "recruiterDelete":
+        return <DeleteConfirmation applicationId={applicationId} deleteAction={deleteRecruiterApplication} refreshData={refreshData} onClose={() => setOpenForm(null)} title="Delete Recruiter Application" />;
 
       case "benchView":
         return (

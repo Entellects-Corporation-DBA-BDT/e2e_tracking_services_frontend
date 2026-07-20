@@ -24,7 +24,9 @@ import Jobs from "./Jobs";
 import Training from "./Training";
 import CandidateOnboarding from "./CandidateOnboarding";
 import EmployeeStatusReport from "./EmpStatus";
-// import Resources from "./Resources"; 
+import DocumentReminders from "./DocumentReminders";
+import DocumentExpiryWidget from "./DocumentExpiryWidget";
+// import Resources from "./Resources";
 
 import "../../styles/Dashboard/index.css";
 
@@ -225,6 +227,7 @@ function Dashboard() {
                     <Loader fullPage />
                   ) : (
                     <>
+                      {/* <DocumentExpiryWidget /> */}
                       <DashboardCards summary={summary} />
                       <DashboardGraphs
                         analytics={analytics}
@@ -289,6 +292,10 @@ function Dashboard() {
             <Route
               path="employee-status"
               element={<EmployeeStatusReport />}
+            />
+            <Route
+              path="document-reminders"
+              element={<DocumentReminders />}
             />
             <Route
               path="jobview/:jobId"

@@ -55,6 +55,11 @@
 .candidate-view-content h3:first-child { margin-top: 0; }
 .candidate-view-content p { margin: 0; line-height: 1.7; white-space: pre-wrap; }
 .candidate-resume-link { display: inline-flex; align-items: center; gap: 8px; color: #2563eb; font-weight: 800; text-decoration: none; }
+.candidate-documents-title { align-items: flex-start; }.candidate-documents-title p { margin: 5px 0 0; color: #64748b; font-size: 13px; }
+.candidate-document-upload { display: grid; gap: 16px; margin-bottom: 18px; padding: 18px; border: 1px solid #dbeafe; border-radius: 14px; background: #f8fbff; }.candidate-document-form-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 13px; }.candidate-document-form-grid label { display: flex; flex-direction: column; gap: 7px; color: #475569; font-size: 11px; font-weight: 800; text-transform: uppercase; }.candidate-document-form-grid input, select { min-height: 41px; padding: 9px 10px; border: 1px solid #dbe4f0; border-radius: 9px; background: #fff; color: #1e293b; font: inherit; text-transform: none; }.candidate-document-upload-row { display: flex; gap: 10px; }.candidate-document-file { display: flex; align-items: center; flex: 1; gap: 10px; padding: 13px; border: 1px dashed #93c5fd; border-radius: 11px; background: #eff6ff; color: #2563eb; font-weight: 700; cursor: pointer; }.candidate-document-file input { display: none; }.candidate-document-upload button { min-width: 210px; border: 0; border-radius: 11px; background: #2563eb; color: #fff; font-weight: 800; cursor: pointer; }.candidate-document-upload button:disabled { opacity: .55; cursor: not-allowed; }
+.candidate-documents-list { display: grid; gap: 14px; }.candidate-document-item { padding: 17px; border: 1px solid #e2e8f0; border-radius: 14px; }.candidate-document-item-top, .candidate-document-item-top>div { display: flex; align-items: center; justify-content: space-between; gap: 10px; }.candidate-document-item-top>div>svg { color: #2563eb; font-size: 22px; }.candidate-document-item-top span span { display: flex; flex-direction: column; }.candidate-document-item-top small { display: block; margin-top: 3px; color: #64748b; }
+.candidate-document-meta { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin: 14px 0; }.candidate-document-meta div { padding: 11px; border-radius: 10px; background: #f8fafc; }.candidate-document-meta span { display: block; margin-bottom: 5px; color: #64748b; font-size: 10px; font-weight: 800; text-transform: uppercase; }.candidate-document-meta strong { font-size: 13px; }
+.candidate-document-actions { display: flex; flex-wrap: wrap; gap: 7px; }.candidate-document-actions button,.candidate-document-actions a { display: inline-flex; align-items: center; gap: 6px; padding: 8px 10px; border: 1px solid #dbe4f0; border-radius: 8px; background: #fff; color: #2563eb; font-size: 12px; font-weight: 800; text-decoration: none; cursor: pointer; }.candidate-document-actions .danger { color: #dc2626; }
 
 .candidate-match-card { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
 .candidate-match-card .candidate-view-title { margin-bottom: 8px; }
@@ -110,4 +115,5 @@
   .candidate-view-grid { grid-template-columns: 1fr; }
   .candidate-match-button { width: 100%; }
   .candidate-view-card { padding: 18px; }
+  .candidate-document-form-grid { grid-template-columns: 1fr; }.candidate-document-upload-row { flex-direction: column; }.candidate-document-upload button { min-height: 44px; }.candidate-document-meta { grid-template-columns: 1fr; }
 }

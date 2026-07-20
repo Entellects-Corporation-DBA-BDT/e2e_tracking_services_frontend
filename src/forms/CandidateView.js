@@ -12,12 +12,25 @@ import {
   FaRobot,
   FaSpinner,
   FaUserTie,
+  FaCalendarAlt,
+  FaEye,
+  FaPaperPlane,
+  FaUpload,
+  FaTimes,
 } from "react-icons/fa";
 import {
   getCandidateById,
   getMatchedJobs,
   matchSuitableJobs,
 } from "../api/candidateApi";
+import {
+  createManualReminder,
+  disableDocumentReminder,
+  sendDocumentReminderNow,
+  updateDocumentReminder,
+  uploadCandidateDocument,
+} from "../api/documentReminderApi";
+import { baseUrlImg } from "../Config/env";
 import "./CandidateView.css";
 
 const MATCHING_STEPS = [
@@ -36,6 +49,14 @@ const MATCHING_STEPS = [
 const getErrorMessage = (error, fallback) =>
   error?.response?.data?.message || error?.message || fallback;
 
+const emptyDocumentDetails = (documentType = "H1B") => ({
+  document_type: documentType,
+  visa_type: documentType === "H1B" ? "H1B" : "",
+  visa_number: "", candidate_name: "", issue_date: "", expiry_date: "",
+  passport_number: "", receipt_number: "", case_number: "",
+  applied_date: "", approved_date: "",
+});
+
 const CandidateView = () => {
   const { candidateId } = useParams();
   const navigate = useNavigate();
@@ -46,6 +67,18 @@ const CandidateView = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [error, setError] = useState("");
   const [matchMessage, setMatchMessage] = useState("");
+  const [documentFile, setDocumentFile] = useState(null);
+  const [documentDetails, setDocumentDetails] = useState(emptyDocumentDetails());
+  const [documentUploading, setDocumentUploading] = useState(false);
+  const [documentMessage, setDocumentMessage] = useState(null);
+  const [jsonDocument, setJsonDocument] = useState(null);
+  const [editDocument, setEditDocument] = useState(null);
+
+  const loadCandidate = async () => {
+    const response = await getCandidateById(candidateId);
+    if (response?.success) setCandidate(response.data);
+    return response;
+  };
 
   useEffect(() => {
     if (!matching) {
@@ -125,6 +158,59 @@ const CandidateView = () => {
     }
   };
 
+  const documentUrl = (path) => {
+    if (!path) return "#";
+    if (/^https?:\/\//i.test(path)) return path;
+    return `${baseUrlImg}/${String(path).replace(/^\//, "")}`;
+  };
+
+  const handleDocumentUpload = async (event) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    if (!documentFile) return;
+    setDocumentUploading(true);
+    setDocumentMessage(null);
+    try {
+      const formData = new FormData();
+      formData.append("candidate_id", candidateId);
+      formData.append("document_type", documentDetails.document_type);
+      formData.append("document_file", documentFile);
+      Object.entries({ ...documentDetails, candidate_name: documentDetails.candidate_name || candidate.name }).forEach(([key, value]) => formData.append(key, value));
+      const response = await uploadCandidateDocument(formData);
+      setDocumentMessage({ type: "success", text: response.message || "Document processed." });
+      setDocumentFile(null);
+      setDocumentDetails(emptyDocumentDetails());
+      form.reset();
+      await loadCandidate();
+    } catch (requestError) {
+      setDocumentMessage({ type: "error", text: getErrorMessage(requestError, "Document could not be processed.") });
+    } finally { setDocumentUploading(false); }
+  };
+
+  const documentAction = async (action, successText) => {
+    try {
+      await action();
+      setDocumentMessage({ type: "success", text: successText });
+      await loadCandidate();
+    } catch (requestError) {
+      setDocumentMessage({ type: "error", text: getErrorMessage(requestError, "Document reminder action failed.") });
+    }
+  };
+
+  const saveDocumentReminder = async (event) => {
+    event.preventDefault();
+    const expiryDate = editDocument.expiry_date;
+    if (editDocument.reminder_id) {
+      await documentAction(
+        () => updateDocumentReminder(editDocument.reminder_id, { expiry_date: expiryDate, next_reminder_date: editDocument.next_reminder_date || null, status: editDocument.reminder_status || "Pending" }),
+        "Reminder updated."
+      );
+    } else {
+      await documentAction(() => createManualReminder(editDocument.id, expiryDate), "Reminder created.");
+    }
+    setEditDocument(null);
+  };
+
   if (loading) {
     return <div className="candidate-view-state">Loading candidate...</div>;
   }
@@ -170,6 +256,54 @@ const CandidateView = () => {
           <Info icon={<FaMapMarkerAlt />} label="Current Location" value={candidate.current_location} />
           <Info icon={<FaCheckCircle />} label="Visa Status" value={candidate.visa_status} />
         </div>
+      </section>
+
+      <section className="candidate-view-card candidate-documents-card">
+        <div className="candidate-view-title candidate-documents-title">
+          <FaFileAlt />
+          <div><h2>Immigration Documents</h2><p>Upload H1B, PERM Labor, or I-140 documents and schedule the appropriate follow-up reminders.</p></div>
+        </div>
+        <form className="candidate-document-upload" onSubmit={handleDocumentUpload}>
+          <div className="candidate-document-form-grid">
+            <label>Document Type<select value={documentDetails.document_type} onChange={(e) => setDocumentDetails(emptyDocumentDetails(e.target.value))}>{["H1B","PERM Labor","I-140"].map((type) => <option key={type}>{type}</option>)}</select></label>
+            <label>Candidate Name<input required value={documentDetails.candidate_name || candidate.name} onChange={(e) => setDocumentDetails({ ...documentDetails, candidate_name: e.target.value })} /></label>
+            {documentDetails.document_type === "H1B" ? <>
+              <label>Visa Number<input value={documentDetails.visa_number} onChange={(e) => setDocumentDetails({ ...documentDetails, visa_number: e.target.value })} /></label>
+              <label>Passport Number<input value={documentDetails.passport_number} onChange={(e) => setDocumentDetails({ ...documentDetails, passport_number: e.target.value })} /></label>
+              <label>Receipt Number<input value={documentDetails.receipt_number} onChange={(e) => setDocumentDetails({ ...documentDetails, receipt_number: e.target.value })} /></label>
+              <label>Issue Date<input type="date" value={documentDetails.issue_date} onChange={(e) => setDocumentDetails({ ...documentDetails, issue_date: e.target.value })} /></label>
+              <label>Expiry Date<input required type="date" min={documentDetails.issue_date || undefined} value={documentDetails.expiry_date} onChange={(e) => setDocumentDetails({ ...documentDetails, expiry_date: e.target.value })} /></label>
+            </> : <>
+              <label>Case / Receipt Number<input value={documentDetails.case_number} onChange={(e) => setDocumentDetails({ ...documentDetails, case_number: e.target.value })} /></label>
+              <label>Applied Date<input required type="date" value={documentDetails.applied_date} onChange={(e) => setDocumentDetails({ ...documentDetails, applied_date: e.target.value })} /></label>
+              <label>Approved Date (if approved)<input type="date" min={documentDetails.applied_date || undefined} value={documentDetails.approved_date} onChange={(e) => setDocumentDetails({ ...documentDetails, approved_date: e.target.value })} /></label>
+            </>}
+          </div>
+          <div className="candidate-document-upload-row">
+            <label className="candidate-document-file"><FaUpload /><span>{documentFile?.name || `Choose ${documentDetails.document_type} PDF or image`}</span><input type="file" accept=".pdf,.png,.jpg,.jpeg,.webp" onChange={(e) => setDocumentFile(e.target.files?.[0] || null)} /></label>
+            <button disabled={!documentFile || !(documentDetails.document_type === "H1B" ? documentDetails.expiry_date : documentDetails.applied_date) || documentUploading}>{documentUploading ? <><FaSpinner className="candidate-spin" /> Saving...</> : "Save Document & Reminder"}</button>
+          </div>
+        </form>
+        {documentMessage && <div className={`candidate-match-alert ${documentMessage.type}`}>{documentMessage.text}</div>}
+
+        {(candidate.documents || []).length ? <div className="candidate-documents-list">{candidate.documents.map((document) => {
+          const details = document.document_details || {};
+          return <article className="candidate-document-item" key={document.id}>
+            <div className="candidate-document-item-top"><div><FaFileAlt /><span><strong>{document.document_type}</strong><small>{details.candidate_name || candidate.name}</small></span></div><span className={`reminder-status ${String(document.reminder_status || "disabled").toLowerCase()}`}>{document.reminder_status || "No Reminder"}</span></div>
+            <div className="candidate-document-meta">
+              <div><span>{document.document_type === "H1B" ? "Expiry Date" : "Reminder Target"}</span><strong>{document.expiry_date || details.reminder_date || details.expiry_date || "-"}</strong></div>
+              <div><span>Next Reminder</span><strong>{document.next_reminder_date || "-"}</strong></div>
+              <div><span>Confidence</span><strong>{details.confidence !== undefined ? `${details.confidence}%` : "-"}</strong></div>
+            </div>
+            <div className="candidate-document-actions">
+              <a href={documentUrl(document.document)} target="_blank" rel="noreferrer"><FaFileAlt /> View Document</a>
+              <button onClick={() => setJsonDocument(document)}><FaEye /> View Details</button>
+              {document.reminder_id && <button onClick={() => documentAction(() => sendDocumentReminderNow(document.reminder_id), "Reminder sent without changing the schedule.")}><FaPaperPlane /> Send Now</button>}
+              <button onClick={() => setEditDocument({ ...document, expiry_date: document.expiry_date || details.reminder_date || details.expiry_date || "" })}><FaCalendarAlt /> {document.reminder_id ? "Edit" : "Set Target"}</button>
+              {document.reminder_id && document.reminder_status !== "Disabled" && <button className="danger" onClick={() => window.confirm("Disable this reminder?") && documentAction(() => disableDocumentReminder(document.reminder_id), "Reminder disabled.")}><FaTimes /> Disable</button>}
+            </div>
+          </article>;
+        })}</div> : <div className="candidate-match-empty"><FaFileAlt /><h3>No documents uploaded</h3><p>Upload the candidate's immigration document above.</p></div>}
       </section>
 
       <section className="candidate-view-card">
@@ -272,6 +406,9 @@ const CandidateView = () => {
           </div>
         </div>
       )}
+
+      {jsonDocument && <div className="reminder-modal-backdrop" onMouseDown={() => setJsonDocument(null)}><div className="reminder-modal" onMouseDown={(e) => e.stopPropagation()}><div className="reminder-modal-header"><h2>Entered Document Details</h2><button onClick={() => setJsonDocument(null)}><FaTimes /></button></div><div className="reminder-json-fields">{[["Candidate Name","candidate_name"],["Visa Type","visa_type"],["Visa Number","visa_number"],["Case Number","case_number"],["Applied Date","applied_date"],["Approved Date","approved_date"],["Issue Date","issue_date"],["Expiry Date","expiry_date"],["Reminder Target","reminder_date"],["Reminder Purpose","reminder_reason"],["Entry Method","entry_method"]].map(([label,key]) => <div key={key}><span>{label}</span><strong>{jsonDocument.document_details?.[key] || "Not entered"}</strong></div>)}</div><h3>Stored JSON</h3><pre>{JSON.stringify(jsonDocument.document_details || {}, null, 2)}</pre></div></div>}
+      {editDocument && <div className="reminder-modal-backdrop"><form className="reminder-modal reminder-edit-modal" onSubmit={saveDocumentReminder}><div className="reminder-modal-header"><h2>{editDocument.reminder_id ? "Edit Reminder" : "Enter Target Date"}</h2><button type="button" onClick={() => setEditDocument(null)}><FaTimes /></button></div><label>Target Date<input required type="date" value={editDocument.expiry_date || ""} onChange={(e) => setEditDocument({ ...editDocument, expiry_date: e.target.value })} /></label>{editDocument.reminder_id && <><label>Next Reminder<input type="date" value={editDocument.next_reminder_date || ""} onChange={(e) => setEditDocument({ ...editDocument, next_reminder_date: e.target.value })} /></label><label>Status<select value={editDocument.reminder_status} onChange={(e) => setEditDocument({ ...editDocument, reminder_status: e.target.value })}>{["Pending","Completed","Expired","Disabled"].map((status) => <option key={status}>{status}</option>)}</select></label></>}<div className="reminder-modal-actions"><button type="button" className="secondary" onClick={() => setEditDocument(null)}>Cancel</button><button>Save Reminder</button></div></form></div>}
     </div>
   );
 };

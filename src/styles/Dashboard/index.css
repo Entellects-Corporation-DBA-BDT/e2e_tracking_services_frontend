@@ -58,24 +58,98 @@ body{
 @media(max-width:768px){
 
   .e2e_sidebar_container{
-    width:80px;
+    width:100%;
+    height:76px;
+    min-height:76px;
+    top:auto;
+    right:0;
+    bottom:0;
+    padding:8px max(10px, env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+    flex-direction:row;
+    align-items:center;
+    gap:8px;
+    border-top:1px solid #e8eaf2;
+    border-right:0;
+    box-shadow:0 -10px 30px rgba(15,23,42,.1);
+    animation:mobileDockIn .35s ease both;
+    z-index:1000;
   }
 
-  .e2e_sidebar_menu_item span,
+  .e2e_sidebar_logo_section,
+  .aiRobotContainer1{
+    display:none !important;
+  }
+
+  .e2e_sidebar_content{
+    display:block;
+    min-width:0;
+    padding:0;
+    overflow-x:auto;
+    overflow-y:hidden;
+    mask-image:linear-gradient(to right, #000 94%, transparent);
+  }
+
+  .e2e_sidebar_menu{
+    width:max-content;
+    min-width:100%;
+    height:58px;
+    margin:0;
+    flex-direction:row;
+    align-items:center;
+    gap:5px;
+  }
+
+  .e2e_sidebar_menu_item{
+    min-width:66px;
+    min-height:54px;
+    padding:6px 8px;
+    flex-direction:column;
+    justify-content:center;
+    gap:4px;
+    border-radius:14px;
+    font-size:10px;
+    animation:none;
+  }
+
+  .e2e_sidebar_menu_item span{
+    display:block;
+    width:60px;
+    text-align:center;
+    line-height:1.1;
+  }
+
+  .e2e_sidebar_menu_item.e2e_sidebar_active,
+  .e2e_sidebar_menu_item.e2e_sidebar_active:visited{
+    color:#fff;
+    box-shadow:0 5px 14px rgba(79,70,229,.26);
+  }
+
   .e2e_sidebar_logout span{
     display:none;
   }
 
+  .e2e_sidebar_logout{
+    width:54px;
+    height:54px;
+    min-height:54px;
+    margin:0;
+    padding:0;
+    justify-content:center;
+    border-radius:16px;
+  }
+
+  .e2e_sidebar_logout .logoutIcon{
+    font-size:19px;
+  }
+
   .e2e_dashboard_right_section{
-
-    margin-left:80px;
-
-    width:calc(100% - 80px);
+    margin-left:0;
+    width:100%;
+    padding-bottom:calc(82px + env(safe-area-inset-bottom));
   }
 
   .e2e_navbar_container{
-
-    width:calc(100% - 80px);
+    width:100%;
   }
 
   .e2e_cards_grid{
@@ -83,7 +157,191 @@ body{
   }
 
   .e2e_dashboard_scroll_content{
-    margin-top:70px;
-    padding:14px;
+    margin-top:0;
+    padding:12px;
+  }
+
+  /* Shared touch and overflow behavior across feature screens. */
+  button,
+  a,
+  select,
+  input{
+    -webkit-tap-highlight-color:transparent;
+  }
+
+  input,
+  select,
+  textarea{
+    max-width:100%;
+    font-size:16px !important;
+  }
+
+  [class*="table_wrapper"],
+  [class*="table-wrap"]{
+    max-width:100%;
+    overflow-x:auto;
+    overscroll-behavior-inline:contain;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+  }
+
+  [class*="table_wrapper"]::-webkit-scrollbar,
+  [class*="table-wrap"]::-webkit-scrollbar{
+    display:none;
+  }
+
+  /* Consistent bottom-sheet behavior for standalone dashboard forms. */
+  :is(.candidateentryform_overlay,
+      .trainingentryform_overlay,
+      .newclientform_overlay,
+      .joblist_form_overlay,
+      .hotlist_form_overlay,
+      .e2e_benchsales_form_overlay,
+      .e2e_new_application_overlay,
+      .primevendor_form_overlay){
+    align-items:flex-end !important;
+    padding:8px 8px max(8px, env(safe-area-inset-bottom)) !important;
+    overflow:hidden;
+    background:rgba(15,23,42,.72);
+    backdrop-filter:blur(4px);
+  }
+
+  :is(.candidateentryform_modal,
+      .trainingentryform_modal,
+      .newclientform_modal,
+      .joblist_form_modal,
+      .hotlist_form_modal,
+      .e2e_benchsales_form_modal,
+      .e2e_new_application_modal,
+      .primevendor_form_modal){
+    width:100% !important;
+    max-width:100% !important;
+    height:min(94dvh, 94vh) !important;
+    max-height:min(94dvh, 94vh) !important;
+    overflow-y:auto !important;
+    overscroll-behavior:contain;
+    border-radius:22px 22px 14px 14px !important;
+    scrollbar-width:none;
+    animation:mobileFormSheetIn .25s ease both !important;
+  }
+
+  :is(.candidateentryform_modal,
+      .trainingentryform_modal,
+      .newclientform_modal,
+      .joblist_form_modal,
+      .hotlist_form_modal,
+      .e2e_benchsales_form_modal,
+      .e2e_new_application_modal,
+      .primevendor_form_modal)::-webkit-scrollbar{
+    display:none;
+  }
+
+  :is(.candidateentryform_grid,
+      .trainingentryform_grid,
+      .newclientform_grid,
+      .joblist_form_grid,
+      .hotlist_form_grid,
+      .e2e_benchsales_form_grid,
+      .e2e_application_form_layout,
+      .primevendor_form_grid){
+    grid-template-columns:1fr !important;
+  }
+
+  :is(.candidateentryform_header,
+      .trainingentryform_header,
+      .newclientform_header,
+      .joblist_form_header,
+      .hotlist_form_header,
+      .e2e_benchsales_form_header,
+      .primevendor_form_header){
+    position:sticky;
+    z-index:12;
+    top:0;
+    padding:14px 16px !important;
+    background:rgba(255,255,255,.97);
+    backdrop-filter:blur(10px);
+  }
+
+  :is(.candidateentryform_title,
+      .trainingentryform_title,
+      .newclientform_title,
+      .joblist_form_title,
+      .hotlist_form_title,
+      .e2e_benchsales_form_header h2,
+      .primevendor_form_header h2){
+    font-size:20px !important;
+    line-height:1.25;
+  }
+
+  :is(.candidateentryform_close_button,
+      .trainingentryform_close_button,
+      .newclientform_close_btn,
+      .joblist_form_close_btn,
+      .hotlist_form_close_btn,
+      .e2e_benchsales_form_close){
+    width:40px !important;
+    height:40px !important;
+    flex:0 0 40px;
+  }
+
+  :is(.candidateentryform_footer,
+      .trainingentryform_footer,
+      .newclientform_button_section,
+      .joblist_form_button_section,
+      .hotlist_form_button_section,
+      .e2e_benchsales_form_buttons,
+      .primevendor_form_actions){
+    position:sticky;
+    z-index:10;
+    bottom:0;
+    padding-bottom:max(14px, env(safe-area-inset-bottom));
+    background:rgba(255,255,255,.96);
+    backdrop-filter:blur(10px);
+  }
+
+  :is(.candidateentryform_footer,
+      .trainingentryform_footer,
+      .newclientform_button_section,
+      .joblist_form_button_section,
+      .hotlist_form_button_section,
+      .e2e_benchsales_form_buttons,
+      .primevendor_form_actions) button{
+    min-height:46px;
+  }
+
+
+  :is(.candidateentryform_input,
+      .candidateentryform_select,
+      .trainingentryform_input,
+      .trainingentryform_select,
+      .newclientform_input,
+      .newclientform_select,
+      .joblist_form_input,
+      .joblist_form_select,
+      .hotlist_form_input,
+      .hotlist_form_select,
+      .e2e_benchsales_form_field input,
+      .e2e_benchsales_form_field select,
+      .primevendor_form_group input){
+    min-height:46px;
+  }
+}
+
+@keyframes mobileDockIn{
+  from{opacity:0;transform:translateY(24px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+@keyframes mobileFormSheetIn{
+  from{opacity:0;transform:translateY(40px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    scroll-behavior:auto !important;
+    animation-duration:.01ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:.01ms !important;
   }
 }

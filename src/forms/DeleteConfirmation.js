@@ -6,14 +6,14 @@ import "./DeleteConfirmation.css";
 const DeleteConfirmation = ({
   title = "Delete Application",
   message = "Are you sure you want to delete this application? This action cannot be undone.",
-  onClose, applicationId, refreshData
+  onClose, applicationId, refreshData, deleteAction = deleteBenchSalesApplication
 }) => {
   const [loading, setLoading] = useState(false);
   const handleDelete = async () => {
     try {
         setLoading(true);
 
-        const response = await deleteBenchSalesApplication(applicationId);
+        const response = await deleteAction(applicationId);
 
         if (response.success) {
             refreshData?.();

@@ -71,6 +71,36 @@ export const getDashboardSummary = async (params = {}) => {
   return response.data?.data ?? response.data;
 };
 
+export const getRecruiterApplications = async (page = 1, limit = 10, search = "") => {
+  const response = await axiosInstance.get("/recruiters/list", { params: { page, limit, search } });
+  return response.data;
+};
+
+export const getRecruiterApplicationById = async (id) => {
+  const response = await axiosInstance.get(`/recruiters/${id}`);
+  return response.data;
+};
+
+export const createRecruiterApplication = async (formData) => {
+  const response = await axiosInstance.post("/recruiters/create", formData);
+  return response.data;
+};
+
+export const updateRecruiterApplication = async (id, formData) => {
+  const response = await axiosInstance.put(`/recruiters/update/${id}`, formData);
+  return response.data;
+};
+
+export const deleteRecruiterApplication = async (id) => {
+  const response = await axiosInstance.delete(`/recruiters/delete/${id}`);
+  return response.data;
+};
+
+export const updateRecruiterApplicationProcess = async (id, processId) => {
+  const response = await axiosInstance.put(`/recruiters/process/${id}`, { process_id: processId });
+  return response.data;
+};
+
 export const getSubmissionAnalytics = async (params = {}) => {
   const response = await axiosInstance.get(
     `/application/dashboard/submissions`,

@@ -397,11 +397,31 @@
 
 @media screen and (max-width:768px){
 
+  .e2e_recruiting_page{
+    padding:14px;
+    border-radius:16px;
+  }
+
   .e2e_recruiting_top{
 
     flex-direction:column;
 
-    align-items:flex-start;
+    align-items:stretch;
+    gap:14px;
+  }
+
+  .e2e_recruiting_left h2{
+    font-size:20px;
+    line-height:1.25;
+  }
+
+  .e2e_recruiting_right,
+  .e2e_recruiting_right button{
+    width:100%;
+  }
+
+  .e2e_recruiting_right button{
+    min-height:44px;
   }
 
   .e2e_recruiting_filters{
@@ -409,6 +429,12 @@
     flex-direction:column;
 
     align-items:stretch;
+    gap:10px;
+  }
+
+  .e2e_recruiting_filters .e2e_pagination_number{
+    width:100%;
+    min-height:42px;
   }
 
   .e2e_recruiting_filter_left{
@@ -436,6 +462,21 @@
   .e2e_recruiting_table_wrapper table{
 
     min-width:850px;
+  }
+
+  .e2e_recruiting_table_wrapper{
+    margin:0 -14px;
+    padding:0 14px 8px;
+  }
+
+  .e2e_recruiting_table_wrapper th,
+  .e2e_recruiting_table_wrapper td{
+    padding:12px 10px;
+  }
+
+  .e2e_recruiting_actions button{
+    min-height:38px;
+    padding:8px 12px;
   }
 
 }

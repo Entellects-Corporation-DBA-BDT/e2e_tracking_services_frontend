@@ -40,3 +40,28 @@
   display: flex;
   gap: 6px;
 }
+
+@media(max-width:600px){
+  .e2e_pagination_container{
+    justify-content:center;
+    gap:6px;
+    margin-top:14px;
+  }
+
+  .e2e_pagination_btn,
+  .e2e_pagination_number{
+    min-width:40px;
+    min-height:40px;
+    padding:8px 10px;
+  }
+
+  .e2e_pagination_numbers{
+    max-width:calc(100vw - 130px);
+    overflow-x:auto;
+    scrollbar-width:none;
+  }
+
+  .e2e_pagination_numbers::-webkit-scrollbar{
+    display:none;
+  }
+}

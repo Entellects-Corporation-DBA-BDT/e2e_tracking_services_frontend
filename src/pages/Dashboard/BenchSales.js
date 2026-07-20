@@ -10,6 +10,12 @@ import getUserDataFromCookies from "../../utils/getUserDataFromCookies";
 const user = getUserDataFromCookies();
 const loginUserId = user?.user_id;
 
+const PROCESS_STATUS = {
+  1: { label: "Submitted", className: "submitted" },
+  2: { label: "Interview Scheduled", className: "interview" },
+  3: { label: "Placed", className: "placed" },
+};
+
 function BenchSales() {
   const [loading, setLoading] = useState(true);
   const [openForm, setOpenForm] = useState(false);
@@ -156,6 +162,7 @@ function BenchSales() {
 
               <th className="e2e_benchsales_th_poc">POC</th>
               <th className="e2e_benchsales_th_client">Client</th>
+              <th className="e2e_benchsales_th_process">Process</th>
               <th className="e2e_benchsales_th_action">Action</th>
             </tr>
           </thead>
@@ -163,7 +170,7 @@ function BenchSales() {
             {tableLoading ? (
               <tr>
                 <td
-                  colSpan="5"
+                  colSpan="8"
                   style={{
                     textAlign: "center",
                     padding: "30px",
@@ -173,12 +180,18 @@ function BenchSales() {
                 </td>
               </tr>
             ) : tableData.length > 0 ? (
-              tableData.map((item, index) => (
+              tableData.map((item, index) => {
+                const process = PROCESS_STATUS[Number(item.process_id)] || {
+                  label: "Not Set",
+                  className: "unknown",
+                };
+
+                return (
                 <tr
                   key={item.id}
-                  className="e2e_benchsales_row"
+                  className={`e2e_benchsales_row ${process.className === "placed" ? "e2e_benchsales_row_placed" : ""}`}
                 >
-                  <td className="e2e_benchsales_td_id">{index + 1} </td>
+                  <td className="e2e_benchsales_td_id">{(currentPage - 1) * entries + index + 1} </td>
                   <td className="e2e_benchsales_td_candidate">
                     <div className="e2e_benchsales_details">
                       <p>Name : <strong>{item.candidate_name}</strong></p>
@@ -204,6 +217,13 @@ function BenchSales() {
 
                   <td className="e2e_benchsales_td_poc">{item.poc}</td>
                   <td className="e2e_benchsales_td_client">{item.client}</td>
+                  <td className="e2e_benchsales_td_process">
+                    <span className={`e2e_benchsales_process_badge e2e_benchsales_process_${process.className}`}>
+                      {process.className === "placed" && <span aria-hidden="true">✓</span>}
+                      {process.label}
+                    </span>
+                    {process.className === "placed" && <small className="e2e_benchsales_placed_note">Submission placed</small>}
+                  </td>
                   <td className="e2e_benchsales_td_action">
                     <div className="e2e_benchsales_actions">
                       <button className="e2e_benchsales_view_btn" onClick={() => {
@@ -226,11 +246,12 @@ function BenchSales() {
                     </div>
                   </td>
                 </tr>
-              ))
+                );
+              })
             ) : (
               <tr>
                 <td
-                  colSpan="5"
+                  colSpan="8"
                   style={{
                     textAlign: "center",
                     padding: "30px",
