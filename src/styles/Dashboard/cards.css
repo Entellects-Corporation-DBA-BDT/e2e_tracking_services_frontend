@@ -30,6 +30,12 @@
   overflow:hidden;
 
   position:relative;
+
+  width:100%;
+  border:2px solid transparent;
+  text-align:left;
+  font:inherit;
+  cursor:pointer;
 }
 
 /* HOVER */
@@ -152,4 +158,19 @@
 
     min-height:110px;
   }
+}
+
+.e2e_single_card:focus-visible{
+  outline:3px solid rgba(37,99,235,.24);
+  outline-offset:3px;
+}
+
+.e2e_single_card.e2e_single_card_active{
+  border-color:#2563eb;
+  transform:scale(1.025);
+  box-shadow:0 12px 28px rgba(37,99,235,.2);
+}
+
+.e2e_single_card.e2e_single_card_active:hover{
+  transform:scale(1.025) translateY(-3px);
 }

@@ -7,10 +7,13 @@ import ContactPage from "./pages/Contactpage";
 import NewRegister from "./forms/NewRegister";
 
 import Secure from "./components/Secure";
+import { PermissionProvider } from "./auth/PermissionContext";
+import ForbiddenPage from "./pages/ForbiddenPage";
 
 function App() {
   return (
     <BrowserRouter>
+      <PermissionProvider>
       <Routes>
 
         {/* Public Routes */}
@@ -18,6 +21,7 @@ function App() {
         <Route path="/about" element={<AboutPage />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/register" element={<NewRegister />} />
+        <Route path="/forbidden" element={<ForbiddenPage />} />
 
         {/* Protected Routes */}
         <Route element={<Secure />}>
@@ -28,6 +32,7 @@ function App() {
         </Route>
 
       </Routes>
+      </PermissionProvider>
     </BrowserRouter>
   );
 }

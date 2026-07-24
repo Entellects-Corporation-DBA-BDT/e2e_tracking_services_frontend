@@ -295,3 +295,72 @@
     opacity: 1;
   }
 }
+
+.application-view.application-view-standalone {
+  width: 100%;
+  max-width: 1220px;
+  height: auto;
+  min-height: calc(100vh - 120px);
+  margin: 0 auto;
+  padding: 4px 0 32px;
+  overflow: visible;
+  background: transparent;
+  animation: applicationPageIn .28s ease both;
+}
+
+.application-view-standalone .candidate-header,
+.application-view-standalone .view-card {
+  border: 1px solid #e8edf4;
+  border-radius: 20px;
+}
+
+.application-view-standalone .candidate-header {
+  background: linear-gradient(135deg, #fff 30%, #eff6ff);
+  box-shadow: 0 12px 36px rgba(15, 23, 42, .08);
+}
+
+.application-page-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 18px;
+  padding: 10px 14px;
+  border: 1px solid #dbe3ef;
+  border-radius: 11px;
+  background: #fff;
+  color: #475569;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.application-page-back:hover { border-color: #2563eb; color: #2563eb; }
+.application-page-type { display: block; margin-bottom: 4px; color: #2563eb; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; }
+.document-card small { margin-top: 5px; color: #94a3b8; font-size: 11px; }
+.document-card-missing { opacity: .52; cursor: default; }
+.document-card-missing:hover { border-color: #e2e8f0; transform: none; }
+
+.application-page-state {
+  display: grid;
+  min-height: 55vh;
+  place-content: center;
+  justify-items: center;
+  padding: 30px;
+  text-align: center;
+  color: #64748b;
+}
+.application-page-state h2 { margin: 14px 0 5px; color: #1e293b; }
+.application-page-state p { margin: 0 0 18px; }
+.application-page-state > span { display: flex; gap: 9px; }
+.application-page-state button { display: inline-flex; align-items: center; gap: 7px; padding: 10px 14px; border: 1px solid #dbe3ef; border-radius: 10px; background: #fff; color: #2563eb; font-weight: 700; cursor: pointer; }
+.application-page-error > div { display: grid; width: 62px; height: 62px; place-items: center; border-radius: 50%; background: #fef2f2; color: #dc2626; font-size: 26px; font-weight: 900; }
+.application-page-spinner { width: 42px; height: 42px; border: 4px solid #dbeafe; border-top-color: #2563eb; border-radius: 50%; animation: applicationPageSpin .8s linear infinite; }
+
+@keyframes applicationPageIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes applicationPageSpin { to { transform: rotate(360deg); } }
+
+@media (max-width: 700px) {
+  .application-view.application-view-standalone { padding-bottom: 20px; }
+  .application-view-standalone .candidate-header { align-items: flex-start; flex-wrap: wrap; padding: 18px; }
+  .application-view-standalone .candidate-status { width: 100%; align-items: stretch; }
+  .application-view-standalone .process-btn { width: 100%; }
+}

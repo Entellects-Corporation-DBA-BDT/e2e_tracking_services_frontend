@@ -1,22 +1,15 @@
 import "../../styles/Dashboard/sidebar.css";
-import Cookies from "js-cookie";
 import { useNavigate, NavLink } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { getMyResources } from "../../api/authApi";
-import { FaSignOutAlt } from "react-icons/fa";
+import { FaShieldAlt, FaSignOutAlt } from "react-icons/fa";
 import { sidebarConfig } from "./SidebarConfig";
 import { createPortal } from "react-dom";
+import { usePermissions } from "../../auth/PermissionContext";
 
 function Sidebar() {
   const navigate = useNavigate();
-
-  const [resources, setResources] = useState([]);
-  const [resourcesCount, setResourcesCount] = useState(null)
+  const {resources,logout}=usePermissions();
   const [showLogoutConfirmation, setShowLogoutConfirmation] = useState(false);
-
-  useEffect(() => {
-    loadResources();
-  }, []);
 
   useEffect(() => {
     if (!showLogoutConfirmation) return undefined;
@@ -29,51 +22,19 @@ function Sidebar() {
     return () => document.removeEventListener("keydown", closeOnEscape);
   }, [showLogoutConfirmation]);
 
-  const loadResources = async () => {
-    try {
-      const data = await getMyResources();
-
-      const visibleResources = data.filter(
-        (item) => item.can_view === 1
-      );
-
-      const hasCandidateAccess = visibleResources.some(
-        (item) => item.resource_name === "candidates"
-      );
-      const hasReminderResource = visibleResources.some(
-        (item) => item.resource_name === "document_reminders"
-      );
-
-      if (hasCandidateAccess && !hasReminderResource) {
-        visibleResources.push({
-          id: "document-reminders",
-          resource_name: "document_reminders",
-          display_name: "Document Reminders",
-          // can_view: 1,
-        });
-      }
-
-      setResources(visibleResources);
-      setResourcesCount(data.length)
-      
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   const getClassName = ({ isActive }) =>
     `e2e_sidebar_menu_item ${isActive ? "e2e_sidebar_active" : ""
     }`;
 
   const handleLogout = () => {
-    Cookies.remove("jwtToken");
-    navigate("/");
+    logout();
+    navigate("/",{replace:true});
   };
 
   return (
     <div className="e2e_sidebar_container">
       <div className="e2e_sidebar_content">
-        {resourcesCount < 10 && <div className="aiRobotContainer1">
+        {resources.length < 10 && <div className="aiRobotContainer1">
           <img
             src="../../robot.png"   // your robot image
             alt="AI Robot"
@@ -102,20 +63,18 @@ function Sidebar() {
 
         <div className="e2e_sidebar_menu">
 
-          {resources.map((resource) => {
+          {resources.filter(resource=>resource.permissions.view&&resource.route&&resource.resource_type==="PAGE"&&resource.component_key).map((resource) => {
             const config =
-              sidebarConfig[resource.resource_name];
-
-            if (!config) return null;
+              sidebarConfig[resource.resource];
 
             return (
               <NavLink
                 key={resource.id}
-                to={config.route}
-                end={config.route === "/dashboard"}
+                to={resource.route}
+                end={resource.route === "/dashboard"}
                 className={getClassName}
               >
-                {config.icon}
+                {config?.icon||<FaShieldAlt className="menuIcon"/>}
                 <span>{resource.display_name}</span>
               </NavLink>
             );

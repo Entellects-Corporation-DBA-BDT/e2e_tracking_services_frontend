@@ -67,4 +67,24 @@ export const sidebarConfig = {
     icon: <FaIdBadge className="menuIcon indigoIcon" />,
     route: "/dashboard/employee-status",
   },
+  users: {
+    icon: <FaUsers className="menuIcon purpleIcon" />,
+    route: "/dashboard/users",
+  },
+  employees: {
+    icon: <FaIdBadge className="menuIcon indigoIcon" />,
+    route: "/dashboard/employee-status",
+  },
+  profile: {
+    icon: <FaUserTie className="menuIcon violetIcon" />,
+    route: "/dashboard/my-profile",
+  },
+  attendance: {
+    icon: <FaIdBadge className="menuIcon blueIcon" />,
+    route: "/dashboard/my-profile",
+  },
+  permissions: {
+    icon: <FaIdBadge className="menuIcon indigoIcon" />,
+    route: "/dashboard/permissions",
+  },
 };

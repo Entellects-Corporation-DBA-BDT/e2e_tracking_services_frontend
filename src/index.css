@@ -6,6 +6,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+.e2e_forbidden{display:grid;min-height:100vh;place-content:center;justify-items:center;padding:30px;background:#f8fafc;text-align:center}.e2e_forbidden>div{display:grid;width:76px;height:76px;place-items:center;border-radius:50%;background:#fee2e2;color:#dc2626;font-size:30px}.e2e_forbidden h1{margin:15px 0 0;color:#dc2626;font-size:54px}.e2e_forbidden h2{margin:0;color:#1e293b}.e2e_forbidden p{max-width:520px;color:#64748b;line-height:1.6}.e2e_forbidden button{display:flex;align-items:center;gap:8px;padding:11px 15px;border:0;border-radius:10px;background:#2563eb;color:#fff;font-weight:800;cursor:pointer}
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',

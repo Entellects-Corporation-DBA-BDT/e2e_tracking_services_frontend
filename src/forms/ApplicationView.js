@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import {
   FaUser,
   FaBuilding,
@@ -9,24 +9,31 @@ import {
   FaIdCard,
   FaPassport,
   FaCalendarAlt,
+  FaArrowLeft,
+  FaRedo,
 } from "react-icons/fa";
 import { getBenchSalesById, getRecruiterApplicationById, updateApplicationProcess, updateRecruiterApplicationProcess } from "../api/applicationApi";
+import { baseUrlImg } from "../Config/env";
 import "./ApplicationView.css";
 
-const ApplicationView = ({ applicationId, module = "bench" }) => {
+const ApplicationView = ({
+  applicationId,
+  module = "bench",
+  standalone = false,
+  title = "Application",
+  onBack,
+}) => {
   const [application, setApplication] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [updating, setUpdating] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [nextProcess, setNextProcess] = useState(null);
 
-  useEffect(() => {
-    fetchApplication();
-  }, [applicationId]);
-
-  const fetchApplication = async () => {
+  const fetchApplication = useCallback(async () => {
     try {
       setLoading(true);
+      setError("");
       const response = module === "recruiter"
         ? await getRecruiterApplicationById(applicationId)
         : await getBenchSalesById(applicationId);
@@ -35,17 +42,22 @@ const ApplicationView = ({ applicationId, module = "bench" }) => {
       }
     } catch (error) {
       console.error("Failed to fetch application:", error);
+      setError(error?.response?.data?.message || "This application could not be loaded.");
     } finally {
       setLoading(false);
     }
-  };
+  }, [applicationId, module]);
+
+  useEffect(() => {
+    fetchApplication();
+  }, [fetchApplication]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div className="application-page-state"><span className="application-page-spinner" /><h2>Loading application...</h2><p>Getting the latest information.</p></div>;
   }
 
   if (!application) {
-    return <div>No Data Found</div>;
+    return <div className="application-page-state application-page-error"><div>!</div><h2>Unable to open application</h2><p>{error || "No application data was found."}</p><span>{onBack && <button type="button" onClick={onBack}><FaArrowLeft /> Back</button>}<button type="button" onClick={fetchApplication}><FaRedo /> Try Again</button></span></div>;
   }
 
   const getFileIcon = (file) => {
@@ -78,14 +90,34 @@ const ApplicationView = ({ applicationId, module = "bench" }) => {
     }
   };
 
+  const fileUrl = (path) => {
+    if (!path) return null;
+    if (/^https?:\/\//i.test(path)) return path;
+    return `${baseUrlImg}/${String(path).replace(/^\//, "")}`;
+  };
+
+  const documents = [
+    ["Resume", application.resume_path, <FaFilePdf />],
+    ["Right to Represent", application.r2r_path, <FaFileWord />],
+    ["Driving License", application.driving_path, <FaIdCard />],
+    ["Visa Copy", application.visa_path, <FaPassport />],
+    ["MSC Copy", application.msc_path, <FaFilePdf />],
+  ];
+
   return (
-    <div className="application-view">
+    <div className={`application-view${standalone ? " application-view-standalone" : ""}`}>
+      {standalone && (
+        <button type="button" className="application-page-back" onClick={onBack}>
+          <FaArrowLeft /> Back to {module === "recruiter" ? "Recruiter Applications" : "Bench Sales"}
+        </button>
+      )}
       {/* Header */}
       <div className="candidate-header">
         <div className="candidate-avatar">
           <FaUser />
         </div>
         <div className="candidate-info">
+          {standalone && <small className="application-page-type">{title} #{application.id}</small>}
           <h2>{application.candidate_name}</h2>
           <p>{application.role}</p>
         </div>
@@ -227,42 +259,17 @@ const ApplicationView = ({ applicationId, module = "bench" }) => {
       <div className="view-card">
         <h3>Documents</h3>
         <div className="document-grid">
-          <a
-            href={application.resume}
-            target="_blank"
-            rel="noreferrer"
-            className="document-card"
-          >
-            {getFileIcon(application.resume)}
-            <span>Resume</span>
-          </a>
-          <a
-            href={application.r2r}
-            target="_blank"
-            rel="noreferrer"
-            className="document-card"
-          >
-            {getFileIcon(application.r2r)}
-            <span>R2R</span>
-          </a>
-          <a
-            href={application.driving_license}
-            target="_blank"
-            rel="noreferrer"
-            className="document-card"
-          >
-            <FaIdCard />
-            <span>Driving License</span>
-          </a>
-          <a
-            href={application.visa_copy}
-            target="_blank"
-            rel="noreferrer"
-            className="document-card"
-          >
-            <FaPassport />
-            <span>Visa Copy</span>
-          </a>
+          {documents.map(([label, path, icon]) => path ? (
+            <a href={fileUrl(path)} target="_blank" rel="noreferrer" className="document-card" key={label}>
+              {getFileIcon(path) || icon}
+              <span>{label}</span>
+              <small>Open document</small>
+            </a>
+          ) : (
+            <div className="document-card document-card-missing" key={label}>
+              {icon}<span>{label}</span><small>Not uploaded</small>
+            </div>
+          ))}
         </div>
       </div>
       {showConfirm && (

@@ -1,264 +1,86 @@
-import { useEffect, useState } from "react";
-
+import { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { FaCheckCircle, FaSearch, FaUserTag } from "react-icons/fa";
+import { getEmployees } from "../../api/employeeApi";
 import "../../styles/Dashboard/empstatus.css";
-
 import Loader from "./Loader";
+import Pagination from "./Pagination";
+import AssignCompanyNameModal from "../../components/AssignCompanyNameModal";
+import EmployeeFormModal from "../../components/EmployeeFormModal";
+import { deleteEmployee } from "../../api/employeeApi";
+import { ProtectedComponent } from "../../auth/PermissionContext";
 
 function EmployeeStatusReport() {
+  const navigate = useNavigate();
+  const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [entries, setEntries] = useState(10);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [employees, setEmployees] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [assigning, setAssigning] = useState(null);
+  const [toast, setToast] = useState("");
+  const [editing,setEditing]=useState(null);
+  const [formOpen,setFormOpen]=useState(false);
+  const [deleting,setDeleting]=useState(null);
 
-  const [loading, setLoading] =
-    useState(true);
-
-  const [searchTerm, setSearchTerm] =
-    useState("");
-
-  const [entries, setEntries] =
-    useState(10);
-
-  const [tableData, setTableData] =
-    useState([]);
+  const loadEmployees = useCallback(async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const response = await getEmployees({ page, limit: entries, search: debouncedSearch });
+      setEmployees(response.data || []);
+      setTotalPages(Math.max(response.total_pages || 1, 1));
+    } catch (requestError) {
+      setError(requestError?.response?.data?.message || "Employees could not be loaded.");
+    } finally {
+      setLoading(false);
+    }
+  }, [debouncedSearch, entries, page]);
 
   useEffect(() => {
+    const timer = window.setTimeout(() => setDebouncedSearch(search.trim()), 350);
+    return () => window.clearTimeout(timer);
+  }, [search]);
+  useEffect(() => { loadEmployees(); }, [loadEmployees]);
+  useEffect(() => {
+    if (!toast) return undefined;
+    const timer = window.setTimeout(() => setToast(""), 3500);
+    return () => window.clearTimeout(timer);
+  }, [toast]);
 
-    setTimeout(() => {
-
-      setTableData([
-
-        {
-          id: 1,
-          empId: "EMP001",
-          employeeName: "Kiran Kumar",
-          email: "kiran@company.com",
-          requestSent: "Yes",
-        },
-
-        {
-          id: 2,
-          empId: "EMP002",
-          employeeName: "Rahul Kumar",
-          email: "rahul@company.com",
-          requestSent: "No",
-        },
-
-        {
-          id: 3,
-          empId: "EMP003",
-          employeeName: "Anjali Sharma",
-          email: "anjali@company.com",
-          requestSent: "Yes",
-        },
-
-        {
-          id: 4,
-          empId: "EMP004",
-          employeeName: "Vamsi Krishna",
-          email: "vamsi@company.com",
-          requestSent: "Pending",
-        },
-
-      ]);
-
-      setLoading(false);
-
-    }, 1000);
-
-  }, []);
-
-  const filteredData = tableData
-
-    .filter(
-      (item) =>
-
-        item.employeeName
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase())
-
-        ||
-
-        item.empId
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase())
-
-        ||
-
-        item.email
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase())
-    )
-
-    .slice(0, entries);
-
-  if (loading) {
-
-    return <Loader />;
-
-  }
+  if (loading && !employees.length) return <Loader fullPage />;
 
   return (
-
     <div className="e2e_empstatus_page">
-
-      <div className="e2e_empstatus_top">
-
-        <div>
-
-          <h2>
-            Employee Status Report
-          </h2>
-
-          <div className="e2e_empstatus_heading_line"></div>
-
-        </div>
-
-        <button className="e2e_empstatus_add_btn">
-
-          + Add New
-
-        </button>
-
-      </div>
-
+      <div className="e2e_empstatus_top"><div><h2>Employee Identity Management</h2><p>Keep legal employee records separate from application-facing Company Names.</p><div className="e2e_empstatus_heading_line" /></div><ProtectedComponent resource="employees" action="create"><button className="e2e_employee_add" onClick={()=>{setEditing(null);setFormOpen(true)}}>+ Add Employee</button></ProtectedComponent></div>
       <div className="e2e_empstatus_filters">
-
-        
-
-        <div className="e2e_empstatus_filter_right">
-
-          <input
-            type="text"
-            placeholder="Search..."
-            value={searchTerm}
-            onChange={(e) =>
-              setSearchTerm(
-                e.target.value
-              )
-            }
-            className="e2e_empstatus_search"
-          />
-
-        </div>
-
+        <label className="e2e_empstatus_search_wrap"><FaSearch /><input type="search" placeholder="Search legal name, Company Name or Employee ID..." value={search} onChange={(event) => { setSearch(event.target.value); setPage(1); }} /></label>
+        <label className="e2e_empstatus_entries">Show <select value={entries} onChange={(event) => { setEntries(Number(event.target.value)); setPage(1); }}>{[10,25,50,100].map((size) => <option key={size}>{size}</option>)}</select></label>
       </div>
-
-      
-
+      {error && <div className="e2e_empstatus_error" role="alert">{error}<button type="button" onClick={loadEmployees}>Try again</button></div>}
       <div className="e2e_empstatus_table_wrapper">
-
-        <table className="e2e_empstatus_table">
-
-          <thead className="e2e_empstatus_thead">
-
-            <tr className="e2e_empstatus_head_row">
-
-              <th>#</th>
-
-              <th>Employee ID</th>
-
-              <th>Employee Name</th>
-
-              <th>Email</th>
-
-              <th>Request Sent</th>
-
-              <th>Action</th>
-
+        <table className="e2e_empstatus_table"><thead><tr><th>Employee ID</th><th>Legal Employee Name</th><th>Company Name</th><th>Role</th><th>Assignment</th><th>Action</th></tr></thead>
+          <tbody>{loading ? <tr><td colSpan="6" className="e2e_empstatus_empty">Loading employees...</td></tr> : employees.length ? employees.map((employee) => (
+            <tr key={employee.id}>
+              <td><strong>{employee.employee_id}</strong></td><td>{employee.legal_name}</td>
+              <td>{employee.company_name ? <span className="e2e_company_identity"><FaUserTag /> {employee.company_name}</span> : <span className="e2e_not_assigned">Not Assigned</span>}</td>
+              <td>{employee.role || "—"}</td>
+              <td><span className={employee.user_id ? "e2e_assignment_badge assigned" : "e2e_assignment_badge unassigned"}>{employee.user_id ? "Assigned" : "Not Assigned"}</span></td>
+              <td><div className="e2e_empstatus_actions"><button type="button" className="e2e_empstatus_view_btn" onClick={() => navigate(`/dashboard/employee-status/${employee.id}`)}>View</button><button type="button" className="editBtn" onClick={()=>{setEditing(employee);setFormOpen(true)}}>Edit</button><button type="button" className="deleteBtn" onClick={()=>setDeleting(employee)}>Remove</button>{!employee.user_id && <button type="button" className="e2e_empstatus_assign_btn" onClick={() => setAssigning(employee)}>Assign</button>}</div></td>
             </tr>
-
-          </thead>
-
-          <tbody className="e2e_empstatus_tbody">
-
-            {filteredData.map(
-              (item, index) => (
-
-                <tr
-                  key={item.id}
-                  className="e2e_empstatus_row"
-                >
-
-                  <td>
-
-                    {index + 1}
-
-                  </td>
-
-                  <td>
-
-                    {item.empId}
-
-                  </td>
-
-                  <td>
-
-                    {item.employeeName}
-
-                  </td>
-
-                  <td>
-
-                    {item.email}
-
-                  </td>
-
-                  <td>
-
-                    <span
-                      className={
-                        item.requestSent === "Yes"
-                          ? "e2e_empstatus_yes"
-                          : item.requestSent === "No"
-                          ? "e2e_empstatus_no"
-                          : "e2e_empstatus_pending"
-                      }
-                    >
-
-                      {item.requestSent}
-
-                    </span>
-
-                  </td>
-
-                  <td>
-
-                    <div className="e2e_empstatus_actions">
-
-                      <button className="e2e_empstatus_view_btn">
-
-                        View
-
-                      </button>
-
-                      <button className="e2e_empstatus_edit_btn">
-
-                        Edit
-
-                      </button>
-
-                      <button className="e2e_empstatus_delete_btn">
-
-                        Delete
-
-                      </button>
-
-                    </div>
-
-                  </td>
-
-                </tr>
-
-              )
-            )}
-
-          </tbody>
-
+          )) : <tr><td colSpan="6" className="e2e_empstatus_empty">No employees found.</td></tr>}</tbody>
         </table>
-
       </div>
-
+      <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
+      {assigning && <AssignCompanyNameModal employee={assigning} onClose={() => setAssigning(null)} onAssigned={(message) => { setAssigning(null); setToast(message); loadEmployees(); }} />}
+      {formOpen&&<EmployeeFormModal employee={editing} onClose={()=>setFormOpen(false)} onSaved={message=>{setFormOpen(false);setToast(message);loadEmployees()}}/>}
+      {deleting&&<div className="e2e_alias_overlay"><section className="e2e_remove_dialog"><div>!</div><h2>Remove Employee?</h2><p>Remove <strong>{deleting.legal_name}</strong>? Their linked User account and historical attendance will be retained.</p><footer><button className="secondary" onClick={()=>setDeleting(null)}>Cancel</button><button className="danger" onClick={async()=>{try{const r=await deleteEmployee(deleting.id);setDeleting(null);setToast(r.message);loadEmployees()}catch(e){setDeleting(null);setError(e?.response?.data?.message||"Employee could not be removed.")}}}>Remove Employee</button></footer></section></div>}
+      {toast && <div className="e2e_identity_toast" role="status"><FaCheckCircle /> {toast}</div>}
     </div>
-
   );
-
 }
 
 export default EmployeeStatusReport;

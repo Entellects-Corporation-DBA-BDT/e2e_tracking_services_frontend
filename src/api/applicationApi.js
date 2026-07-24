@@ -71,6 +71,16 @@ export const getDashboardSummary = async (params = {}) => {
   return response.data?.data ?? response.data;
 };
 
+export const getDashboardTable = async (table, params = {}) => {
+  const response = await axiosInstance.get(`/dashboard/${table}`, { params });
+  return response.data;
+};
+
+export const getDashboardRecord = async (table, id) => {
+  const response = await axiosInstance.get(`/dashboard/${table}/${id}`);
+  return response.data;
+};
+
 export const getRecruiterApplications = async (page = 1, limit = 10, search = "") => {
   const response = await axiosInstance.get("/recruiters/list", { params: { page, limit, search } });
   return response.data;
@@ -179,21 +189,6 @@ export const updateApplicationProcess = async (id, processId) => {
     {
       process_id: processId,
     }
-  );
-
-  return response.data;
-};
-
-
-/*
-|--------------------------------------------------------------------------
-| Recent Activities`
-|--------------------------------------------------------------------------
-*/
-
-export const getRecentActivities = async () => {
-  const response = await axiosInstance.get(
-    "/application/dashboard/recent-activities"
   );
 
   return response.data;

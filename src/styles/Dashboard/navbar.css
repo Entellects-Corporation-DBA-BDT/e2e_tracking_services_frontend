@@ -221,6 +221,10 @@
 /* PROFILE */
 
 .e2e_navbar_profile{
+  border:0;
+  font:inherit;
+  text-align:left;
+  cursor:pointer;
 
   display:flex;
 

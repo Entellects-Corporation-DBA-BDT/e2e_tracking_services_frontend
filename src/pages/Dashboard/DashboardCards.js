@@ -6,6 +6,7 @@ import {
   FaUserTie,
   FaChartLine,
 } from "react-icons/fa";
+import { usePermissions } from "../../auth/PermissionContext";
 
 const STANDARD_METRICS = ["submissions", "interviews", "placements"];
 
@@ -14,7 +15,12 @@ const formatMetricTitle = (key) => key
   .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
   .join(" ");
 
-function DashboardCards({ summary = {} }) {
+function DashboardCards({
+  summary = {},
+  selectedCard = "submissions",
+  onSelect = () => {},
+}) {
+  const { can } = usePermissions();
   const cards = useMemo(() => {
     const secondaryMetric = summary.active_candidates !== undefined
       ? "active_candidates"
@@ -45,12 +51,12 @@ function DashboardCards({ summary = {} }) {
         title: "Placements",
         icon: <FaUserTie />,
       },
-    ].map((card) => ({
+    ].filter((card) => can(`dashboard_${card.key}`, "view")).map((card) => ({
       ...card,
       count: summary[card.key] ?? 0,
       growth: summary[`${card.key}_growth`] ?? "",
     }));
-  }, [summary]);
+  }, [summary, can]);
 
   return (
 
@@ -58,9 +64,13 @@ function DashboardCards({ summary = {} }) {
 
       {cards.map((item, index) => (
 
-        <div
-          className="e2e_single_card"
-          key={index}
+        <button
+          type="button"
+          className={`e2e_single_card${selectedCard === item.key ? " e2e_single_card_active" : ""}`}
+          key={item.key}
+          onClick={() => onSelect(item.key)}
+          aria-pressed={selectedCard === item.key}
+          aria-controls="dashboard-data-table"
         >
 
           <div className="e2e_card_top">
@@ -87,7 +97,7 @@ function DashboardCards({ summary = {} }) {
 
           </div>
 
-        </div>
+        </button>
 
       ))}
 

@@ -20,9 +20,10 @@ export const loginUser = async (loginDetails) => {
       "userData",
       JSON.stringify(userData)
     );
+    window.dispatchEvent(new CustomEvent("e2e-auth-changed", { detail: { token } }));
 
     const resourceResponse = await axiosInstance.get(
-      "/resource/my",
+      "/auth/me",
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -30,11 +31,12 @@ export const loginUser = async (loginDetails) => {
       }
     );
 
-    const resources = resourceResponse.data.data;
+    const resources = (resourceResponse.data.resources || [])
+      .filter((resource) => resource.permissions?.view);
 
     return {
       ...response.data,
-      firstRoute: resources?.[0]?.route || "/dashboard",
+      firstRoute: resources.find((resource) => resource.route)?.route || "/dashboard",
     };
   } catch (error) {
     throw error.response?.data || error;

@@ -1,1 +1,2 @@
-export const baseUrl = "http://localhost:5000/api";
+// Keep one source of truth for the API URL.
+export { baseUrl } from "./env";

@@ -5,8 +5,10 @@ import PrimeVendorDeleteConfirmation from "../../forms/PrimeVendorDeleteConfirma
 import "../../styles/Dashboard/primevendors.css";
 import Loader from "./Loader";
 import Pagination from "./Pagination";
+import { useNavigate } from "react-router-dom";
 
 function PrimeVendors() {
+  const navigate = useNavigate();
   const [openAction, setOpenAction] = useState(null);
   const [selectedVendor, setSelectedVendor] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -145,7 +147,7 @@ function PrimeVendors() {
                   </td>
                   <td className="e2e_prime_td e2e_prime_td_action">
                     <div className="e2e_prime_actions">
-                      <button className="viewBtn" onClick={() => openVendorAction("view", vendor)}>View</button>
+                      <button className="viewBtn" onClick={() => navigate(`/dashboard/vendors/${vendor.id}`)}>View</button>
                       <button className="editBtn" onClick={() => openVendorAction("edit", vendor)}>Edit</button>
                       <button className="deleteBtn" onClick={() => openVendorAction("delete", vendor)}>Delete</button>
                     </div>
@@ -161,7 +163,7 @@ function PrimeVendors() {
 
       <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
 
-      {["create", "view", "edit"].includes(openAction) && (
+      {["create", "edit"].includes(openAction) && (
         <PrimeVendorForm mode={openAction} vendorId={selectedVendor?.id} closePopup={closeAction} refreshData={fetchVendors} />
       )}
 

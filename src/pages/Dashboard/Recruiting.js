@@ -5,11 +5,13 @@ import Pagination from "./Pagination";
 import FormView from "../../forms/FormView";
 import getUserDataFromCookies from "../../utils/getUserDataFromCookies";
 import { getRecruiterApplications } from "../../api/applicationApi";
+import { useNavigate } from "react-router-dom";
 
 const user = getUserDataFromCookies();
 const loginUserId = user?.user_id;
 
 function Recruiting() {
+  const navigate = useNavigate();
   const [openForm, setOpenForm] = useState(null);
   const [selectedApplicationId, setSelectedApplicationId] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -68,7 +70,7 @@ function Recruiting() {
         <td style={{ color:Number(loginUserId)===Number(item.employee_id)?"#16a34a":"inherit",fontWeight:Number(loginUserId)===Number(item.employee_id)?700:400 }}>{item.employee_name || "-"}</td>
         <td><strong>{item.candidate_name || "-"}</strong></td>
         <td>{item.poc || "-"}</td><td>{item.feedback || "-"}</td>
-        <td><div className="e2e_recruiting_actions"><button className="viewBtn" onClick={() => open("recruiterView",item.id)}>View</button><button className="editBtn" onClick={() => open("recruiterEdit",item.id)}>Edit</button><button className="deleteBtn" onClick={() => open("recruiterDelete",item.id)}>Delete</button></div></td>
+        <td><div className="e2e_recruiting_actions"><button className="viewBtn" onClick={() => navigate(`/dashboard/recruiting/${item.id}`)}>View</button><button className="editBtn" onClick={() => open("recruiterEdit",item.id)}>Edit</button><button className="deleteBtn" onClick={() => open("recruiterDelete",item.id)}>Delete</button></div></td>
       </tr>) : <tr><td colSpan="7" style={{ textAlign:"center",padding:30 }}>No recruiter applications found.</td></tr>}</tbody>
     </table></div>
     <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />

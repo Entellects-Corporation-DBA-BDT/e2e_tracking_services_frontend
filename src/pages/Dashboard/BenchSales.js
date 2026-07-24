@@ -6,6 +6,7 @@ import { getBenchSalesData } from "../../api/applicationApi";
 import Pagination from "./Pagination";
 import FormView from "../../forms/FormView";
 import getUserDataFromCookies from "../../utils/getUserDataFromCookies";
+import { useNavigate } from "react-router-dom";
 
 const user = getUserDataFromCookies();
 const loginUserId = user?.user_id;
@@ -17,6 +18,7 @@ const PROCESS_STATUS = {
 };
 
 function BenchSales() {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [openForm, setOpenForm] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
@@ -227,8 +229,7 @@ function BenchSales() {
                   <td className="e2e_benchsales_td_action">
                     <div className="e2e_benchsales_actions">
                       <button className="e2e_benchsales_view_btn" onClick={() => {
-                        setSelectedApplicationId(item.id);
-                        setOpenForm("benchView");
+                        navigate(`/dashboard/bench-sales/${item.id}`);
                       }}>View</button>
                       <button
                         className="e2e_benchsales_edit_btn"

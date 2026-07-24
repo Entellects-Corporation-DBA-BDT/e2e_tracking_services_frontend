@@ -2,38 +2,17 @@ import "../../styles/Dashboard/navbar.css";
 import { FaBell } from "react-icons/fa";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { getMyResources } from "../../api/authApi";
+import { usePermissions } from "../../auth/PermissionContext";
 import { sidebarConfig } from "./SidebarConfig";
 
 function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
   const searchRef = useRef(null);
-  const [user, setUser] = useState(null);
-  const [resources, setResources] = useState([]);
+  const { resources, user } = usePermissions();
   const [searchTerm, setSearchTerm] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
   const [activeSuggestion, setActiveSuggestion] = useState(-1);
-
-  useEffect(() => {
-    const storedUser = localStorage.getItem("userData");
-
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-  }, []);
-
-  useEffect(() => {
-    let mounted = true;
-    getMyResources()
-      .then((data) => {
-        if (mounted) {
-          setResources(data.filter((item) => Number(item.can_view) === 1 && sidebarConfig[item.resource_name]));
-        }
-      })
-      .catch((error) => console.error("Unable to load searchable resources:", error));
-    return () => { mounted = false; };
-  }, []);
 
   useEffect(() => {
     const closeSearch = (event) => {
@@ -46,13 +25,13 @@ function Navbar() {
   const suggestions = useMemo(() => {
     const query = searchTerm.trim().toLowerCase();
     if (!query) return [];
-    return resources.filter((item) =>
-      `${item.display_name || ""} ${item.resource_name || ""}`.replaceAll("_", " ").toLowerCase().includes(query)
+    return resources.filter((item) => item.permissions?.view && item.resource_type === "PAGE" && item.component_key && sidebarConfig[item.resource]).filter((item) =>
+      `${item.display_name || ""} ${item.resource || ""}`.replaceAll("_", " ").toLowerCase().includes(query)
     );
   }, [resources, searchTerm]);
 
   const selectResource = (resource) => {
-    navigate(sidebarConfig[resource.resource_name].route);
+    navigate(resource.route);
     setSearchTerm("");
     setSearchOpen(false);
     setActiveSuggestion(-1);
@@ -91,15 +70,29 @@ function Navbar() {
       "Candidate Onboarding",
     "/dashboard/employee-status":
       "Employee Status Report",
+    "/dashboard/users": "User Management",
+    "/dashboard/permissions": "Permission Matrix",
     "/dashboard/vendor-onboarding":
       "Vendor Onboarding",
   };
+
+  const currentPageTitle = location.pathname.startsWith("/dashboard/records/")
+    ? "Dashboard Record Details"
+    : /^\/dashboard\/recruiting\/\d+$/.test(location.pathname)
+      ? "Recruiter Application Details"
+      : /^\/dashboard\/bench-sales\/\d+$/.test(location.pathname)
+        ? "Bench Sales Application Details"
+        : /^\/dashboard\/vendors\/\d+$/.test(location.pathname)
+          ? "Prime Vendor Details"
+        : /^\/dashboard\/employee-status\/\d+$/.test(location.pathname)
+          ? "Employee Identity Details"
+        : pageTitles[location.pathname] || "Dashboard";
 
   return (
     <div className="e2e_navbar_container">
       <div>
         <h2 className="e2e_navbar_title">
-          {pageTitles[location.pathname] || "Dashboard"}
+          {currentPageTitle}
         </h2>
 
         <p className="e2e_navbar_subtitle">
@@ -132,10 +125,10 @@ function Navbar() {
               {suggestions.length ? suggestions.map((resource, index) => (
                 <button type="button" role="option" aria-selected={index === activeSuggestion}
                   className={`e2e_navbar_suggestion ${index === activeSuggestion ? "is-active" : ""}`}
-                  key={resource.id || resource.resource_name}
+                  key={resource.id || resource.resource}
                   onMouseEnter={() => setActiveSuggestion(index)} onClick={() => selectResource(resource)}>
-                  <span className="e2e_navbar_suggestion_icon">{sidebarConfig[resource.resource_name].icon}</span>
-                  <span><strong>{resource.display_name || resource.resource_name.replaceAll("_", " ")}</strong><small>Open resource</small></span>
+                  <span className="e2e_navbar_suggestion_icon">{sidebarConfig[resource.resource].icon}</span>
+                  <span><strong>{resource.display_name || resource.resource.replaceAll("_", " ")}</strong><small>Open resource</small></span>
                 </button>
               )) : <div className="e2e_navbar_no_suggestion">No accessible resource found</div>}
             </div>
@@ -146,16 +139,16 @@ function Navbar() {
           <FaBell />
         </div>
 
-        <div className="e2e_navbar_profile">
+        <button type="button" className="e2e_navbar_profile" onClick={() => navigate("/dashboard/my-profile")} aria-label="Open my employee profile and attendance">
   <div className="e2e_navbar_avatar">
-    {user?.nick_name?.charAt(0)?.toUpperCase() || "U"}
+    {user?.username?.charAt(0)?.toUpperCase() || "U"}
   </div>
 
   <div className="e2e_navbar_profile_info">
-    <h4>{user?.nick_name || "User"}</h4>
+    <h4>{user?.username || "User"}</h4>
     <p>{user?.email || "Employee"}</p>
   </div>
-</div>
+</button>
       </div>
     </div>
   );
