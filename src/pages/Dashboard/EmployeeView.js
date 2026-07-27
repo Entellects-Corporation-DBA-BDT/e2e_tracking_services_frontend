@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { FaArrowLeft, FaBriefcase, FaIdBadge, FaRedo, FaTrashAlt, FaUser, FaUserTag } from "react-icons/fa";
 import { getEmployeeById, removeCompanyName } from "../../api/employeeApi";
 import AssignCompanyNameModal from "../../components/AssignCompanyNameModal";
@@ -11,6 +11,7 @@ import { usePermissions } from "../../auth/PermissionContext";
 function EmployeeView() {
   const { employeeId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { can } = usePermissions();
   const [employee, setEmployee] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -61,7 +62,9 @@ function EmployeeView() {
           {[["legal_name","Legal Name"],["employee_id","Employee ID"],["contact_info","Contact Information"],["gender","Gender"],["birthdate","Birth Date"],["created_on","Created On"]].map(([key,label]) => <div className="e2e_record_field" key={key}><dt><FaIdBadge /> {label}</dt><dd>{employee[key] || "Not provided"}</dd></div>)}
         </dl>
       </section>
-      <AttendancePanel employeeId={employee.id} canManage={can("attendance", "edit")} />
+      <AttendancePanel employeeId={employee.id} employeeCode={employee.employee_id}
+        isOwn={location.pathname.startsWith("/dashboard/my-profile/")}
+        canManage={can("attendance", "edit")} />
 
       <section className="e2e_record_card e2e_company_identity_card">
         <div className="e2e_record_card_title"><FaUserTag /><div><h2>Company Identity</h2><p>The alias used across dashboards, applications, interviews, placements, and reports.</p></div></div>

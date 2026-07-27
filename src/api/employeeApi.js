@@ -40,3 +40,14 @@ export const updateEmployee = async (id, data) => (await axiosInstance.put(`/emp
 export const deleteEmployee = async (id) => (await axiosInstance.delete(`/employees/${id}`)).data;
 export const getMyEmployeeProfile = async () => (await axiosInstance.get("/employees/me")).data;
 export const getPositions = async () => (await axiosInstance.get("/position/list", { params: { page: 1, limit: 100 } })).data;
+export const getTodayAttendance = async () => (await axiosInstance.get("/attendance/today")).data;
+export const clockAttendance = async (action, employeeId) =>
+  (await axiosInstance.post(`/attendance/time-${action}`, { employee_id: employeeId })).data;
+export const getHolidays = async (year) => (await axiosInstance.get("/attendance/holidays", { params: { year } })).data;
+export const saveHoliday = async (data) => (await axiosInstance.post("/attendance/holidays", data)).data;
+export const deleteHoliday = async (id) => (await axiosInstance.delete(`/attendance/holidays/${id}`)).data;
+export const getLeaves = async (params = {}) => (await axiosInstance.get("/attendance/leaves", { params })).data;
+export const submitLeave = async (data) => (await axiosInstance.post("/attendance/leaves", data)).data;
+export const addEmployeeLeave = async (data) => (await axiosInstance.post("/attendance/leaves/admin", data)).data;
+export const reviewLeave = async (id, data) => (await axiosInstance.put(`/attendance/leaves/${id}`, data)).data;
+export const editAttendance = async (id, data) => (await axiosInstance.put(`/attendance/records/${id}`, data)).data;

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import axiosInstance from "../../api/axiosInstance";
 import { ProtectedButton } from "../../auth/PermissionComponents";
+import ConfirmDialog from "../../components/ConfirmDialog";
 
 export default function AccessCatalog({ type }) {
   const resource = type === "positions" ? "positions" : "resources";
@@ -10,6 +11,7 @@ export default function AccessCatalog({ type }) {
   const [search, setSearch] = useState("");
   const [editing, setEditing] = useState(null);
   const [error, setError] = useState("");
+  const [removing, setRemoving] = useState(null);
 
   const load = useCallback(async () => {
     try {
@@ -33,8 +35,8 @@ export default function AccessCatalog({ type }) {
   };
 
   const remove = async (row) => {
-    if (!window.confirm(`Remove ${row[nameField]}?`)) return;
     await axiosInstance.delete(`/${singular}/delete/${row.id}`);
+    setRemoving(null);
     load();
   };
 
@@ -47,7 +49,7 @@ export default function AccessCatalog({ type }) {
     <div className="user-table"><table><thead><tr><th>Name</th><th>Display Name</th><th>Route</th><th>Status</th><th>Actions</th></tr></thead>
       <tbody>{rows.map((row) => <tr key={row.id}><td>{row[nameField]}</td><td>{row.display_name || "—"}</td><td>{row.route || "—"}</td><td>{row.status}</td><td><div>
         <ProtectedButton resource={resource} action="edit"><button onClick={() => setEditing(row)}>Edit</button></ProtectedButton>
-        <ProtectedButton resource={resource} action="delete"><button className="danger" onClick={() => remove(row)}>Remove</button></ProtectedButton>
+        <ProtectedButton resource={resource} action="delete"><button className="danger" onClick={() => setRemoving(row)}>Remove</button></ProtectedButton>
       </div></td></tr>)}</tbody></table></div>
     {editing && <div className="e2e_alias_overlay"><section className="employee-form-modal"><form onSubmit={save}><h2>{editing.id ? "Edit" : "Add"} {singular}</h2>
       <label>Name<input required value={editing[nameField] || ""} onChange={(event) => setEditing({ ...editing, [nameField]: event.target.value })} /></label>
@@ -55,5 +57,8 @@ export default function AccessCatalog({ type }) {
       <label>Status<select value={editing.status || "Active"} onChange={(event) => setEditing({ ...editing, status: event.target.value })}><option>Active</option><option>Inactive</option></select></label>
       <footer><button type="button" className="secondary" onClick={() => setEditing(null)}>Cancel</button><button className="primary">Save</button></footer>
     </form></section></div>}
+    <ConfirmDialog open={Boolean(removing)} title={`Remove ${singular}?`}
+      message={`Remove ${removing?.[nameField] || `this ${singular}`}? This may affect permissions and linked dashboard access.`}
+      confirmLabel={`Remove ${singular}`} onCancel={()=>setRemoving(null)} onConfirm={()=>remove(removing)} />
   </div>;
 }

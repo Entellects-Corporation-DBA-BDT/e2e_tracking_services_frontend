@@ -12,6 +12,7 @@ import {
   FaLaptopCode,
   FaIdBadge,
   FaBell,
+  FaCalendarCheck,
 } from "react-icons/fa";
 
 export const sidebarConfig = {
@@ -80,8 +81,8 @@ export const sidebarConfig = {
     route: "/dashboard/my-profile",
   },
   attendance: {
-    icon: <FaIdBadge className="menuIcon blueIcon" />,
-    route: "/dashboard/my-profile",
+    icon: <FaCalendarCheck className="menuIcon blueIcon" />,
+    route: "/dashboard/attendance",
   },
   permissions: {
     icon: <FaIdBadge className="menuIcon indigoIcon" />,

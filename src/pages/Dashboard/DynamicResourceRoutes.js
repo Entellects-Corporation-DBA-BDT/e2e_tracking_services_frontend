@@ -20,6 +20,7 @@ import EmployeeView from "./EmployeeView";
 import CandidateView from "../../forms/CandidateView";
 import JobView from "../../forms/JobView";
 import AccessCatalog from "./AccessCatalog";
+import AttendanceManagement from "./AttendanceManagement";
 
 const PAGE_COMPONENTS = {
   recruiting: <Recruiting />,
@@ -34,6 +35,7 @@ const PAGE_COMPONENTS = {
   employees: <EmployeeStatusReport />,
   users: <UserManagement />,
   profile: <MyProfile />,
+  attendance: <AttendanceManagement />,
   permissions: <PermissionMatrix />,
   positions: <AccessCatalog type="positions" />,
   resources: <AccessCatalog type="resources" />,

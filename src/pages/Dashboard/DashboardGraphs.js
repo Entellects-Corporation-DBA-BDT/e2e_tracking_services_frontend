@@ -244,13 +244,9 @@ function DashboardGraphs({
               value={category}
               onChange={(e) => onCategoryChange(e.target.value)}
             >
-              <option value="benchsales">Recruiting</option>
-              <option value="recruiting">Bench Sales</option>
-              <option value="hotlist">Hot List</option>
-              <option value="jobs">Jobs</option>
-              <option value="primevendors">Prime Vendors</option>
-              <option value="clients">Clients</option>
-              <option value="candidates">Candidates</option>
+              <option value="all">All Submissions</option>
+              <option value="recruiters">Recruiters</option>
+              <option value="benchsales">Bench Sales</option>
             </select>
           </div>
           {selectedFilter === "custom" && (

@@ -20,16 +20,20 @@ import { usePermissions } from "../../auth/PermissionContext";
 
 import "../../styles/Dashboard/index.css";
 
-const formatDate = (date) => {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
+const formatDate = (date) => new Intl.DateTimeFormat("en-CA", {
+  timeZone: "America/New_York",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+}).format(date);
 
-  return `${year}-${month}-${day}`;
+const newYorkCalendarDate = () => {
+  const value = formatDate(new Date());
+  return new Date(`${value}T12:00:00`);
 };
 
 const getPresetDateRange = (filter) => {
-  const today = new Date();
+  const today = newYorkCalendarDate();
   const start = new Date(today);
 
   if (filter === "this_week") {
@@ -103,7 +107,7 @@ function Dashboard() {
     filter: "today",
     ...getPresetDateRange("today"),
   }));
-  const [category, setCategory] = useState("benchsales");
+  const [category, setCategory] = useState("all");
   const [summary, setSummary] = useState({});
   const [analytics, setAnalytics] = useState({ data: [], total: 0 });
   const [loading, setLoading] = useState(true);

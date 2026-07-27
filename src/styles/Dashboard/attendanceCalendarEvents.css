@@ -1,0 +1,44 @@
+.attendance-calendar-grid button span small {
+  display: block;
+  max-width: 78px;
+  margin-top: 4px;
+  overflow: hidden;
+  font-size: 8px;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.attendance-calendar-grid button.holiday {
+  border-color: #f9a8d4;
+  background: #fdf2f8;
+  color: #be185d;
+  opacity: 1;
+}
+.attendance-calendar-grid button.leave {
+  border-color: #93c5fd;
+  background: #eff6ff;
+  color: #1d4ed8;
+  opacity: 1;
+}
+.attendance-calendar-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 12px;
+}
+.attendance-calendar-legend span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #64748b;
+  font-size: 11px;
+}
+.attendance-calendar-legend span::before {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  background: #dcfce7;
+  content: "";
+}
+.attendance-calendar-legend span.leave::before { background: #bfdbfe; }
+.attendance-calendar-legend span.holiday::before { background: #fbcfe8; }
