@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { FaCalendarCheck, FaCheck, FaClock, FaPlus, FaTimes, FaTrash, FaUserCheck, FaUserTimes } from "react-icons/fa";
 import {
   addEmployeeLeave, deleteHoliday, getEmployees, getHolidays, getLeaves,
-  getTodayAttendance, reviewLeave, saveHoliday,
+  getAttendanceIpPermissions, getMonthlyAttendance, getTodayAttendance, reviewLeave, saveHoliday, updateEmployeeWfhPermission,
 } from "../../api/employeeApi";
 import { usePermissions } from "../../auth/PermissionContext";
 import MyProfile from "./MyProfile";
@@ -13,11 +13,15 @@ const blankLeave = { employee_id:"", leave_type:"paid", start_date:"", end_date:
 const blankHoliday = { holiday_date:"", name:"", description:"", is_optional:false };
 
 function AttendanceManagement() {
-  const { can } = usePermissions();
+  const { can, user } = usePermissions();
   const admin = can("attendance","edit");
+  const superAdmin = Boolean(user?.super_admin);
   const [tab,setTab]=useState("today");
+  const localDate=new Date().toLocaleDateString("en-CA",{timeZone:"America/New_York"});
+  const [selectedDate,setSelectedDate]=useState(localDate),[selectedMonth,setSelectedMonth]=useState(localDate.slice(0,7));
   const [leaves,setLeaves]=useState([]),[employees,setEmployees]=useState([]),[holidays,setHolidays]=useState([]);
   const [today,setToday]=useState({data:[],total_employees:0,present:0,absent:0,late:0,working:0});
+  const [monthly,setMonthly]=useState({data:[]}),[ipPermissions,setIpPermissions]=useState([]),[savingRestriction,setSavingRestriction]=useState(null),[restrictionSearch,setRestrictionSearch]=useState("");
   const [leave,setLeave]=useState(blankLeave),[holiday,setHoliday]=useState(blankHoliday);
   const [status,setStatus]=useState(""),[message,setMessage]=useState({text:"",error:false}),[loading,setLoading]=useState(true);
   const [confirmation,setConfirmation]=useState(null);
@@ -25,14 +29,15 @@ function AttendanceManagement() {
   const load=useCallback(async()=>{
     setLoading(true);
     try{
-      const [leaveResult,employeeResult,holidayResult,todayResult]=await Promise.all([
-        getLeaves(status?{status}:{}),getEmployees({limit:100,page:1,employment:"current"}),getHolidays(new Date().getFullYear()),getTodayAttendance()
-      ]);
+      const requests=[getLeaves(status?{status}:{}),getEmployees({limit:100,page:1,employment:"current"}),getHolidays(new Date().getFullYear()),getTodayAttendance(selectedDate),getMonthlyAttendance(selectedMonth)];
+      if(superAdmin)requests.push(getAttendanceIpPermissions());
+      const [leaveResult,employeeResult,holidayResult,todayResult,monthResult,settingsResult]=await Promise.all(requests);
       setLeaves(leaveResult.data||[]);setEmployees(employeeResult.data||[]);setHolidays(holidayResult.data||[]);
-      setToday(todayResult||{data:[]});
+      setToday(todayResult||{data:[]});setMonthly(monthResult||{data:[]});
+      if(settingsResult)setIpPermissions(settingsResult.data||[]);
     }catch(error){setMessage({text:error?.response?.data?.message||"Attendance management could not be loaded.",error:true});}
     finally{setLoading(false);}
-  },[status]);
+  },[status,selectedDate,selectedMonth,superAdmin]);
   useEffect(()=>{if(admin)load();},[admin,load]);
   if(!admin)return <MyProfile/>;
 
@@ -53,11 +58,11 @@ function AttendanceManagement() {
 
   return <main className="attendance-management">
     <header className="attendance-management-hero"><span><FaCalendarCheck/></span><div><p>HR & ADMIN</p><h1>Attendance Management</h1><small>Approve leave, add employee leave, and maintain the company holiday calendar. All attendance times use US Eastern Time (ET).</small></div></header>
-    <nav>{[["today","Today's Attendance"],["approvals","Leave Approvals"],["add-leave","Add Employee Leave"],["holidays","Holidays"]].map(([key,label])=><button key={key} className={tab===key?"active":""} onClick={()=>setTab(key)}>{label}</button>)}</nav>
+    <nav>{[["today","Daily Attendance"],["monthly","Monthly Summary"],...(superAdmin?[["restriction","IP Restriction"]]:[]),["approvals","Leave Approvals"],["add-leave","Add Employee Leave"],["holidays","Holidays"]].map(([key,label])=><button key={key} className={tab===key?"active":""} onClick={()=>setTab(key)}>{label}</button>)}</nav>
     {message.text&&<p className={`attendance-admin-message ${message.error?"error":""}`}>{message.text}</p>}
     {loading?<div className="attendance-loading"><span/> Loading attendance management...</div>:<>
       {tab==="today"&&<section className="attendance-admin-section">
-        <div className="attendance-section-title"><div><h2>Today's Working Employees</h2><p>Only employee records assigned to a company login are included.</p></div><strong>{today.work_date}</strong></div>
+        <div className="attendance-section-title"><div><h2>Daily Attendance</h2><p>Select any date to review every active employee.</p></div><label className="attendance-date-filter">Date<input type="date" max={localDate} value={selectedDate} onChange={e=>setSelectedDate(e.target.value)}/></label></div>
         <div className="attendance-today-cards">
           <article><FaUserCheck/><span><small>Current Employees</small><strong>{today.total_employees||0}</strong></span></article>
           <article className="present"><FaCalendarCheck/><span><small>Present Today</small><strong>{today.present||0}</strong></span></article>
@@ -67,11 +72,19 @@ function AttendanceManagement() {
         <div className="attendance-admin-table"><table><thead><tr><th>Employee</th><th>Company Login</th><th>Role</th><th>Time In</th><th>Time Out</th><th>Hours</th><th>Status</th></tr></thead>
           <tbody>{today.data?.length?today.data.map(row=><tr key={row.id}><td><strong>{row.legal_name}</strong><small>{row.employee_id}</small></td><td><strong>{row.company_name}</strong><small>{row.username}</small></td><td>{row.role||"-"}</td><td>{row.present?`${row.time_in} ET`:"-"}</td><td>{row.present?(row.time_out==="00:00:00"?"Working":`${row.time_out} ET`):"-"}</td><td>{row.present?`${row.hours||0} h`:"-"}</td><td><mark className={row.present?"approved":"rejected"}>{row.present?(Number(row.status)===1?"Present - On time":"Present - Late"):"Absent"}</mark></td></tr>):<tr><td colSpan="7">No current employees are assigned to company users.</td></tr>}</tbody></table></div>
       </section>}
-      {tab==="approvals"&&<section className="attendance-admin-section">
+      {tab==="monthly"&&<section className="attendance-admin-section">
+        <div className="attendance-section-title"><div><h2>Monthly Attendance Summary</h2><p>Totals for every active employee through {monthly.end_date||"the selected month"}.</p></div><label className="attendance-date-filter">Month<input type="month" max={localDate.slice(0,7)} value={selectedMonth} onChange={e=>setSelectedMonth(e.target.value)}/></label></div>
+        <div className="attendance-admin-table"><table><thead><tr><th>Employee</th><th>Company Login</th><th>Role</th><th>Present Days</th><th>Half Days</th><th>Late Days</th><th>Total Hours</th></tr></thead><tbody>{monthly.data?.length?monthly.data.map(row=><tr key={row.id}><td><strong>{row.legal_name}</strong><small>{row.employee_id}</small></td><td><strong>{row.company_name}</strong><small>{row.username}</small></td><td>{row.role||"-"}</td><td>{row.present_days}</td><td>{row.half_days}</td><td>{row.late_days}</td><td><strong>{row.total_hours||0} h</strong></td></tr>):<tr><td colSpan="7">No employees found for this month.</td></tr>}</tbody></table></div>
+      </section>}
+      {tab==="restriction"&&superAdmin&&<section className="attendance-admin-section attendance-restriction-card">
+        <div className="attendance-section-title"><div><h2>Employee WFH Access</h2><p>Company IP restriction remains active. Grant an exception only to employees currently working from home.</p></div><input className="restriction-search" placeholder="Search employee..." value={restrictionSearch} onChange={e=>setRestrictionSearch(e.target.value)}/></div>
+        <div className="attendance-admin-table"><table><thead><tr><th>Employee</th><th>Company Login</th><th>Role</th><th>Attendance Access</th><th>Action</th></tr></thead><tbody>{ipPermissions.filter(row=>`${row.legal_name} ${row.employee_code} ${row.company_name} ${row.username}`.toLowerCase().includes(restrictionSearch.toLowerCase())).map(row=><tr key={row.employee_id}><td><strong>{row.legal_name}</strong><small>{row.employee_code}</small></td><td><strong>{row.company_name}</strong><small>{row.username}</small></td><td>{row.role||"-"}</td><td><mark className={row.wfh_allowed?"approved":"rejected"}>{row.wfh_allowed?"WFH allowed":"Company network only"}</mark></td><td><button className={`wfh-toggle ${row.wfh_allowed?"remove":"grant"}`} disabled={savingRestriction===row.employee_id} onClick={async()=>{setSavingRestriction(row.employee_id);try{const result=await updateEmployeeWfhPermission(row.employee_id,!row.wfh_allowed);setIpPermissions(current=>current.map(item=>item.employee_id===row.employee_id?{...item,wfh_allowed:result.wfh_allowed}:item));setMessage({text:`${row.legal_name}: ${result.message}`,error:false});}catch(error){setMessage({text:error?.response?.data?.message||"WFH permission could not be updated.",error:true});}finally{setSavingRestriction(null);}}}>{savingRestriction===row.employee_id?"Saving...":row.wfh_allowed?"Remove WFH Access":"Grant WFH Access"}</button></td></tr>)}</tbody></table></div>
+        <small>Only Super Admin can grant or remove these employee-specific exceptions.</small>
+      </section>}      {tab==="approvals"&&<section className="attendance-admin-section">
         <div className="attendance-section-title"><div><h2>Leave Requests</h2><p>Review pending requests and view completed decisions.</p></div>
           <select value={status} onChange={e=>setStatus(e.target.value)}><option value="">All statuses</option><option value="pending">Pending</option><option value="approved">Approved</option><option value="rejected">Rejected</option></select></div>
         <div className="attendance-admin-table"><table><thead><tr><th>Employee</th><th>Type</th><th>Dates</th><th>Duration</th><th>Reason</th><th>Status</th><th>Approved / Rejected By</th><th>Action</th></tr></thead>
-          <tbody>{leaves.length?leaves.map(row=><tr key={row.id}><td><strong>{row.employee_name}</strong><small>{row.employee_id}</small></td><td>{row.leave_type}</td><td>{row.start_date}<br/>{row.end_date}</td><td>{row.duration.replaceAll("_"," ")}</td><td>{row.reason}</td><td><mark className={row.status}>{row.status}</mark></td><td>{row.status==="pending"?"—":<span className="leave-reviewer"><strong>{row.reviewer_display_name||"HR"}</strong><small>{row.review_source||"Website"}{row.reviewed_at?` · ${row.reviewed_at}`:""}</small></span>}</td><td>{row.status==="pending"?<span className="attendance-decision"><button title="Approve" onClick={()=>setConfirmation({type:"leave",row,next:"approved"})}><FaCheck/></button><button title="Reject" onClick={()=>setConfirmation({type:"leave",row,next:"rejected"})}><FaTimes/></button></span>:"—"}</td></tr>):<tr><td colSpan="8">No leave requests found.</td></tr>}</tbody></table></div>
+          <tbody>{leaves.length?leaves.map(row=><tr key={row.id}><td><strong>{row.employee_name}</strong><small>{row.employee_id}</small></td><td>{row.leave_type}</td><td>{row.start_date}<br/>{row.end_date}</td><td>{row.duration.replaceAll("_"," ")}</td><td>{row.reason}</td><td><mark className={row.status}>{row.status}</mark></td><td>{row.status==="pending"?"--":<span className="leave-reviewer"><strong>{row.reviewer_display_name||"HR"}</strong><small>{row.review_source||"Website"}{row.reviewed_at?` - ${row.reviewed_at}`:""}</small></span>}</td><td>{row.status==="pending"?<span className="attendance-decision"><button title="Approve" onClick={()=>setConfirmation({type:"leave",row,next:"approved"})}><FaCheck/></button><button title="Reject" onClick={()=>setConfirmation({type:"leave",row,next:"rejected"})}><FaTimes/></button></span>:"--"}</td></tr>):<tr><td colSpan="8">No leave requests found.</td></tr>}</tbody></table></div>
       </section>}
       {tab==="add-leave"&&<section className="attendance-admin-section"><div className="attendance-section-title"><div><h2>Add Approved Leave</h2><p>Record leave directly for an employee. It is approved immediately.</p></div></div>
         <form className="attendance-admin-form" onSubmit={addLeave}>

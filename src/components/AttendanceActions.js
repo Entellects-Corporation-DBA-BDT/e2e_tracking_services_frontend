@@ -24,7 +24,7 @@ function AttendanceActions({ employeeCode, isOwn, canManage, onChanged }) {
   const load = useCallback(async () => {
     try {
       const requests = [getHolidays(new Date().getFullYear()), getLeaves()];
-      if (isOwn) requests.unshift(getTodayAttendance());
+      if (isOwn) requests.unshift(getTodayAttendance(undefined, true));
       const results = await Promise.all(requests);
       let offset = 0;
       if (isOwn) { setToday(results[0]); offset = 1; }
@@ -66,9 +66,9 @@ function AttendanceActions({ employeeCode, isOwn, canManage, onChanged }) {
   const nextAction = !record ? "in" : record.time_out === "00:00:00" ? "out" : "";
   return <div className="attendance-workflows">
     {isOwn && <section className="attendance-clock-card">
-      <div><span><FaClock /></span><div><h3>Today in Eastern Time</h3><p>{today?.work_date || "Loading..."} · 9:30 AM–6:30 PM America/New_York</p></div></div>
+      <div><span><FaClock /></span><div><h3>Today in Eastern Time</h3><p>{today?.work_date || "Loading..."} Â· 9:30 AMâ€“6:30 PM America/New_York</p></div></div>
       <div className="clock-status"><strong>{record ? record.work_status.replace("_", " ") : "Not timed in"}</strong>
-        <small>{record ? `${record.time_in} — ${record.time_out === "00:00:00" ? "Working" : record.time_out}` : today?.network?.allowed ? "Confirm your employee ID to begin" : `Company network required · Current IP: ${today?.network?.ip || "unknown"}`}</small></div>
+        <small>{record ? `${record.time_in} â€” ${record.time_out === "00:00:00" ? "Working" : record.time_out}` : today?.network?.allowed ? "Confirm your employee ID to begin" : `Company network required Â· Current IP: ${today?.network?.ip || "unknown"}`}</small></div>
       {nextAction && <button title={!today?.network?.allowed ? "Connect to the company network to record attendance" : ""}
         className={`clock-button ${nextAction}`} onClick={() => setConfirming(nextAction)}>Time {nextAction === "in" ? "In" : "Out"}</button>}
       {!nextAction && record && <span className="shift-complete"><FaCheck /> Shift completed</span>}
@@ -88,7 +88,7 @@ function AttendanceActions({ employeeCode, isOwn, canManage, onChanged }) {
         <input required className="leave-reason" placeholder="Reason" value={leave.reason} onChange={e=>setLeave({...leave,reason:e.target.value})}/>
         <button disabled={busy}><FaCalendarPlus /> Request Leave</button>
       </form>}
-      <div className="leave-list">{leaves.length ? leaves.map(item=><article key={item.id}><div><strong>{item.employee_name || "My leave"} · {item.leave_type}</strong><span>{item.start_date} to {item.end_date} · {item.duration.replace("_"," ")}</span><small>{item.reason}</small></div><mark className={item.status}>{item.status}</mark>
+      <div className="leave-list">{leaves.length ? leaves.map(item=><article key={item.id}><div><strong>{item.employee_name || "My leave"} Â· {item.leave_type}</strong><span>{item.start_date} to {item.end_date} Â· {item.duration.replace("_"," ")}</span><small>{item.reason}</small></div><mark className={item.status}>{item.status}</mark>
         {canManage && item.status==="pending" && <footer><button onClick={()=>decideLeave(item.id,"approved")}><FaCheck /></button><button onClick={()=>decideLeave(item.id,"rejected")}><FaTimes /></button></footer>}</article>) : <p>No leave requests found.</p>}</div>
     </section>
 

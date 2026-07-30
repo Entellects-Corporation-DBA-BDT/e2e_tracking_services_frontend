@@ -40,7 +40,10 @@ export const updateEmployee = async (id, data) => (await axiosInstance.put(`/emp
 export const deleteEmployee = async (id) => (await axiosInstance.delete(`/employees/${id}`)).data;
 export const getMyEmployeeProfile = async () => (await axiosInstance.get("/employees/me")).data;
 export const getPositions = async () => (await axiosInstance.get("/position/list", { params: { page: 1, limit: 100 } })).data;
-export const getTodayAttendance = async () => (await axiosInstance.get("/attendance/today")).data;
+export const getTodayAttendance = async (date, self = false) => (await axiosInstance.get("/attendance/today", { params: { ...(date ? { date } : {}), ...(self ? { self: 1 } : {}) } })).data;
+export const getMonthlyAttendance = async (month) => (await axiosInstance.get("/attendance/month", { params: { month } })).data;
+export const getAttendanceIpPermissions = async () => (await axiosInstance.get("/attendance/ip-settings")).data;
+export const updateEmployeeWfhPermission = async (employeeId, wfhAllowed) => (await axiosInstance.put(`/attendance/ip-settings/${employeeId}`, { wfh_allowed: wfhAllowed })).data;
 export const clockAttendance = async (action, employeeId) =>
   (await axiosInstance.post(`/attendance/time-${action}`, { employee_id: employeeId })).data;
 export const getHolidays = async (year) => (await axiosInstance.get("/attendance/holidays", { params: { year } })).data;

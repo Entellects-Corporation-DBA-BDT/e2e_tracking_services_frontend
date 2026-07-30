@@ -48,7 +48,9 @@ function fetchEmployees($filters) {
         FROM employees e
         LEFT JOIN users u ON u.id = e.user_id
         LEFT JOIN positions p ON p.id = u.position_id
-        $where ORDER BY e.id DESC LIMIT ? OFFSET ?");
+        $where
+        ORDER BY (e.user_id IS NULL) ASC, e.id DESC
+        LIMIT ? OFFSET ?");
     $dataParams = array_merge($params, [(int)$filters['limit'], (int)$filters['offset']]);
     $stmt->bind_param($types . 'ii', ...$dataParams);
     $stmt->execute();
@@ -58,9 +60,9 @@ function fetchEmployees($filters) {
     return ['data' => $rows, 'total' => $total];
 }
 
-function fetchTodayAttendanceRoster() {
+function fetchAttendanceRoster($date = null) {
     global $conn;
-    $date = newYorkNow()->format('Y-m-d');
+    $date = $date ?: newYorkNow()->format('Y-m-d');
     $sql = "SELECT e.id,e.employee_id,e.user_id,
             TRIM(CONCAT_WS(' ',e.firstname,e.lastname)) legal_name,
             u.nick_name company_name,u.email username,p.position_name role,
@@ -87,6 +89,37 @@ function fetchTodayAttendanceRoster() {
         'absent'=>max(0,count($rows)-$present),'late'=>$late,'working'=>$working,'data'=>$rows];
 }
 
+function fetchMonthlyAttendanceRoster($month) {
+    global $conn;
+    $start=$month.'-01';
+    $end=(new DateTimeImmutable($start))->modify('last day of this month')->format('Y-m-d');
+    $today=newYorkNow()->format('Y-m-d');
+    if($end>$today)$end=$today;
+    $stmt=$conn->prepare("SELECT e.id,e.employee_id,
+            TRIM(CONCAT_WS(' ',e.firstname,e.lastname)) legal_name,
+            u.nick_name company_name,u.email username,p.position_name role,
+            COUNT(DISTINCT a.date) present_days,
+            SUM(CASE WHEN a.status=0 THEN 1 ELSE 0 END) late_days,
+            SUM(CASE WHEN a.work_status='half_day' THEN 1 ELSE 0 END) half_days,
+            ROUND(SUM(CASE WHEN a.time_out<>'00:00:00' AND a.time_out>a.time_in
+                THEN TIMESTAMPDIFF(SECOND,a.time_in,a.time_out)/3600
+                ELSE COALESCE(a.num_hr,0) END),2) total_hours
+        FROM employees e
+        INNER JOIN users u ON u.id=e.user_id
+        LEFT JOIN positions p ON p.id=u.position_id
+        LEFT JOIN attendance a ON a.employee_id=e.id AND a.date BETWEEN ? AND ?
+        WHERE e.user_id IS NOT NULL
+        GROUP BY e.id,e.employee_id,e.firstname,e.lastname,u.nick_name,u.email,p.position_name
+        ORDER BY e.firstname,e.lastname");
+    $stmt->bind_param('ss',$start,$end);$stmt->execute();
+    $rows=[];$result=$stmt->get_result();
+    while($row=$result->fetch_assoc()){
+        $row['id']=(int)$row['id'];$row['present_days']=(int)$row['present_days'];
+        $row['late_days']=(int)$row['late_days'];$row['half_days']=(int)$row['half_days'];
+        $row['total_hours']=(float)($row['total_hours']??0);$rows[]=$row;
+    }
+    return ['success'=>true,'month'=>$month,'start_date'=>$start,'end_date'=>$end,'data'=>$rows];
+}
 function fetchEmployeeById($id) {
     global $conn;
     $stmt = $conn->prepare("SELECT e.id, e.employee_id, e.firstname, e.lastname,
@@ -305,13 +338,51 @@ function newYorkNow() {
     return new DateTimeImmutable('now',new DateTimeZone('America/New_York'));
 }
 
-function attendanceClientIp() {
-    // REMOTE_ADDR is intentionally used instead of user-controlled forwarding
-    // headers. If the API is behind a trusted reverse proxy, configure that
-    // proxy/web server to replace REMOTE_ADDR with the verified client address.
-    return trim((string)($_SERVER['REMOTE_ADDR'] ?? ''));
+function fetchAttendanceIpPermissions() {
+    global $conn;
+    $result=$conn->query("SELECT e.id employee_id,e.employee_id employee_code,
+            TRIM(CONCAT_WS(' ',e.firstname,e.lastname)) legal_name,
+            u.nick_name company_name,u.email username,p.position_name role,
+            COALESCE(w.wfh_allowed,0) wfh_allowed,w.updated_at
+        FROM employees e INNER JOIN users u ON u.id=e.user_id
+        LEFT JOIN positions p ON p.id=u.position_id
+        LEFT JOIN attendance_wfh_permissions w ON w.employee_id=e.id
+        WHERE e.user_id IS NOT NULL ORDER BY e.firstname,e.lastname");
+    if(!$result)return ['success'=>false,'message'=>'Run the per-user WFH permission migration first.'];
+    $rows=[];while($row=$result->fetch_assoc()){$row['employee_id']=(int)$row['employee_id'];$row['wfh_allowed']=(bool)$row['wfh_allowed'];$rows[]=$row;}
+    return ['success'=>true,'data'=>$rows];
 }
-
+function employeeWfhAllowed($employeeId) {
+    global $conn;$stmt=$conn->prepare('SELECT wfh_allowed FROM attendance_wfh_permissions WHERE employee_id=? LIMIT 1');
+    if(!$stmt)return false;$stmt->bind_param('i',$employeeId);$stmt->execute();$row=$stmt->get_result()->fetch_assoc();
+    return (bool)($row['wfh_allowed']??false);
+}
+function saveEmployeeWfhPermission($employeeId,$allowed,$updatedBy) {
+    global $conn;$value=$allowed?1:0;
+    $stmt=$conn->prepare('SELECT id FROM employees WHERE id=? AND user_id IS NOT NULL LIMIT 1');
+    $stmt->bind_param('i',$employeeId);$stmt->execute();if(!$stmt->get_result()->fetch_assoc())return ['success'=>false,'not_found'=>true,'message'=>'Active employee not found.'];
+    $stmt=$conn->prepare('INSERT INTO attendance_wfh_permissions(employee_id,wfh_allowed,updated_by) VALUES(?,?,?) ON DUPLICATE KEY UPDATE wfh_allowed=VALUES(wfh_allowed),updated_by=VALUES(updated_by),updated_at=CURRENT_TIMESTAMP');
+    if(!$stmt)return ['success'=>false,'message'=>'Run the per-user WFH permission migration first.'];
+    $stmt->bind_param('iii',$employeeId,$value,$updatedBy);$stmt->execute();
+    return ['success'=>true,'message'=>$allowed?'WFH attendance access granted for this employee.':'WFH attendance access removed. Company IP restriction now applies.','employee_id'=>$employeeId,'wfh_allowed'=>(bool)$allowed];
+}
+function attendanceClientIp() {
+    $remote=trim((string)($_SERVER['REMOTE_ADDR']??''));
+    $isTrustedLocalProxy=in_array($remote,['127.0.0.1','::1','::'],true);
+    if($isTrustedLocalProxy){
+        $forwarded=trim((string)($_SERVER['HTTP_X_FORWARDED_FOR']??''));
+        $candidates=$forwarded!==''?explode(',',$forwarded):[];
+        $realIp=trim((string)($_SERVER['HTTP_X_REAL_IP']??''));
+        if($realIp!=='')$candidates[]=$realIp;
+        foreach($candidates as $candidate){
+            $candidate=trim($candidate);
+            if(filter_var($candidate,FILTER_VALIDATE_IP)!==false&&!in_array($candidate,['127.0.0.1','::1','::'],true))return $candidate;
+        }
+        // Never treat the reverse proxy's loopback address as the employee IP.
+        return '';
+    }
+    return filter_var($remote,FILTER_VALIDATE_IP)!==false?$remote:'';
+}
 function ipMatchesNetwork($ip,$network) {
     $network=trim($network);
     if($network===''||filter_var($ip,FILTER_VALIDATE_IP)===false)return false;
@@ -344,10 +415,11 @@ function getTodayAttendanceState($employeeId) {
     $stmt->bind_param('is',$employeeId,$date);$stmt->execute();
     $record=$stmt->get_result()->fetch_assoc();
     if($record){$record['id']=(int)$record['id'];$record['hours']=(float)$record['hours'];}
-    $settings=attendanceSettings();$clientIp=attendanceClientIp();
+    $settings=attendanceSettings();$clientIp=attendanceClientIp();$wfhAllowed=employeeWfhAllowed($employeeId);
     return ['success'=>true,'timezone'=>'America/New_York','current_time'=>$now->format(DateTimeInterface::ATOM),
         'work_date'=>$date,'schedule'=>$settings,'record'=>$record,
-        'network'=>['allowed'=>companyIpAllows($clientIp,$settings['allowed_ip_addresses']??''),'ip'=>$clientIp]];
+        'network'=>['restriction_enabled'=>(bool)($settings['ip_restriction_enabled']??1),'wfh_allowed'=>$wfhAllowed,
+            'allowed'=>!(bool)($settings['ip_restriction_enabled']??1)||$wfhAllowed||companyIpAllows($clientIp,$settings['allowed_ip_addresses']??''),'ip'=>$clientIp]];
 }
 
 function clockAttendance($employeeId,$userId,$action) {
@@ -356,7 +428,7 @@ function clockAttendance($employeeId,$userId,$action) {
     $utc=$now->setTimezone(new DateTimeZone('UTC'))->format('Y-m-d H:i:s');
     $settings=attendanceSettings();
     $clientIp=attendanceClientIp();
-    if(!companyIpAllows($clientIp,$settings['allowed_ip_addresses']??'')){
+    if((bool)($settings['ip_restriction_enabled']??1)&&!employeeWfhAllowed($employeeId)&&!companyIpAllows($clientIp,$settings['allowed_ip_addresses']??'')){
         return ['success'=>false,'message'=>'Time In and Time Out are only available from the company network. Your current IP is '.$clientIp.'.'];
     }
     $conn->begin_transaction();
@@ -419,8 +491,10 @@ function fetchLeaves($employeeId,$filters=[]) {
     global $conn;$where='';$types='';$params=[];
     if($employeeId){$where='WHERE l.employee_id=?';$types='i';$params[]=$employeeId;}
     elseif(!empty($filters['status'])){$where='WHERE l.status=?';$types='s';$params[]=$filters['status'];}
-    $stmt=$conn->prepare("SELECT l.*,e.employee_id,TRIM(CONCAT_WS(' ',e.firstname,e.lastname)) employee_name
-        FROM leave_requests l JOIN employees e ON e.id=l.employee_id $where ORDER BY l.created_at DESC LIMIT 200");
+    $stmt=$conn->prepare("SELECT l.*,e.employee_id,TRIM(CONCAT_WS(' ',e.firstname,e.lastname)) employee_name,
+        COALESCE(NULLIF(l.reviewer_name,''),NULLIF(TRIM(u.nick_name),''),u.email) reviewer_display_name
+        FROM leave_requests l JOIN employees e ON e.id=l.employee_id
+        LEFT JOIN users u ON u.id=l.reviewed_by $where ORDER BY l.created_at DESC LIMIT 200");
     if($params)$stmt->bind_param($types,...$params);$stmt->execute();return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 }
 function submitLeave($employeeId,$data,$reviewedBy=null) {
@@ -440,18 +514,38 @@ function submitLeave($employeeId,$data,$reviewedBy=null) {
         $stmt->bind_param('issssssi',$employeeId,$type,$start,$end,$duration,$reason,$status,$reviewedBy);
         $message='Employee leave added and approved.';
     }else{
-        $stmt=$conn->prepare('INSERT INTO leave_requests(employee_id,leave_type,start_date,end_date,duration,reason) VALUES(?,?,?,?,?,?)');
-        $stmt->bind_param('isssss',$employeeId,$type,$start,$end,$duration,$reason);
+        $approvalToken=bin2hex(random_bytes(32));$approvalTokenHash=hash('sha256',$approvalToken);
+        $stmt=$conn->prepare("INSERT INTO leave_requests(employee_id,leave_type,start_date,end_date,duration,reason,approval_token_hash,approval_token_expires_at)
+            VALUES(?,?,?,?,?,?,?,DATE_ADD(UTC_TIMESTAMP(),INTERVAL 7 DAY))");
+        $stmt->bind_param('issssss',$employeeId,$type,$start,$end,$duration,$reason,$approvalTokenHash);
         $message='Leave request submitted for approval.';
     }
-    return $stmt->execute()?['success'=>true,'message'=>$message]:['success'=>false,'message'=>'Leave request could not be submitted.'];
+    if(!$stmt->execute())return ['success'=>false,'message'=>'Leave request could not be submitted.'];
+    $result=['success'=>true,'message'=>$message,'leave_id'=>(int)$conn->insert_id];
+    if(isset($approvalToken))$result['approval_token']=$approvalToken;
+    return $result;
+}
+function fetchLeaveEmailDetails($id) {
+    global $conn;$stmt=$conn->prepare("SELECT l.*,e.employee_id,TRIM(CONCAT_WS(' ',e.firstname,e.lastname)) employee_name
+        FROM leave_requests l JOIN employees e ON e.id=l.employee_id WHERE l.id=? LIMIT 1");
+    $stmt->bind_param('i',$id);$stmt->execute();return $stmt->get_result()->fetch_assoc();
 }
 function updateLeaveStatus($id,$data,$userId) {
     global $conn;$status=$data['status']??'';$comment=trim((string)($data['manager_comment']??''));
     if(!in_array($status,['approved','rejected','cancelled'],true))return ['success'=>false,'message'=>'Invalid leave status.'];
-    $stmt=$conn->prepare("UPDATE leave_requests SET status=?,manager_comment=?,reviewed_by=?,reviewed_at=UTC_TIMESTAMP()
-        WHERE id=? AND status='pending'");$stmt->bind_param('ssii',$status,$comment,$userId,$id);$stmt->execute();
+    $stmt=$conn->prepare("SELECT COALESCE(NULLIF(TRIM(nick_name),''),email) reviewer_name FROM users WHERE id=? LIMIT 1");
+    $stmt->bind_param('i',$userId);$stmt->execute();$reviewer=$stmt->get_result()->fetch_assoc();$reviewerName=$reviewer['reviewer_name']??'HR user';$source='Website';
+    $stmt=$conn->prepare("UPDATE leave_requests SET status=?,manager_comment=?,reviewed_by=?,reviewer_name=?,review_source=?,reviewed_at=UTC_TIMESTAMP(),approval_token_hash=NULL,approval_token_expires_at=NULL
+        WHERE id=? AND status='pending'");$stmt->bind_param('ssissi',$status,$comment,$userId,$reviewerName,$source,$id);$stmt->execute();
     return $stmt->affected_rows?['success'=>true,'message'=>'Leave request '.$status.'.']:['success'=>false,'message'=>'Pending leave request not found.'];
+}
+function reviewLeaveByEmailToken($token,$status,$reviewerName) {
+    global $conn;if(!preg_match('/^[a-f0-9]{64}$/',$token)||!in_array($status,['approved','rejected'],true))return ['success'=>false,'message'=>'This approval link is invalid.'];
+    $hash=hash('sha256',$token);$source='Email';
+    $stmt=$conn->prepare("UPDATE leave_requests SET status=?,reviewer_name=?,review_source=?,reviewed_at=UTC_TIMESTAMP(),approval_token_hash=NULL,approval_token_expires_at=NULL
+        WHERE approval_token_hash=? AND approval_token_expires_at>=UTC_TIMESTAMP() AND status='pending'");
+    $stmt->bind_param('ssss',$status,$reviewerName,$source,$hash);$stmt->execute();
+    return $stmt->affected_rows?['success'=>true,'message'=>'Leave request '.$status.' successfully.']:['success'=>false,'message'=>'This approval link has expired or was already used.'];
 }
 function adminEditAttendance($id,$data,$userId) {
     global $conn;$timeIn=$data['time_in']??'';$timeOut=$data['time_out']??'';$notes=trim((string)($data['notes']??''));

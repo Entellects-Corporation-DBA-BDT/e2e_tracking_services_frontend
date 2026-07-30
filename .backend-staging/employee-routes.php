@@ -11,6 +11,9 @@ if ($method === 'POST' && $path === 'employee/login') {
     loginEmployee(json_decode(file_get_contents('php://input'), true) ?: []);
     exit;
 }
+if ($method === 'GET' && $path === 'attendance/leaves/email-review') {
+    reviewLeaveFromEmail();
+}
 
 $user = authenticate();
 $employeePermission=getEffectivePermission('employees');
@@ -37,7 +40,19 @@ if ($method === 'GET' && $path === 'attendance/today') {
     requirePermission('attendance','can_view');
     attendanceToday($user, ($attendancePermission['data_scope'] ?? 'OWN') === 'ALL'); exit;
 }
-if ($method === 'POST' && in_array($path, ['attendance/time-in','attendance/time-out'], true)) {
+if ($method === 'GET' && $path === 'attendance/month') {
+    requirePermission('attendance','can_view');
+    if (($attendancePermission['data_scope'] ?? 'OWN') !== 'ALL') employeeAdminDenied();
+    attendanceMonth(); exit;
+}
+if ($method === 'GET' && $path === 'attendance/ip-settings') {
+    if ((int)$user['position_id'] !== 1) employeeSuperAdminDenied();
+    getAttendanceIpPermissions(); exit;
+}
+if ($method === 'PUT' && preg_match('#^attendance/ip-settings/(\d+)$#', $path, $matches)) {
+    if ((int)$user['position_id'] !== 1) employeeSuperAdminDenied();
+    updateEmployeeWfhPermission((int)$matches[1],$user); exit;
+}if ($method === 'POST' && in_array($path, ['attendance/time-in','attendance/time-out'], true)) {
     requirePermission('attendance','can_view');
     attendanceClock($user, $path === 'attendance/time-in' ? 'in' : 'out'); exit;
 }
@@ -144,5 +159,11 @@ exit;
 function employeeAdminDenied() {
     http_response_code(403);
     echo json_encode(['success' => false, 'message' => 'Administrator access required.']);
+    exit;
+}
+
+function employeeSuperAdminDenied() {
+    http_response_code(403);
+    echo json_encode(['success' => false, 'message' => 'Super Admin access required.']);
     exit;
 }
