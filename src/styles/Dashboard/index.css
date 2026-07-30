@@ -377,3 +377,86 @@ body{background:#f7f8fc}
   .e2e_navbar_container{position:static;box-shadow:none}
   .e2e_table_scroll{max-height:none;overflow:visible}
 }
+
+/* Fixed dashboard navbar with independently scrolling page content */
+.e2e_dashboard_main_layout {
+  height: 100dvh;
+  min-height: 100dvh;
+  overflow: hidden;
+}
+
+.e2e_dashboard_right_section {
+  display: flex;
+  height: 100dvh;
+  min-width: 0;
+  min-height: 0;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.e2e_dashboard_right_section > .e2e_navbar_container {
+  position: relative;
+  top: auto;
+  flex: 0 0 auto;
+  width: 100%;
+  z-index: 100;
+}
+
+.e2e_dashboard_scroll_content {
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Keep every scroll area usable while hiding visual scrollbar tracks. */
+html,
+body,
+#root,
+.e2e_dashboard_main_layout,
+.e2e_dashboard_right_section,
+.e2e_dashboard_scroll_content,
+.e2e_dashboard_scroll_content * {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+#root::-webkit-scrollbar,
+.e2e_dashboard_main_layout::-webkit-scrollbar,
+.e2e_dashboard_right_section::-webkit-scrollbar,
+.e2e_dashboard_scroll_content::-webkit-scrollbar,
+.e2e_dashboard_scroll_content *::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .e2e_dashboard_right_section {
+    height: 100dvh;
+    padding-bottom: 0;
+  }
+
+  .e2e_dashboard_scroll_content {
+    padding-bottom: calc(94px + env(safe-area-inset-bottom));
+  }
+}
+
+@media print {
+  .e2e_dashboard_main_layout,
+  .e2e_dashboard_right_section {
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+  }
+
+  .e2e_dashboard_scroll_content {
+    overflow: visible;
+  }
+}

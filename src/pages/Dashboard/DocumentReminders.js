@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { FaBell, FaEdit, FaEye, FaFileAlt, FaPaperPlane, FaTimes } from "react-icons/fa";
 import { useSearchParams } from "react-router-dom";
+import { baseUrlImg } from "../../Config/env";
 import {
   disableDocumentReminder,
   getDocumentReminders,
@@ -13,6 +14,12 @@ import "../../styles/Dashboard/documentReminders.css";
 const emptyFilters = { candidate: "", document_type: "", expiry_from: "", expiry_to: "", status: "", days_left: "" };
 const errorMessage = (error, fallback) => error?.response?.data?.message || error?.message || fallback;
 const displayDate = (value) => value ? new Date(`${value}T12:00:00`).toLocaleDateString("en-US", { timeZone: "America/New_York" }) : "-";
+const documentUrl = (value) => {
+  const path = String(value || "").trim();
+  if (!path) return "";
+  if (/^https?:\/\//i.test(path)) return path;
+  return `${String(baseUrlImg).replace(/\/+$/, "")}/${path.replace(/^\/+/, "")}`;
+};
 
 function DocumentReminders() {
   const [searchParams] = useSearchParams();
@@ -24,6 +31,7 @@ function DocumentReminders() {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState(null);
   const [jsonRow, setJsonRow] = useState(null);
+  const [previewRow, setPreviewRow] = useState(null);
   const [editRow, setEditRow] = useState(null);
   const [saving, setSaving] = useState(false);
 
@@ -109,7 +117,7 @@ function DocumentReminders() {
                 <td><span className={Number(row.days_left) <= 30 ? "days-critical" : ""}>{row.days_left}</span></td>
                 <td>{displayDate(row.next_reminder_date)}</td><td><span className={`reminder-status ${row.status.toLowerCase()}`}>{row.status}</span></td>
                 <td><div className="document-reminders-actions">
-                  <a href={row.document} target="_blank" rel="noreferrer" title="View document"><FaFileAlt /></a>
+                  <button type="button" title="View document" onClick={() => setPreviewRow(row)}><FaFileAlt /></button>
                   <button title="View extracted JSON" onClick={() => setJsonRow(row)}><FaEye /></button>
                   <button title="Send reminder now" disabled={row.status === "Disabled"} onClick={() => runAction(() => sendDocumentReminderNow(row.id), "Reminder email sent. Future schedule was unchanged.")}><FaPaperPlane /></button>
                   <button title="Edit reminder" onClick={() => setEditRow({ ...row })}><FaEdit /></button>
@@ -122,12 +130,22 @@ function DocumentReminders() {
       </div>
       <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
 
+      {previewRow && <DocumentPreviewModal row={previewRow} onClose={() => setPreviewRow(null)} />}
       {jsonRow && <JsonModal row={jsonRow} onClose={() => setJsonRow(null)} />}
       {editRow && <EditModal row={editRow} setRow={setEditRow} onClose={() => setEditRow(null)} onSave={saveEdit} saving={saving} />}
     </div>
   );
 }
 
+function DocumentPreviewModal({ row, onClose }) {
+  const url = documentUrl(row.document);
+  return <div className="reminder-modal-backdrop document-preview-backdrop" onMouseDown={onClose}>
+    <section className="document-preview-modal" role="dialog" aria-modal="true" aria-labelledby="document-preview-title" onMouseDown={(event) => event.stopPropagation()}>
+      <header><div><FaFileAlt /><span><h2 id="document-preview-title">{row.document_type}</h2><p>{row.candidate_name}</p></span></div><aside><a href={url} target="_blank" rel="noreferrer">Open in new tab</a><button type="button" onClick={onClose} aria-label="Close document preview"><FaTimes /></button></aside></header>
+      {url ? <iframe src={url} title={`${row.document_type} document for ${row.candidate_name}`} /> : <div className="document-preview-empty">No document file is attached to this reminder.</div>}
+    </section>
+  </div>;
+}
 function JsonModal({ row, onClose }) {
   const details = row.document_details || {};
   const fields = [["Candidate Name",details.candidate_name],["Visa Type",details.visa_type],["Visa Number",details.visa_number],["Case Number",details.case_number],["Applied Date",details.applied_date],["Approved Date",details.approved_date],["Issue Date",details.issue_date],["Expiry Date",details.expiry_date],["Reminder Target",details.reminder_date],["Reminder Purpose",details.reminder_reason],["Entry Method",details.entry_method]];

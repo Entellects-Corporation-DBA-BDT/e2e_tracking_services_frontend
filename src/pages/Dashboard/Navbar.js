@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { usePermissions } from "../../auth/PermissionContext";
 import { sidebarConfig } from "./SidebarConfig";
+import { useTheme } from "../../auth/ThemeContext";
 
 function Navbar() {
   const location = useLocation();
@@ -16,7 +17,7 @@ function Navbar() {
   const [activeSuggestion, setActiveSuggestion] = useState(-1);
   const [profileOpen, setProfileOpen] = useState(false);
   const [showLogoutConfirmation, setShowLogoutConfirmation] = useState(false);
-  const [darkMode, setDarkMode] = useState(() => localStorage.getItem("e2e-theme") === "dark");
+  const { darkMode, toggleTheme } = useTheme();
   const profileRef = useRef(null);
 
   useEffect(() => {
@@ -33,10 +34,6 @@ function Navbar() {
     navigate("/", { replace: true });
   };
 
-  useEffect(() => {
-    document.documentElement.classList.toggle("e2e-dark", darkMode);
-    localStorage.setItem("e2e-theme", darkMode ? "dark" : "light");
-  }, [darkMode]);
 
   const suggestions = useMemo(() => {
     const query = searchTerm.trim().toLowerCase();
@@ -162,7 +159,7 @@ function Navbar() {
           <FaPrint />
         </button>
         <button type="button" className="e2e_navbar_utility" title={darkMode ? "Use light theme" : "Use dark theme"}
-          onClick={() => setDarkMode((value) => !value)}>
+          onClick={toggleTheme}>
           {darkMode ? <FaSun /> : <FaMoon />}
         </button>
         <button type="button" className="e2e_navbar_notification" title="Notifications">

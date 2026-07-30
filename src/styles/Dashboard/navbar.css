@@ -506,3 +506,5 @@
     display:none;
   }
 }
+/* Search is one flex control: the icon stays beside text and never overlays it. */
+.e2e_navbar_search_wrap{display:flex;position:relative;align-items:center;gap:10px;height:48px;padding:0 14px;border:1px solid #e5e7eb;border-radius:14px;background:#f9fafb;transition:border-color .2s,box-shadow .2s}.e2e_navbar_search_wrap:focus-within{border-color:#6366f1;box-shadow:0 0 0 3px rgba(99,102,241,.12)}.e2e_navbar_search_icon{position:static!important;inset:auto!important;width:16px;height:16px;flex:0 0 16px;transform:none!important}.e2e_navbar_search{width:100%!important;min-width:0;height:100%!important;padding:0!important;border:0!important;outline:0!important;box-shadow:none!important;background:transparent!important}.e2e-dark .e2e_navbar_search_wrap{border-color:#34435b;background:#101a2d}.e2e-dark .e2e_navbar_search{color:#f1f5f9}.e2e-dark .e2e_navbar_search::placeholder{color:#8391a7}@media(max-width:768px){.e2e_navbar_search_wrap{height:42px;padding:0 12px}}

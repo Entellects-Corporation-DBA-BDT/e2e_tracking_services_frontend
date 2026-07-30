@@ -473,3 +473,5 @@
 .e2e_sidebar_active:visited {
   color: rgb(2, 13, 71);
 }
+/* Fixed brand header; only the resource navigation scrolls. */
+.e2e_sidebar_container{justify-content:flex-start!important;padding:18px 14px!important}.e2e_sidebar_logo_section{width:100%;flex:0 0 auto;padding:3px 8px 15px!important}.e2e_sidebar_divider{width:calc(100% - 8px);height:1px;flex:0 0 1px;margin:0 4px 12px;background:linear-gradient(90deg,transparent,#d9dfeb 12%,#d9dfeb 88%,transparent)}.e2e_sidebar_resource_scroll{min-height:0;flex:1 1 auto;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;padding:0 4px 16px 0;scrollbar-width:none;-ms-overflow-style:none}.e2e_sidebar_resource_scroll::-webkit-scrollbar{display:none;width:0;height:0}.e2e_sidebar_resource_scroll .e2e_sidebar_menu{margin-top:0!important}.e2e-dark .e2e_sidebar_divider{background:linear-gradient(90deg,transparent,#334155 12%,#334155 88%,transparent)}
