@@ -138,6 +138,7 @@ const JobView = () => {
         return new Date(date).toLocaleDateString(
             "en-GB",
             {
+                timeZone: "America/New_York",
                 day: "2-digit",
                 month: "short",
                 year: "numeric",

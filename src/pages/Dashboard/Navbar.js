@@ -1,7 +1,8 @@
 import "../../styles/Dashboard/navbar.css";
-import { FaBell } from "react-icons/fa";
+import { FaBell, FaChevronDown, FaMoon, FaPrint, FaRedo, FaSearch, FaSignOutAlt, FaSun } from "react-icons/fa";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { usePermissions } from "../../auth/PermissionContext";
 import { sidebarConfig } from "./SidebarConfig";
 
@@ -9,18 +10,33 @@ function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
   const searchRef = useRef(null);
-  const { resources, user } = usePermissions();
+  const { resources, user, logout } = usePermissions();
   const [searchTerm, setSearchTerm] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
   const [activeSuggestion, setActiveSuggestion] = useState(-1);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [showLogoutConfirmation, setShowLogoutConfirmation] = useState(false);
+  const [darkMode, setDarkMode] = useState(() => localStorage.getItem("e2e-theme") === "dark");
+  const profileRef = useRef(null);
 
   useEffect(() => {
     const closeSearch = (event) => {
       if (!searchRef.current?.contains(event.target)) setSearchOpen(false);
+      if (!profileRef.current?.contains(event.target)) setProfileOpen(false);
     };
     document.addEventListener("mousedown", closeSearch);
     return () => document.removeEventListener("mousedown", closeSearch);
   }, []);
+
+  const handleLogout = () => {
+    logout();
+    navigate("/", { replace: true });
+  };
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("e2e-dark", darkMode);
+    localStorage.setItem("e2e-theme", darkMode ? "dark" : "light");
+  }, [darkMode]);
 
   const suggestions = useMemo(() => {
     const query = searchTerm.trim().toLowerCase();
@@ -59,6 +75,7 @@ function Navbar() {
     "/dashboard": "Dashboard",
     "/dashboard/recruiting": "Recruiting",
     "/dashboard/bench-sales": "Bench Sales",
+    "/dashboard/bench-sales/performance": "Bench Sales Performance",
     "/dashboard/hotlist": "Hot List",
     "/dashboard/jobs": "Jobs",
     "/dashboard/vendors": "Prime Vendors",
@@ -102,6 +119,7 @@ function Navbar() {
 
       <div className="e2e_navbar_right">
         <div className="e2e_navbar_search_wrap" ref={searchRef}>
+          <FaSearch className="e2e_navbar_search_icon" aria-hidden="true" />
           <input
             type="search"
             placeholder="Search your resources..."
@@ -135,21 +153,62 @@ function Navbar() {
           )}
         </div>
 
-        <div className="e2e_navbar_notification">
+        <button type="button" className="e2e_navbar_utility" title="Refresh dashboard"
+          onClick={() => window.dispatchEvent(new CustomEvent("e2e-dashboard-refresh"))}>
+          <FaRedo />
+        </button>
+        <button type="button" className="e2e_navbar_utility" title="Print or save dashboard"
+          onClick={() => window.print()}>
+          <FaPrint />
+        </button>
+        <button type="button" className="e2e_navbar_utility" title={darkMode ? "Use light theme" : "Use dark theme"}
+          onClick={() => setDarkMode((value) => !value)}>
+          {darkMode ? <FaSun /> : <FaMoon />}
+        </button>
+        <button type="button" className="e2e_navbar_notification" title="Notifications">
           <FaBell />
+        </button>
+
+        <div className="e2e_navbar_account" ref={profileRef}>
+          <button type="button" className="e2e_navbar_profile" onClick={() => setProfileOpen((value) => !value)}
+            aria-label="Open account menu" aria-expanded={profileOpen}>
+            <div className="e2e_navbar_avatar">{user?.username?.charAt(0)?.toUpperCase() || "U"}</div>
+            <div className="e2e_navbar_profile_info">
+              <h4>{user?.username || "User"}</h4>
+              <p>{user?.email || "Employee"}</p>
+            </div>
+            <FaChevronDown className={`e2e_navbar_chevron${profileOpen ? " is-open" : ""}`} />
+          </button>
+          {profileOpen && (
+            <div className="e2e_navbar_account_menu">
+              <button type="button" onClick={() => navigate("/dashboard/my-profile")}>
+                <span className="e2e_account_initial">{user?.username?.charAt(0)?.toUpperCase() || "U"}</span>
+                <span><strong>My profile</strong><small>Account & attendance</small></span>
+              </button>
+              <button type="button" className="e2e_account_logout" onClick={() => {
+                setProfileOpen(false);
+                setShowLogoutConfirmation(true);
+              }}>
+                <FaSignOutAlt /><span><strong>Logout</strong><small>End this session</small></span>
+              </button>
+            </div>
+          )}
         </div>
-
-        <button type="button" className="e2e_navbar_profile" onClick={() => navigate("/dashboard/my-profile")} aria-label="Open my employee profile and attendance">
-  <div className="e2e_navbar_avatar">
-    {user?.username?.charAt(0)?.toUpperCase() || "U"}
-  </div>
-
-  <div className="e2e_navbar_profile_info">
-    <h4>{user?.username || "User"}</h4>
-    <p>{user?.email || "Employee"}</p>
-  </div>
-</button>
       </div>
+      {showLogoutConfirmation && createPortal(
+        <div className="e2e_logout_dialog_backdrop" onMouseDown={() => setShowLogoutConfirmation(false)}>
+          <div className="e2e_logout_dialog" role="alertdialog" aria-modal="true"
+            aria-labelledby="logout-dialog-title" onMouseDown={(event) => event.stopPropagation()}>
+            <div className="e2e_logout_dialog_icon"><FaSignOutAlt /></div>
+            <h2 id="logout-dialog-title">Confirm logout</h2>
+            <p>Are you sure you want to end your session?</p>
+            <div className="e2e_logout_dialog_actions">
+              <button type="button" className="e2e_logout_cancel" onClick={() => setShowLogoutConfirmation(false)}>Cancel</button>
+              <button type="button" className="e2e_logout_confirm" onClick={handleLogout}><FaSignOutAlt /> Logout</button>
+            </div>
+          </div>
+        </div>, document.body
+      )}
     </div>
   );
 }

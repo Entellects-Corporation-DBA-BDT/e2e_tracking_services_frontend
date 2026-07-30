@@ -4,6 +4,7 @@ import {
   getDashboardTable,
   getDashboardSummary,
   getSubmissionAnalytics,
+  getWorkforceAnalytics,
 } from "../../api/applicationApi";
 
 import Sidebar from "./Sidebar";
@@ -12,6 +13,8 @@ import Navbar from "./Navbar";
 import DashboardCards from "./DashboardCards";
 import DashboardGraphs from "./DashboardGraphs";
 import DashboardTable from "./DashboardTable";
+import OperationsCommandCenter from "./OperationsCommandCenter";
+import WorkforceSubmissionAnalytics from "./WorkforceSubmissionAnalytics";
 import DashboardRecordView from "./DashboardRecordView";
 import Loader from "./Loader";
 import useDynamicResourceRoutes from "./DynamicResourceRoutes";
@@ -57,7 +60,8 @@ const TABLES = {
       ["submission_date", "Submission Date"], ["candidate", "Candidate"],
       ["recruiter", "Recruiter"], ["vendor", "Vendor"], ["client", "Client"],
       ["technology", "Technology"], ["status", "Status"], ["rate", "Rate"],
-      ["location", "Location"],
+      ["location", "Location"], ["interview_slot", "Interview Slot"],
+      ["feedback", "Feedback"],
     ],
   },
   active_candidates: {
@@ -93,7 +97,7 @@ const TABLES = {
 const makeColumns = (columns) => columns.map(([key, label]) => ({
   key,
   label,
-  sortable: !["experience", "preferred_location", "availability", "round", "start_date"].includes(key),
+  sortable: !["experience", "preferred_location", "availability", "round", "start_date", "interview_slot", "feedback"].includes(key),
 }));
 
 function Dashboard() {
@@ -124,6 +128,13 @@ function Dashboard() {
   const [tableSort, setTableSort] = useState("submission_date");
   const [tableOrder, setTableOrder] = useState("desc");
   const [tableRefresh, setTableRefresh] = useState(0);
+  const [dashboardRefresh, setDashboardRefresh] = useState(0);
+  const [workforceAnalytics, setWorkforceAnalytics] = useState({});
+  const [workforceLoading, setWorkforceLoading] = useState(true);
+  const [workforceError, setWorkforceError] = useState("");
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState(null);
+  const [workforceRefresh, setWorkforceRefresh] = useState(0);
+  const [workforcePeriod, setWorkforcePeriod] = useState("this_week");
   const activeRequest = useRef(0);
   const activeTableRequest = useRef(0);
 
@@ -185,7 +196,42 @@ function Dashboard() {
         activeRequest.current += 1;
       }
     };
-  }, [filterParams]);
+  }, [filterParams, dashboardRefresh]);
+
+  useEffect(() => {
+    let active = true;
+    const loadWorkforceAnalytics = async () => {
+      setWorkforceLoading(true);
+      setWorkforceError("");
+      try {
+        const result = await getWorkforceAnalytics(selectedEmployeeId, workforcePeriod);
+        if (!active) return;
+        setWorkforceAnalytics(result || {});
+        setSelectedEmployeeId(
+          result?.selected_employee_id || result?.employees?.[0]?.employee_id || null
+        );
+      } catch (error) {
+        if (!active) return;
+        console.error(error);
+        setWorkforceError(
+          error?.response?.data?.message || "Weekly employee analytics could not be loaded."
+        );
+      } finally {
+        if (active) setWorkforceLoading(false);
+      }
+    };
+    loadWorkforceAnalytics();
+    return () => { active = false; };
+  }, [selectedEmployeeId, workforcePeriod, workforceRefresh, dashboardRefresh]);
+
+  useEffect(() => {
+    const refreshDashboard = () => {
+      setDashboardRefresh((value) => value + 1);
+      setTableRefresh((value) => value + 1);
+    };
+    window.addEventListener("e2e-dashboard-refresh", refreshDashboard);
+    return () => window.removeEventListener("e2e-dashboard-refresh", refreshDashboard);
+  }, []);
 
   useEffect(() => {
     const timer = window.setTimeout(() => setDebouncedSearch(tableSearch), 350);
@@ -410,6 +456,25 @@ function Dashboard() {
                         onCategoryChange={handleCategoryChange}
                         onApplyDateFilter={handleApplyDateFilter}
                       />
+                      <WorkforceSubmissionAnalytics
+                        data={workforceAnalytics}
+                        loading={workforceLoading}
+                        error={workforceError}
+                        selectedEmployeeId={
+                          selectedEmployeeId || workforceAnalytics.selected_employee_id
+                        }
+                        period={workforcePeriod}
+                        onPeriodChange={(nextPeriod) => {
+                          setSelectedEmployeeId(null);
+                          setWorkforcePeriod(nextPeriod);
+                        }}
+                        onEmployeeSelect={setSelectedEmployeeId}
+                        onRetry={() => setWorkforceRefresh((value) => value + 1)}
+                        onSubmissionOpen={(id) =>
+                          navigate(`/dashboard/records/submissions/${id}`)
+                        }
+                      />
+                      <OperationsCommandCenter summary={summary} refreshToken={dashboardRefresh} />
                     </>
                   )}
                   <DashboardTable
@@ -434,7 +499,11 @@ function Dashboard() {
                     }}
                     onRefresh={() => setTableRefresh((value) => value + 1)}
                     onExport={can(`dashboard_${selectedCard}`, "export") ? handleExport : undefined}
-                    onView={(row) => navigate(`/dashboard/records/${selectedCard}/${row.id}`)}
+                    onView={(row) => navigate(
+                      selectedCard === "active_candidates"
+                        ? `/dashboard/candidates/${row.id}`
+                        : `/dashboard/records/${selectedCard}/${row.id}`
+                    )}
                     onAdd={() => navigate(
                       selectedCard === "active_candidates"
                         ? "/dashboard/candidates"

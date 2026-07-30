@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
 import {
   FaArrowLeft,
   FaBriefcase,
@@ -43,29 +43,6 @@ const RECORD_CONFIG = {
       {
         title: "Commercial Details",
         fields: [["rate", "Rate"], ["bill_rate", "Bill Rate"], ["visa", "Visa"]],
-      },
-    ],
-  },
-  active_candidates: {
-    endpoint: "active-candidates",
-    singular: "Active Candidate",
-    backLabel: "Back to Active Candidates",
-    accent: "violet",
-    sections: [
-      {
-        title: "Candidate Information",
-        fields: [
-          ["candidate", "Candidate"], ["status", "Status"], ["email", "Email"],
-          ["phone", "Phone"], ["current_location", "Current Location"],
-          ["visa", "Visa"], ["technology", "Technology"],
-        ],
-      },
-      {
-        title: "Ownership and Timeline",
-        fields: [
-          ["recruiter", "Recruiter"], ["recruiter_role", "Recruiter Role"],
-          ["created_at", "Created"], ["updated_at", "Last Updated"],
-        ],
       },
     ],
   },
@@ -151,6 +128,7 @@ function DashboardRecordView() {
   const [error, setError] = useState("");
 
   const loadRecord = async () => {
+    if (["active_candidates", "active-candidates"].includes(recordType)) return;
     if (!config) return;
     setLoading(true);
     setError("");
@@ -177,6 +155,10 @@ function DashboardRecordView() {
     () => DOCUMENTS.filter(([key]) => record?.[key]),
     [record]
   );
+
+  if (["active_candidates", "active-candidates"].includes(recordType)) {
+    return <Navigate to={`/dashboard/candidates/${recordId}`} replace />;
+  }
 
   if (!config) {
     return (
@@ -235,6 +217,11 @@ function DashboardRecordView() {
       </header>
 
       <nav className="e2e_record_quick_nav" aria-label="Record sections">
+        {record.candidate_id && (
+          <Link to={`/dashboard/candidates/${record.candidate_id}`}>
+            Open Candidate Profile
+          </Link>
+        )}
         {config.sections.map((section, index) => (
           <a href={`#record-section-${index}`} key={section.title}>{section.title}</a>
         ))}

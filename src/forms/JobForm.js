@@ -78,6 +78,7 @@ const JobForm = ({ jobId, isEdit = false, onClose, refreshData }) => {
       }
 
       await refreshData?.();
+      if (response.warning) alert(response.warning);
       onClose?.();
     } catch (error) {
       setSubmitError(
@@ -137,7 +138,7 @@ const JobForm = ({ jobId, isEdit = false, onClose, refreshData }) => {
           <div className="job-form-actions">
             <button type="button" className="job-form-cancel" onClick={onClose}>Cancel</button>
             <button type="submit" className="job-form-save" disabled={saving}>
-              <FiCheckCircle /> {saving ? (isEdit ? "Updating and parsing..." : "Saving and parsing...") : (isEdit ? "Update Job" : "Create Job")}
+              <FiCheckCircle /> {saving ? (isEdit ? "Updating job..." : "Saving job...") : (isEdit ? "Update Job" : "Create Job")}
             </button>
           </div>
         </form>

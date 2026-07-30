@@ -30,7 +30,12 @@ function EmployeeStatusReport() {
     setLoading(true);
     setError("");
     try {
-      const response = await getEmployees({ page, limit: entries, search: debouncedSearch });
+      const response = await getEmployees({
+        page,
+        limit: entries,
+        search: debouncedSearch,
+        employment: "all",
+      });
       setEmployees(response.data || []);
       setTotalPages(Math.max(response.total_pages || 1, 1));
     } catch (requestError) {
@@ -67,7 +72,7 @@ function EmployeeStatusReport() {
             <tr key={employee.id}>
               <td><strong>{employee.employee_id}</strong></td><td>{employee.legal_name}</td>
               <td>{employee.company_name ? <span className="e2e_company_identity"><FaUserTag /> {employee.company_name}</span> : <span className="e2e_not_assigned">Not Assigned</span>}</td>
-              <td>{employee.role || "—"}</td>
+              <td>{employee.role || "â€”"}</td>
               <td><span className={employee.user_id ? "e2e_assignment_badge assigned" : "e2e_assignment_badge unassigned"}>{employee.user_id ? "Assigned" : "Not Assigned"}</span></td>
               <td><div className="e2e_empstatus_actions"><button type="button" className="e2e_empstatus_view_btn" onClick={() => navigate(`/dashboard/employee-status/${employee.id}`)}>View</button><button type="button" className="editBtn" onClick={()=>{setEditing(employee);setFormOpen(true)}}>Edit</button><button type="button" className="deleteBtn" onClick={()=>setDeleting(employee)}>Remove</button>{!employee.user_id && <button type="button" className="e2e_empstatus_assign_btn" onClick={() => setAssigning(employee)}>Assign</button>}</div></td>
             </tr>

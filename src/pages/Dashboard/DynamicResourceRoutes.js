@@ -21,6 +21,7 @@ import CandidateView from "../../forms/CandidateView";
 import JobView from "../../forms/JobView";
 import AccessCatalog from "./AccessCatalog";
 import AttendanceManagement from "./AttendanceManagement";
+import RecruiterPerformance from "./RecruiterPerformance.";
 
 const PAGE_COMPONENTS = {
   recruiting: <Recruiting />,
@@ -44,7 +45,10 @@ const PAGE_COMPONENTS = {
 
 const DETAIL_COMPONENTS = {
   recruiting: [{ suffix: ":applicationId", element: <ApplicationPageView module="recruiter" /> }],
-  "bench-sales": [{ suffix: ":applicationId", element: <ApplicationPageView module="bench" /> }],
+  "bench-sales": [
+    { suffix: "performance", element: <RecruiterPerformance /> },
+    { suffix: ":applicationId", element: <ApplicationPageView module="bench" /> },
+  ],
   vendors: [{ suffix: ":vendorId", element: <PrimeVendorView /> }],
   candidates: [{ suffix: ":candidateId", element: <CandidateView /> }],
   employees: [{ suffix: ":employeeId", element: <EmployeeView /> }],
@@ -55,12 +59,13 @@ const DETAIL_COMPONENTS = {
 const relativePath = (route) => route.replace(/^\/dashboard\/?/, "").replace(/^\/|\/$/g, "");
 
 export default function useDynamicResourceRoutes() {
-  const { resources } = usePermissions();
+  const { resources, isAdmin } = usePermissions();
   return resources
     .filter((resource) => resource.resource_type === "PAGE"
       && resource.permissions?.view
       && resource.route
       && resource.component_key
+      && (isAdmin || !["clients", "prime_vendors"].includes(resource.resource))
       && resource.component_key !== "dashboard")
     .flatMap((resource) => {
       const component = PAGE_COMPONENTS[resource.component_key];

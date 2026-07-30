@@ -32,6 +32,7 @@ import {
 } from "../api/documentReminderApi";
 import { baseUrlImg } from "../Config/env";
 import "./CandidateView.css";
+import ProfilePerformance from "../components/ProfilePerformance";
 
 const MATCHING_STEPS = [
   "Initializing AI matching engine...",
@@ -257,6 +258,11 @@ const CandidateView = () => {
           <Info icon={<FaCheckCircle />} label="Visa Status" value={candidate.visa_status} />
         </div>
       </section>
+
+      <ProfilePerformance
+        candidateId={candidateId}
+        title={`${candidate.name} · Submission Performance`}
+      />
 
       <section className="candidate-view-card candidate-documents-card">
         <div className="candidate-view-title candidate-documents-title">

@@ -12,7 +12,7 @@ import "../../styles/Dashboard/documentReminders.css";
 
 const emptyFilters = { candidate: "", document_type: "", expiry_from: "", expiry_to: "", status: "", days_left: "" };
 const errorMessage = (error, fallback) => error?.response?.data?.message || error?.message || fallback;
-const displayDate = (value) => value ? new Date(`${value}T00:00:00`).toLocaleDateString() : "-";
+const displayDate = (value) => value ? new Date(`${value}T12:00:00`).toLocaleDateString("en-US", { timeZone: "America/New_York" }) : "-";
 
 function DocumentReminders() {
   const [searchParams] = useSearchParams();

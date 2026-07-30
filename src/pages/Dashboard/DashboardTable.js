@@ -17,6 +17,15 @@ const displayValue = (value) => {
   return value;
 };
 
+const statusClass = (value) => String(value || "unknown")
+  .toLowerCase()
+  .replace(/\s+/g, "-")
+  .replace(/[^a-z0-9-]/g, "");
+
+const renderCell = (column, value) => column.key === "status"
+  ? <span className={`e2e_table_status e2e_table_status_${statusClass(value)}`}><i />{displayValue(value)}</span>
+  : displayValue(value);
+
 function DashboardTable({
   title,
   columns,
@@ -133,7 +142,7 @@ function DashboardTable({
               : data.map((row) => (
                 <tr key={row.id}>
                   {columns.map((column) => (
-                    <td key={column.key}>{displayValue(row[column.key])}</td>
+                    <td key={column.key}>{renderCell(column, row[column.key])}</td>
                   ))}
                   <td>
                     <div className="e2e_action_buttons">

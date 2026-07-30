@@ -15,6 +15,7 @@ import {
 import { getBenchSalesById, getRecruiterApplicationById, updateApplicationProcess, updateRecruiterApplicationProcess } from "../api/applicationApi";
 import { baseUrlImg } from "../Config/env";
 import "./ApplicationView.css";
+import "./InterviewSchedule.css";
 
 const ApplicationView = ({
   applicationId,
@@ -29,6 +30,13 @@ const ApplicationView = ({
   const [updating, setUpdating] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [nextProcess, setNextProcess] = useState(null);
+  const [processError, setProcessError] = useState("");
+  const [interviewForm, setInterviewForm] = useState({
+    interview_date: "",
+    interview_start_time: "",
+    interview_end_time: "",
+    feedback: "",
+  });
 
   const fetchApplication = useCallback(async () => {
     try {
@@ -72,10 +80,13 @@ const ApplicationView = ({
   const handleProcessUpdate = async () => {
     try {
       setUpdating(true);
+      setProcessError("");
       const updateProcess = module === "recruiter" ? updateRecruiterApplicationProcess : updateApplicationProcess;
+      const details = nextProcess === 2 ? interviewForm : {};
       const res = await updateProcess(
         application.id,
-        nextProcess
+        nextProcess,
+        details
       );
 
       if (res.success) {
@@ -85,6 +96,7 @@ const ApplicationView = ({
 
     } catch (err) {
       console.error(err);
+      setProcessError(err?.response?.data?.message || "The application process could not be updated.");
     } finally {
       setUpdating(false);
     }
@@ -135,6 +147,12 @@ const ApplicationView = ({
               onClick={() => {
                 if (application.process_id === 1) {
                   setNextProcess(2);
+                  setInterviewForm({
+                    interview_date: "",
+                    interview_start_time: "",
+                    interview_end_time: "",
+                    feedback: application.feedback || "",
+                  });
                 } else {
                   setNextProcess(3);
                 }
@@ -237,6 +255,22 @@ const ApplicationView = ({
         </div>
       </div>
 
+      {(application.interview_slot || application.process_id >= 2) && (
+        <div className="view-card interview-detail-card">
+          <h3>Interview Details</h3>
+          <div className="info-grid">
+            <div className="info-item">
+              <FaCalendarAlt />
+              <div><label>Interview Slot Date & Time (ET)</label><span>{application.interview_slot || "Not entered"}</span></div>
+            </div>
+            <div className="info-item interview-feedback-item">
+              <FaUser />
+              <div><label>Feedback</label><span>{application.feedback || "No feedback entered"}</span></div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Feedback */}
       <div className="view-card">
         <h3>Feedback</h3>
@@ -286,6 +320,29 @@ const ApplicationView = ({
                 ? `Are you sure you want to move "${application.candidate_name}" to Interview Scheduled?`
                 : `Are you sure you want to mark "${application.candidate_name}" as Placed?`}
             </p>
+            {nextProcess === 2 && (
+              <div className="interview-schedule-form">
+                <label>
+                  <span>Interview Date</span>
+                  <input required type="date" value={interviewForm.interview_date} onChange={(event) => setInterviewForm({ ...interviewForm, interview_date: event.target.value })} />
+                </label>
+                <div>
+                  <label>
+                    <span>Start Time (ET)</span>
+                    <input required type="time" value={interviewForm.interview_start_time} onChange={(event) => setInterviewForm({ ...interviewForm, interview_start_time: event.target.value })} />
+                  </label>
+                  <label>
+                    <span>End Time (ET)</span>
+                    <input required type="time" value={interviewForm.interview_end_time} onChange={(event) => setInterviewForm({ ...interviewForm, interview_end_time: event.target.value })} />
+                  </label>
+                </div>
+                <label>
+                  <span>Feedback</span>
+                  <textarea required rows="3" placeholder="Example: Interview completed with Southwest Airlines" value={interviewForm.feedback} onChange={(event) => setInterviewForm({ ...interviewForm, feedback: event.target.value })} />
+                </label>
+              </div>
+            )}
+            {processError && <div className="interview-schedule-error">{processError}</div>}
 
             <div className="confirm-buttons">
               <button
@@ -296,7 +353,13 @@ const ApplicationView = ({
               </button>
               <button
                 className="confirm-btn"
-                disabled={updating}
+                disabled={updating || (nextProcess === 2 && (
+                  !interviewForm.interview_date
+                  || !interviewForm.interview_start_time
+                  || !interviewForm.interview_end_time
+                  || interviewForm.interview_end_time <= interviewForm.interview_start_time
+                  || !interviewForm.feedback.trim()
+                ))}
                 onClick={handleProcessUpdate}
               >
                 {updating

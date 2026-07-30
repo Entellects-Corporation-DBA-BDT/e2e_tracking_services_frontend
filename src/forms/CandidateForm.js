@@ -220,17 +220,23 @@ const CandidateForm = ({
 
             }
 
+            let response;
+
             if (isEdit) {
 
-                await updateCandidate(candidateId, payload);
+                response = await updateCandidate(candidateId, payload);
 
             } else {
 
-                await createCandidate(payload);
+                response = await createCandidate(payload);
 
             }
 
-            refreshData?.();
+            await refreshData?.();
+
+            if (response?.warning) {
+                alert(response.warning);
+            }
 
             onClose();
 

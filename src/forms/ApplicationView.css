@@ -49,6 +49,8 @@
 .candidate-info h2 {
   margin: 0;
   font-size: 24px;
+  color: #172033;
+  font-weight: 800;
 }
 
 .candidate-info p {

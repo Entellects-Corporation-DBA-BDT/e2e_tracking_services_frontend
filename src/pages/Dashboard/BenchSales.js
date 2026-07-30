@@ -101,7 +101,7 @@ function BenchSales() {
           <h2>
             BenchSales Application List
             <button className="performence-button" onClick={() => {
-                          setOpenForm("performence");
+                          navigate("/dashboard/bench-sales/performance");
                         }}>Performance</button>
           </h2>
           <div className="e2e_recruiting_heading_line"></div>

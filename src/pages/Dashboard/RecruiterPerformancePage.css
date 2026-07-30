@@ -1,0 +1,155 @@
+.performance-dashboard {
+  width: 100%;
+  min-height: 100%;
+  max-height: none;
+  overflow: visible;
+}
+
+.performance-candidate-filter {
+  flex: 1;
+  min-width: 210px;
+}
+
+.performance-candidate-filter input {
+  width: 100%;
+}
+
+.performance-filters select {
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #344054;
+}
+
+.performance-explorer {
+  margin-bottom: 12px;
+  padding: 17px;
+  border: 1px solid #ded7ff;
+  border-radius: 15px;
+  background: linear-gradient(135deg, #ffffff, #faf9ff);
+  box-shadow: 0 4px 16px rgba(91, 53, 245, 0.06);
+}
+
+.performance-explorer-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.performance-explorer-heading > div:first-child > span {
+  color: #6846f5;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+}
+
+.performance-explorer-heading h3 {
+  margin: 3px 0;
+  font-size: 16px;
+  text-transform: capitalize;
+}
+
+.performance-explorer-heading p {
+  margin: 0;
+  color: #98a2b3;
+  font-size: 9px;
+}
+
+.performance-explorer-heading > div:last-child {
+  display: flex;
+  gap: 8px;
+}
+
+.performance-explorer-heading label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: #667085;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.performance-explorer-heading select {
+  min-width: 130px;
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid #ddd6fe;
+  border-radius: 9px;
+  background: #fff;
+  color: #344054;
+  outline: 0;
+}
+
+.performance-explorer-grid {
+  display: grid;
+  grid-template-columns: minmax(330px, 0.75fr) minmax(520px, 1.25fr);
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.performance-explorer-grid > article {
+  min-width: 0;
+  border: 1px solid #eceaf7;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.explorer-pie > div:last-child {
+  padding-bottom: 0;
+}
+
+.explorer-legend {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  max-height: 150px;
+  padding: 0 10px 10px;
+  overflow: auto;
+}
+
+.explorer-legend button {
+  display: grid;
+  grid-template-columns: 8px 1fr auto;
+  align-items: center;
+  gap: 6px;
+  padding: 6px;
+  border: 0;
+  border-radius: 7px;
+  background: #fafaff;
+  color: #344054;
+  text-align: left;
+  cursor: pointer;
+}
+
+.explorer-legend i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.explorer-legend span {
+  overflow: hidden;
+  font-size: 9px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.explorer-legend strong {
+  font-size: 10px;
+}
+
+@media (max-width: 900px) {
+  .performance-dashboard {
+    width: 100%;
+  }
+
+  .performance-explorer-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .performance-explorer-grid {
+    grid-template-columns: 1fr;
+  }
+}

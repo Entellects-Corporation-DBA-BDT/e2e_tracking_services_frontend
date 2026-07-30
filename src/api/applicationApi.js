@@ -81,6 +81,36 @@ export const getDashboardRecord = async (table, id) => {
   return response.data;
 };
 
+export const getExecutiveDashboardSummary = async () => {
+  const response = await axiosInstance.get("/dashboard/executive-summary");
+  return response.data?.data ?? response.data;
+};
+
+export const getDashboardActivities = async (limit = 30) => {
+  const response = await axiosInstance.get("/dashboard/activities", { params: { limit } });
+  return response.data?.data ?? [];
+};
+
+export const getWorkforceAnalytics = async (employeeId, period = "this_week") => {
+  const response = await axiosInstance.get("/dashboard/workforce-analytics", {
+    params: {
+      ...(employeeId ? { employee_id: employeeId } : {}),
+      period,
+    },
+  });
+  return response.data?.data ?? response.data;
+};
+
+export const getProfilePerformance = async ({ candidateId, userId }) => {
+  const response = await axiosInstance.get("/dashboard/profile-performance", {
+    params: {
+      ...(candidateId ? { candidate_id: candidateId } : {}),
+      ...(userId ? { user_id: userId } : {}),
+    },
+  });
+  return response.data?.data ?? response.data;
+};
+
 export const getRecruiterApplications = async (page = 1, limit = 10, search = "") => {
   const response = await axiosInstance.get("/recruiters/list", { params: { page, limit, search } });
   return response.data;
@@ -106,8 +136,8 @@ export const deleteRecruiterApplication = async (id) => {
   return response.data;
 };
 
-export const updateRecruiterApplicationProcess = async (id, processId) => {
-  const response = await axiosInstance.put(`/recruiters/process/${id}`, { process_id: processId });
+export const updateRecruiterApplicationProcess = async (id, processId, details = {}) => {
+  const response = await axiosInstance.put(`/recruiters/process/${id}`, { process_id: processId, ...details });
   return response.data;
 };
 
@@ -176,18 +206,20 @@ export const deleteBenchSalesApplication = async (id) => {
   return response.data;
 };
 
-export const getPerformanceDashboard = async () => {
+export const getPerformanceDashboard = async (params = {}) => {
   const response = await axiosInstance.get(
-    "/benchsales/dashboard/performance"
+    "/benchsales/dashboard/performance",
+    { params }
   );
   return response.data;
 };
 
-export const updateApplicationProcess = async (id, processId) => {
+export const updateApplicationProcess = async (id, processId, details = {}) => {
   const response = await axiosInstance.put(
     `/benchsales/process/${id}`,
     {
       process_id: processId,
+      ...details,
     }
   );
 

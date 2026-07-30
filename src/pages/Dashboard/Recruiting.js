@@ -47,7 +47,7 @@ function Recruiting() {
   useEffect(() => { fetchApplications(); }, [fetchApplications]);
 
   const open = (form, id = null) => { setSelectedApplicationId(id); setOpenForm(form); };
-  const displayDate = (date) => date ? new Date(`${date}`).toLocaleDateString() : "-";
+  const displayDate = (date) => date ? new Date(`${date}`).toLocaleDateString("en-US", { timeZone: "America/New_York" }) : "-";
 
   if (initialLoading) return <Loader fullPage />;
 

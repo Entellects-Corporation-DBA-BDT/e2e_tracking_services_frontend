@@ -16,8 +16,10 @@ export function PermissionProvider({children}){
  },[]);
  const value=useMemo(()=>{
   const resources=profile?.resources||[];
+  const roleName=String(profile?.user?.role?.name||profile?.user?.role||profile?.user?.user_type||"").toLowerCase();
+  const isAdmin=Boolean(profile?.user?.super_admin||profile?.user?.is_admin||["admin","administrator","super admin","super_admin"].includes(roleName));
   const getResource=name=>PermissionService.resource(profile,name);
-  return {profile,user:profile?.user,resources,loading,error,refresh,getResource,logout:()=>{
+  return {profile,user:profile?.user,resources,loading,error,refresh,getResource,isAdmin,logout:()=>{
    Cookies.remove("jwtToken");localStorage.removeItem("userData");setProfile(null);setToken(null);setError("");
    window.dispatchEvent(new CustomEvent("e2e-auth-changed"));
   },

@@ -10,11 +10,10 @@ import {
 } from "recharts";
 
 import {
-  FaCode,
-  FaDatabase,
-  FaPython,
-  FaAws,
   FaArrowRight,
+  FaLightbulb,
+  FaBullseye,
+  FaCheckCircle,
 } from "react-icons/fa";
 
 const COLORS = [
@@ -26,13 +25,6 @@ const COLORS = [
   "#00C2A8",
   "#7D5FFF",
   "#FF7F50",
-];
-
-const SKILL_ICONS = [
-  <FaCode />,
-  <FaDatabase />,
-  <FaPython />,
-  <FaAws />,
 ];
 
 const EMPTY_ANALYTICS = [];
@@ -76,19 +68,6 @@ function DashboardGraphs({
         color: COLORS[index % COLORS.length],
       })),
     [analyticsData]
-  );
-
-  const skills = useMemo(
-    () => analyticsData.map((item, index) => ({
-        name: item.label,
-        value: total
-          ? Number((((Number(item.value) || 0) / total) * 100).toFixed(1))
-          : 0,
-        submissions: Number(item.value) || 0,
-        color: COLORS[index % COLORS.length],
-        icon: SKILL_ICONS[index % SKILL_ICONS.length],
-      })),
-    [analyticsData, total]
   );
 
   return (
@@ -149,52 +128,6 @@ function DashboardGraphs({
         </button>
       </div>
 
-      {/* =========================
-          TOP SKILLS
-      ========================= */}
-
-      <div className="e2e_card">
-        <div className="e2e_card_header">
-          <h3 className="e2e_card_title">Top Skills</h3>
-          <button className="e2e_view_all">View All</button>
-        </div>
-        <div className="e2e_skills_list">
-          {skills.map((item, index) => (
-            <div
-              className="e2e_skill_item"
-              key={index}
-            >
-              <div className="e2e_skill_left">
-                <div
-                  className="e2e_skill_icon"
-                  style={{
-                    background: `${item.color}20`,
-                    color: item.color,
-                  }}
-                >
-                  {item.icon}
-                </div>
-                <p>{item.name}</p>
-              </div>
-              <div className="e2e_skill_bar_wrapper">
-                <div className="e2e_skill_bar_bg">
-                  <div
-                    className="e2e_skill_bar_fill"
-                    style={{
-                      width: `${item.value}%`,
-                      background: item.color,
-                    }}
-                  ></div>
-
-                </div>
-                <span>
-                  {item.value}% ({item.submissions})
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
       <div className="e2e_card">
         <div className="e2e_graph_filter_header">
           <h3 className="e2e_card_title">Submission Analytics</h3>
@@ -262,6 +195,20 @@ function DashboardGraphs({
         </div>
 
       </div>
+      <aside className="e2e_insight_panel" aria-label="Recruiting insight">
+        <div className="e2e_insight_heading"><FaLightbulb /><span>Recruiting Insight</span></div>
+        <blockquote>
+          “Every submission is a new opportunity. Consistency, quality, and timely
+          follow-up turn submissions into successful placements.”
+        </blockquote>
+        <p className="e2e_insight_signature">— E2E Tracking Services</p>
+        <div className="e2e_focus_list">
+          <h4><FaBullseye /> Focus Today</h4>
+          {["Submit quality candidates", "Follow up on pending interviews", "Update candidate feedback", "Convert interviews into placements"].map((item) => (
+            <p key={item}><FaCheckCircle /> {item}</p>
+          ))}
+        </div>
+      </aside>
 
     </div>
 

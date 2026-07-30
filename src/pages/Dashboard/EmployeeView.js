@@ -7,6 +7,19 @@ import AttendancePanel from "../../components/AttendancePanel";
 import "../../styles/Dashboard/recordView.css";
 import "../../styles/Dashboard/empstatus.css";
 import { usePermissions } from "../../auth/PermissionContext";
+import ProfilePerformance from "../../components/ProfilePerformance";
+
+const hasSubmissionPerformance = (role) => {
+  const normalizedRole = String(role || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[-_]+/g, " ")
+    .replace(/\s+/g, " ");
+
+  return normalizedRole === "bench sales"
+    || normalizedRole === "benchsales"
+    || normalizedRole === "it recruiter";
+};
 
 function EmployeeView() {
   const { employeeId } = useParams();
@@ -53,7 +66,7 @@ function EmployeeView() {
   return (
     <article className="e2e_record_page e2e_record_blue">
       <button className="e2e_record_back" onClick={() => navigate("/dashboard/employee-status")}><FaArrowLeft /> Back to Employees</button>
-      <header className="e2e_record_hero"><div className="e2e_record_avatar"><FaUser /></div><div><p>Employee · {employee.employee_id}</p><h1>{employee.legal_name}</h1><span>{employee.company_name ? `Company Name: ${employee.company_name}` : "Company Name not assigned"}</span></div><strong className={`e2e_record_status ${employee.user_id ? "" : "unassigned"}`}>{employee.user_id ? "Assigned" : "Not Assigned"}</strong></header>
+      <header className="e2e_record_hero"><div className="e2e_record_avatar"><FaUser /></div><div><p>Employee Â· {employee.employee_id}</p><h1>{employee.legal_name}</h1><span>{employee.company_name ? `Company Name: ${employee.company_name}` : "Company Name not assigned"}</span></div><strong className={`e2e_record_status ${employee.user_id ? "" : "unassigned"}`}>{employee.user_id ? "Assigned" : "Not Assigned"}</strong></header>
 
       {error && <div className="e2e_empstatus_error" role="alert">{error}</div>}
       <section className="e2e_record_card">
@@ -62,6 +75,13 @@ function EmployeeView() {
           {[["legal_name","Legal Name"],["employee_id","Employee ID"],["contact_info","Contact Information"],["gender","Gender"],["birthdate","Birth Date"],["created_on","Created On"]].map(([key,label]) => <div className="e2e_record_field" key={key}><dt><FaIdBadge /> {label}</dt><dd>{employee[key] || "Not provided"}</dd></div>)}
         </dl>
       </section>
+
+      {employee.user_id && hasSubmissionPerformance(employee.role) && (
+        <ProfilePerformance
+          userId={employee.user_id}
+          title={`${employee.company_name || employee.legal_name} Â· Performance`}
+        />
+      )}
       <AttendancePanel employeeId={employee.id} employeeCode={employee.employee_id}
         isOwn={location.pathname.startsWith("/dashboard/my-profile/")}
         canManage={can("attendance", "edit")} />

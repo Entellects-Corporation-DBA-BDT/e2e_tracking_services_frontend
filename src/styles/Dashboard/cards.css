@@ -174,3 +174,20 @@
 .e2e_single_card.e2e_single_card_active:hover{
   transform:scale(1.025) translateY(-3px);
 }
+
+.e2e_single_card{
+  border-radius:14px;
+  box-shadow:0 3px 14px rgba(16,24,40,.06);
+}
+.e2e_single_card.e2e_single_card_active{
+  border-color:#6c63ff;
+  transform:none;
+  box-shadow:0 8px 24px rgba(79,70,229,.12);
+}
+.e2e_single_card.e2e_single_card_active:hover{transform:translateY(-3px)}
+.e2e_card_top p{color:#1d2939;font-weight:700}
+.e2e_card_top h2{color:#0b1538}
+.e2e_card_icon{
+  border-radius:13px;
+  background:linear-gradient(135deg,#5b21f4,#4f86f7);
+}

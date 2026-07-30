@@ -4,11 +4,10 @@ import {
   getBenchSalesById,
   updateBenchSalesApplication
 } from "../api/applicationApi.js";
+import { getCandidateData } from "../api/candidateApi.js";
 import {
-  FiX,
   FiCalendar,
   FiUser,
-  FiBriefcase,
   FiMapPin,
   FiUploadCloud,
 } from "react-icons/fi";
@@ -24,6 +23,7 @@ const BenchSales = ({ onClose, applicationId, isEdit = false, refreshData }) => 
   }).format(new Date());
   const [formData, setFormData] = useState({
     date_created: today,
+    candidate_id: "",
     candidate_name: "",
     vendor: "",
     poc: "",
@@ -44,6 +44,9 @@ const BenchSales = ({ onClose, applicationId, isEdit = false, refreshData }) => 
   });
 
   const [loading, setLoading] = useState(false);
+  const [candidates, setCandidates] = useState([]);
+  const [loadingCandidates, setLoadingCandidates] = useState(true);
+  const [candidateError, setCandidateError] = useState("");
 
   const handleChange = (e) => {
     setFormData({
@@ -60,38 +63,64 @@ const BenchSales = ({ onClose, applicationId, isEdit = false, refreshData }) => 
   };
 
   useEffect(() => {
-    if (!isEdit || !applicationId) return;
+    let active = true;
 
-    const fetchApplication = async () => {
+    const loadForm = async () => {
       try {
-        const res = await getBenchSalesById(applicationId);
+        setLoadingCandidates(true);
+        setCandidateError("");
+        const [candidateResponse, applicationResponse] = await Promise.all([
+          getCandidateData(1, 1000, ""),
+          isEdit && applicationId
+            ? getBenchSalesById(applicationId)
+            : Promise.resolve(null),
+        ]);
+
+        if (!active) return;
+        setCandidates(candidateResponse.data || []);
+
+        if (!applicationResponse?.data) return;
+        const item = applicationResponse.data;
 
         setFormData({
-          date_created: res.data.date_created || today,
-          candidate_name: res.data.candidate_name || "",
-          vendor: res.data.vendor || "",
-          poc: res.data.poc || "",
-          feedback: res.data.feedback || "",
-          client: res.data.client || "",
-          emp_loc: res.data.emp_loc || "",
-          rate: res.data.rate || "",
-          role: res.data.role || "",
-          candidate_loc: res.data.candidate_loc || "",
-          remarks: res.data.remarks || "",
+          date_created: item.date_created || today,
+          candidate_id: item.candidate_id || "",
+          candidate_name: item.candidate_name || "",
+          vendor: item.vendor || "",
+          poc: item.poc || "",
+          feedback: item.feedback || "",
+          client: item.client || "",
+          emp_loc: item.emp_loc || "",
+          rate: item.rate || "",
+          role: item.role || "",
+          candidate_loc: item.candidate_loc || "",
+          remarks: item.remarks || "",
         });
-
       } catch (err) {
-        console.log(err);
+        if (active) {
+          console.error(err);
+          setCandidateError(
+            err?.response?.data?.message || "Candidates could not be loaded."
+          );
+        }
+      } finally {
+        if (active) setLoadingCandidates(false);
       }
     };
 
-    fetchApplication();
-
-  }, [applicationId, isEdit]);
+    loadForm();
+    return () => {
+      active = false;
+    };
+  }, [applicationId, isEdit, today]);
 
   const handleSubmit = async () => {
 
     if (loading) return; // Prevent multiple clicks
+    if (!formData.candidate_id) {
+      alert("Please select a candidate.");
+      return;
+    }
 
     setLoading(true);
 
@@ -100,7 +129,9 @@ const BenchSales = ({ onClose, applicationId, isEdit = false, refreshData }) => 
       const payload = new FormData();
 
       Object.keys(formData).forEach((key) => {
-        payload.append(key, formData[key]);
+        if (key !== "candidate_name") {
+          payload.append(key, formData[key]);
+        }
       });
 
       Object.keys(files).forEach((key) => {
@@ -175,9 +206,28 @@ const BenchSales = ({ onClose, applicationId, isEdit = false, refreshData }) => 
           <label>Candidate Name</label>
           <div className="inputWrapper">
             <FiUser />
-            <input type="text" placeholder="Enter candidate name" name="candidate_name" value={formData.candidate_name}
-              onChange={handleChange} />
+            <select
+              name="candidate_id"
+              value={formData.candidate_id}
+              onChange={handleChange}
+              disabled={loadingCandidates}
+              required
+            >
+              <option value="">
+                {loadingCandidates
+                  ? "Loading candidates..."
+                  : isEdit && formData.candidate_name && !formData.candidate_id
+                    ? `Legacy record: ${formData.candidate_name} — select a candidate`
+                    : "Select Candidate"}
+              </option>
+              {candidates.map((candidate) => (
+                <option key={candidate.id} value={candidate.id}>
+                  {candidate.name}
+                </option>
+              ))}
+            </select>
           </div>
+          {candidateError && <small className="fieldError">{candidateError}</small>}
         </div>
 
         <div className="inputGroup">
@@ -355,7 +405,7 @@ const BenchSales = ({ onClose, applicationId, isEdit = false, refreshData }) => 
         <button
           className="saveBtn"
           onClick={handleSubmit}
-          disabled={loading}
+          disabled={loading || loadingCandidates || Boolean(candidateError)}
         >
           {loading && <span className="btnLoader"></span>}
 

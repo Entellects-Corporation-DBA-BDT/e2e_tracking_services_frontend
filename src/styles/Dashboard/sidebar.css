@@ -12,7 +12,7 @@
   left: 0;
   top: 0;
 
-  padding: 10px 10px;
+  padding: 18px 14px;
 
   display: flex;
   flex-direction: column;
@@ -115,7 +115,7 @@
 
   padding: 0 12px;
 
-  border-radius: 14px;
+  border-radius: 11px;
 
   cursor: pointer;
 
@@ -263,6 +263,15 @@
   position: relative;
   overflow: hidden;
   box-shadow: 0 5px 16px rgba(15, 23, 42, 0.06);
+}
+
+.e2e_sidebar_menu{gap:6px}
+.e2e_sidebar_logo_section{padding:0 10px 15px}
+.e2e_sidebar_active,
+.e2e_sidebar_active:visited{
+  color:#fff;
+  background:linear-gradient(135deg,#5b21f4,#5635f5);
+  box-shadow:0 8px 18px rgba(91,33,244,.22);
 }
 
 .e2e_sidebar_logout:hover {
