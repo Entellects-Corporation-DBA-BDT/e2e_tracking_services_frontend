@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
-import { FaBell, FaEdit, FaEye, FaFileAlt, FaPaperPlane, FaTimes } from "react-icons/fa";
+import { FaBell, FaDownload, FaEdit, FaEye, FaFileAlt, FaPaperPlane, FaTimes } from "react-icons/fa";
 import { useSearchParams } from "react-router-dom";
 import { baseUrlImg } from "../../Config/env";
 import {
   disableDocumentReminder,
+  exportDocumentReminders,
   getDocumentReminders,
   sendDocumentReminderNow,
   updateDocumentReminder,
@@ -72,6 +73,21 @@ function DocumentReminders() {
     setPage(1);
   };
 
+  const downloadExcel = async () => {
+    try {
+      const blob = await exportDocumentReminders(appliedFilters);
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `filtered-immigration-documents-${new Date().toISOString().slice(0, 10)}.xls`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      setMessage({ type: "error", text: errorMessage(error, "Filtered documents could not be exported.") });
+    }
+  };
   const saveEdit = async (event) => {
     event.preventDefault();
     setSaving(true);
@@ -92,7 +108,7 @@ function DocumentReminders() {
   return (
     <div className="document-reminders-page">
       <div className="document-reminders-heading">
-        <div><h1><FaBell /> Document Reminders</h1><p>Monitor H1B expirations, PERM filing windows, and I-140 case follow-ups.</p></div>
+        <div><h1><FaBell /> Document Reminders</h1><p>Monitor H1B expirations, PERM filing windows, and I-140 priority dates.</p></div><button type="button" className="document-export-button" onClick={downloadExcel}><FaDownload /> Download Excel</button>
       </div>
 
       {message && <div className={`document-reminders-alert ${message.type}`}>{message.text}<button onClick={() => setMessage(null)}><FaTimes /></button></div>}
@@ -148,7 +164,7 @@ function DocumentPreviewModal({ row, onClose }) {
 }
 function JsonModal({ row, onClose }) {
   const details = row.document_details || {};
-  const fields = [["Candidate Name",details.candidate_name],["Visa Type",details.visa_type],["Visa Number",details.visa_number],["Case Number",details.case_number],["Applied Date",details.applied_date],["Approved Date",details.approved_date],["Issue Date",details.issue_date],["Expiry Date",details.expiry_date],["Reminder Target",details.reminder_date],["Reminder Purpose",details.reminder_reason],["Entry Method",details.entry_method]];
+  const fields = [["Candidate Name",details.candidate_name],["Visa Type",details.visa_type],["Visa Number",details.visa_number],["Case Number",details.case_number],["Notice Date",details.notice_date],["Received Date",details.received_date],["Priority Date",details.priority_date],["Applied Date",details.applied_date],["Approved Date",details.approved_date],["Issue Date",details.issue_date],["Expiry Date",details.expiry_date],["Reminder Target",details.reminder_date],["Reminder Purpose",details.reminder_reason],["Entry Method",details.entry_method]];
   return <div className="reminder-modal-backdrop" onMouseDown={onClose}><div className="reminder-modal" onMouseDown={(e) => e.stopPropagation()}><div className="reminder-modal-header"><h2>Entered Document Details</h2><button onClick={onClose}><FaTimes /></button></div><div className="reminder-json-fields">{fields.map(([label,value]) => <div key={label}><span>{label}</span><strong>{value || "Not entered"}</strong></div>)}</div><h3>Stored JSON</h3><pre>{JSON.stringify(details,null,2)}</pre></div></div>;
 }
 

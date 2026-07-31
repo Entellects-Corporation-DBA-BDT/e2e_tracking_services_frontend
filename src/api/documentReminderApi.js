@@ -5,6 +5,10 @@ export const getDocumentReminders = async (filters = {}) => {
   return response.data;
 };
 
+export const exportDocumentReminders = async (filters = {}) => {
+  const response = await axiosInstance.get("/document-reminders/export", { params: filters, responseType: "blob" });
+  return response.data;
+};
 export const getDocumentReminder = async (id) => {
   const response = await axiosInstance.get(`/document-reminders/${id}`);
   return response.data;
