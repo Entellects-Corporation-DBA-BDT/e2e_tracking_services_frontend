@@ -101,11 +101,14 @@ export const getWorkforceAnalytics = async (employeeId, period = "this_week") =>
   return response.data?.data ?? response.data;
 };
 
-export const getProfilePerformance = async ({ candidateId, userId }) => {
+export const getProfilePerformance = async ({ candidateId, userId, page = 1, limit = 10, relatedId }) => {
   const response = await axiosInstance.get("/dashboard/profile-performance", {
     params: {
       ...(candidateId ? { candidate_id: candidateId } : {}),
       ...(userId ? { user_id: userId } : {}),
+      page,
+      limit,
+      ...(relatedId ? { related_id: relatedId } : {}),
     },
   });
   return response.data?.data ?? response.data;

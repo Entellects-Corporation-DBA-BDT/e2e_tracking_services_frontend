@@ -20,12 +20,14 @@ export default function ProfilePerformance({ candidateId, userId, title }) {
   const [metric, setMetric] = useState("submissions");
   const [selectedRelated, setSelectedRelated] = useState(null);
   const [refresh, setRefresh] = useState(0);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   useEffect(() => {
     let active = true;
     setLoading(true);
     setError("");
-    getProfilePerformance({ candidateId, userId }).then((result) => {
+    getProfilePerformance({ candidateId, userId, page, limit: pageSize, relatedId: selectedRelated }).then((result) => {
       if (active) {
         setData(result || {});
         setSelectedRelated(null);
@@ -34,7 +36,7 @@ export default function ProfilePerformance({ candidateId, userId, title }) {
       if (active) setError(requestError?.response?.data?.message || "Performance data could not be loaded.");
     }).finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
-  }, [candidateId, userId, refresh]);
+  }, [candidateId, userId, page, pageSize, refresh, selectedRelated]);
 
   const summary = data.summary || {};
   const breakdown = Array.isArray(data.breakdown) ? data.breakdown : [];
@@ -50,14 +52,18 @@ export default function ProfilePerformance({ candidateId, userId, title }) {
     { name: "Placed", value: number(summary.placements), color: "#28b879" },
   ];
   const chartData = breakdown.map((item, index) => ({ ...item, value: number(item[metric]), color: COLORS[index % COLORS.length] }));
-  const visibleApplications = useMemo(() => selectedRelated === null
-    ? applications
-    : applications.filter((item) => number(profileType === "candidate" ? item.employee_id : item.candidate_id) === number(selectedRelated)),
-  [applications, profileType, selectedRelated]);
+  const visibleApplications = applications;
+  const pagination = data.pagination || {};
+  const currentPage = number(pagination.page) || page;
+  const totalPages = Math.max(1, number(pagination.total_pages) || 1);
+  const totalRecords = number(pagination.total_records);
 
   const triggerRelated = (entry) => {
     const id = entry?.related_id ?? entry?.payload?.related_id;
-    if (id !== undefined && id !== null) setSelectedRelated(number(id));
+    if (id !== undefined && id !== null) {
+      setSelectedRelated(number(id));
+      setPage(1);
+    }
   };
 
   if (loading) return <section className="profile-performance-state"><span /> Loading performance history...</section>;
@@ -81,11 +87,16 @@ export default function ProfilePerformance({ candidateId, userId, title }) {
       </div>
       <article className="profile-performance-trend"><h3>Submission Activity</h3><ResponsiveContainer width="100%" height={240}><LineChart data={trend}><CartesianGrid strokeDasharray="3 3" vertical={false} /><XAxis dataKey="activity_date" tickFormatter={shortDate} tick={{ fontSize: 10 }} /><YAxis allowDecimals={false} /><Tooltip labelFormatter={shortDate} /><Legend /><Line dataKey="submissions" stroke="#5b35f5" strokeWidth={3} /><Line dataKey="interviews" stroke="#ff9f0a" strokeWidth={2} /><Line dataKey="placements" stroke="#28b879" strokeWidth={2} /></LineChart></ResponsiveContainer></article>
       <article className="profile-performance-details">
-        <div><h3><FaUserCheck /> Related Submission Details</h3>{selectedRelated !== null && <button onClick={() => setSelectedRelated(null)}>Show all</button>}</div>
+        <div><h3><FaUserCheck /> Related Submission Details</h3>{selectedRelated !== null && <button onClick={() => { setSelectedRelated(null); setPage(1); }}>Show all</button>}</div>
         <div className="profile-performance-table"><table><thead><tr><th>Date</th><th>Candidate</th><th>User</th><th>Role</th><th>Client / Vendor</th><th>Status</th><th>Rate</th><th /></tr></thead><tbody>
           {visibleApplications.length ? visibleApplications.map((item) => <tr key={item.id}><td>{shortDate(item.date_created)}</td><td><strong>{item.candidate_name || "-"}</strong></td><td>{item.employee_name || "-"}</td><td>{item.role || "-"}</td><td>{item.client || item.vendor || "-"}</td><td><span className={`profile-process process-${item.process_id}`}>{item.status}</span></td><td>{item.rate ? `$${item.rate}` : "-"}</td><td><button onClick={() => navigate(`/dashboard/records/submissions/${item.id}`)}>View</button></td></tr>)
             : <tr><td colSpan="8">No submission activity is available.</td></tr>}
         </tbody></table></div>
+        <footer className="profile-performance-pagination">
+          <label>Rows<select value={pageSize} onChange={(event) => { setPageSize(Number(event.target.value)); setPage(1); }}><option value="5">5</option><option value="10">10</option><option value="50">50</option><option value="100">100</option></select></label>
+          <span>{totalRecords ? `${((currentPage - 1) * pageSize) + 1}-${Math.min(currentPage * pageSize, totalRecords)} of ${totalRecords}` : "0 records"}</span>
+          <nav aria-label="Related submission pages"><button disabled={currentPage <= 1} onClick={() => setPage(currentPage - 1)}>Previous</button><strong>Page {currentPage} of {totalPages}</strong><button disabled={currentPage >= totalPages} onClick={() => setPage(currentPage + 1)}>Next</button></nav>
+        </footer>
       </article>
     </section>
   );
