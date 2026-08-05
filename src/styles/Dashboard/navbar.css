@@ -13,11 +13,13 @@
 
   display:flex;
 
+  flex-wrap:wrap;
+
   justify-content:space-between;
 
   align-items:center;
 
-  padding:22px 35px;
+  padding:14px 24px;
 
   background:#ffffff;
 
@@ -44,22 +46,23 @@
 
 .e2e_navbar_title{
 
-  font-size:30px;
+  font-size:24px;
 
   font-weight:700;
 
   color:#111827;
 
-  letter-spacing:-0.8px;
+  letter-spacing:-0.5px;
+  line-height:1.15;
 }
 
 .e2e_navbar_subtitle{
 
-  margin-top:5px;
+  margin-top:3px;
 
   color:#6b7280;
 
-  font-size:15px;
+  font-size:12px;
 
   font-weight:500;
 }
@@ -72,13 +75,13 @@
 
   align-items:center;
 
-  gap:18px;
+  gap:10px;
 }
 
 /* SEARCH */
 
 .e2e_navbar_search_wrap{
-  width:280px;
+  width:260px;
   position:relative;
 }
 
@@ -124,6 +127,44 @@
   text-align:left;
   cursor:pointer;
 }
+
+.e2e_candidate_navbar_sections{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  order:3;
+  width:calc(100% + 48px);
+  flex:0 0 calc(100% + 48px);
+  margin:12px -24px -14px;
+  padding:9px 24px 10px;
+  overflow-x:auto;
+  border-top:1px solid #dfe6ef;
+  background:#f7f9fc;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.9);
+  scrollbar-width:none;
+}
+.e2e_navbar_container.has-section-navigation .e2e_navbar_subtitle{display:none}
+.e2e_navbar_container.has-section-navigation>div:first-child{align-self:center}
+.e2e_candidate_navbar_sections::-webkit-scrollbar{display:none}
+.e2e_candidate_navbar_sections a,.e2e_candidate_navbar_sections button{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  min-height:36px;
+  flex:0 0 auto;
+  padding:7px 11px;
+  border:1px solid #e2e8f0;
+  border-radius:9px;
+  background:#fff;
+  color:#475569;
+  font-size:11px;
+  font-weight:800;
+  text-decoration:none;
+  white-space:nowrap;
+  cursor:pointer;
+}
+.e2e_candidate_navbar_sections a:hover,.e2e_candidate_navbar_sections a:focus-visible{border-color:#c7d2fe;background:#eef2ff;color:#4f46e5;outline:none}
+.e2e_candidate_navbar_sections button{border-color:#dbe4f0;color:#334155}
 .e2e_navbar_account_menu button:hover{background:#f7f7fb}
 .e2e_navbar_account_menu button + button{border-top:1px solid #eef0f4;border-radius:0 0 10px 10px}
 .e2e_navbar_account_menu span strong,.e2e_navbar_account_menu span small{display:block}
@@ -161,7 +202,7 @@
 
   width:100%;
 
-  height:48px;
+  height:42px;
 
   border:1px solid #e5e7eb;
 
@@ -259,9 +300,9 @@
 
 .e2e_navbar_notification{
 
-  width:48px;
+  width:42px;
 
-  height:48px;
+  height:42px;
 
   display:flex;
 
@@ -371,7 +412,7 @@
   align-items: center;
   gap: 12px;
   cursor: pointer;
-  padding: 8px 14px;
+  padding: 5px 9px;
   border-radius: 14px;
   transition: all 0.3s ease;
 }
@@ -382,8 +423,8 @@
 }
 
 .e2e_navbar_avatar {
-  width: 45px;
-  height: 45px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   background: linear-gradient(
     135deg,
@@ -394,7 +435,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
+  font-size: 15px;
   font-weight: 700;
   text-transform: uppercase;
   box-shadow: 0 4px 12px rgba(255, 122, 24, 0.3);
@@ -474,6 +515,21 @@
     gap:10px;
     background:rgba(255,255,255,.94);
     backdrop-filter:blur(14px);
+  }
+
+  .e2e_candidate_navbar_sections{
+    width:calc(100% + 28px);
+    flex-basis:calc(100% + 28px);
+    margin:10px -14px -12px;
+    padding:9px 14px 10px;
+    gap:6px;
+  }
+
+  .e2e_candidate_navbar_sections a,
+  .e2e_candidate_navbar_sections button{
+    min-height:34px;
+    padding:7px 10px;
+    font-size:10px;
   }
 
   .e2e_navbar_left,

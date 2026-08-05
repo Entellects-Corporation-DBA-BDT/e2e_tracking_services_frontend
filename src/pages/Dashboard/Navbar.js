@@ -1,5 +1,5 @@
 import "../../styles/Dashboard/navbar.css";
-import { FaBell, FaChevronDown, FaMoon, FaPrint, FaRedo, FaSearch, FaSignOutAlt, FaSun } from "react-icons/fa";
+import { FaArrowLeft, FaBell, FaBriefcase, FaCalendarAlt, FaChevronDown, FaFileAlt, FaMedal, FaMoon, FaPrint, FaRedo, FaSearch, FaSignOutAlt, FaSun, FaUserTie } from 'react-icons/fa';
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -11,7 +11,7 @@ function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
   const searchRef = useRef(null);
-  const { resources, user, logout } = usePermissions();
+  const { resources: allResources, user, logout, isAdmin } = usePermissions();
   const [searchTerm, setSearchTerm] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
   const [activeSuggestion, setActiveSuggestion] = useState(-1);
@@ -19,6 +19,15 @@ function Navbar() {
   const [showLogoutConfirmation, setShowLogoutConfirmation] = useState(false);
   const { darkMode, toggleTheme } = useTheme();
   const profileRef = useRef(null);
+  const candidateDetailPath = /^\/dashboard\/candidates\/[^/]+$/.test(location.pathname) ? location.pathname : null;
+  const dashboardHome = location.pathname === '/dashboard' || location.pathname === '/dashboard/';
+  const myProfilePath = /^\/dashboard\/my-profile\/[^/]+$/.test(location.pathname) ? location.pathname : null;
+  const resources = useMemo(
+    () => isAdmin ? allResources : allResources.filter(
+      (item) => !['clients', 'prime_vendors'].includes(item.resource)
+    ),
+    [allResources, isAdmin]
+  );
 
   useEffect(() => {
     const closeSearch = (event) => {
@@ -28,6 +37,7 @@ function Navbar() {
     document.addEventListener("mousedown", closeSearch);
     return () => document.removeEventListener("mousedown", closeSearch);
   }, []);
+
 
   const handleLogout = () => {
     logout();
@@ -78,6 +88,7 @@ function Navbar() {
     "/dashboard/vendors": "Prime Vendors",
     "/dashboard/clients": "Clients",
     "/dashboard/candidates": "Candidates",
+    "/dashboard/candidate-access": "Candidate Portal Management",
     "/dashboard/document-reminders": "Document Reminders",
     "/dashboard/training": "Training",
     "/dashboard/candidate-onboarding":
@@ -90,8 +101,10 @@ function Navbar() {
       "Vendor Onboarding",
   };
 
-  const currentPageTitle = location.pathname.startsWith("/dashboard/records/")
-    ? "Dashboard Record Details"
+  const currentPageTitle = candidateDetailPath
+    ? 'Candidate Details'
+    : location.pathname.startsWith('/dashboard/records/')
+    ? 'Dashboard Record Details'
     : /^\/dashboard\/recruiting\/\d+$/.test(location.pathname)
       ? "Recruiter Application Details"
       : /^\/dashboard\/bench-sales\/\d+$/.test(location.pathname)
@@ -103,7 +116,7 @@ function Navbar() {
         : pageTitles[location.pathname] || "Dashboard";
 
   return (
-    <div className="e2e_navbar_container">
+    <div className={`e2e_navbar_container${candidateDetailPath || dashboardHome || myProfilePath ? ' has-section-navigation' : ''}`}>
       <div>
         <h2 className="e2e_navbar_title">
           {currentPageTitle}
@@ -192,6 +205,27 @@ function Navbar() {
           )}
         </div>
       </div>
+      {candidateDetailPath && <nav className='e2e_candidate_navbar_sections' aria-label='Candidate profile sections'>
+        <button type='button' onClick={() => navigate('/dashboard/candidates')}><FaArrowLeft /> Back</button>
+        <a href={`${candidateDetailPath}#overview`}><FaUserTie /> Overview</a>
+        <a href={`${candidateDetailPath}#reports`}><FaCalendarAlt /> Reports & Activity</a>
+        <a href={`${candidateDetailPath}#documents`}><FaFileAlt /> Documents</a>
+        <a href={`${candidateDetailPath}#resume`}><FaMedal /> Skills & Resume</a>
+        <a href={`${candidateDetailPath}#job-matches`}><FaBriefcase /> Job Matches</a>
+      </nav>}
+      {dashboardHome && <nav className='e2e_candidate_navbar_sections e2e_dashboard_navbar_sections' aria-label='Dashboard sections'>
+        <a href='/dashboard#overview'><FaUserTie /> Overview</a>
+        <a href='/dashboard#workforce'><FaCalendarAlt /> Workforce</a>
+        <a href='/dashboard#operations'><FaBriefcase /> Operations</a>
+        <a href='/dashboard#records'><FaFileAlt /> Records</a>
+      </nav>}
+      {myProfilePath && <nav className='e2e_candidate_navbar_sections' aria-label='My Profile sections'>
+        <button type='button' onClick={() => navigate('/dashboard')}><FaArrowLeft /> Back</button>
+        <a href={`${myProfilePath}#profile-overview`}><FaUserTie /> Overview</a>
+        <a href={`${myProfilePath}#profile-performance`}><FaBriefcase /> Performance</a>
+        <a href={`${myProfilePath}#profile-attendance`}><FaCalendarAlt /> Attendance</a>
+        <a href={`${myProfilePath}#profile-identity`}><FaFileAlt /> Company Identity</a>
+      </nav>}
       {showLogoutConfirmation && createPortal(
         <div className="e2e_logout_dialog_backdrop" onMouseDown={() => setShowLogoutConfirmation(false)}>
           <div className="e2e_logout_dialog" role="alertdialog" aria-modal="true"

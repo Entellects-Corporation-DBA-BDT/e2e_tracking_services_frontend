@@ -1,4 +1,6 @@
 .document-reminders-page { min-height: 100%; padding: 24px; background: #f5f7fb; color: #1e293b; }
+.document-candidate-link { color: #1d4ed8; text-decoration: none; }
+.document-candidate-link:hover, .document-candidate-link:focus-visible { text-decoration: underline; }
 .document-reminders-heading { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
 .document-reminders-heading h1 { display: flex; align-items: center; gap: 11px; margin: 0; font-size: 28px; }
 .document-reminders-heading h1 svg { color: #4f46e5; }

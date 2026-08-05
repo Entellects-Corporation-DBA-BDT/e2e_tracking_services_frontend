@@ -53,6 +53,14 @@ const getPresetDateRange = (filter) => {
   };
 };
 
+const ConfidentialResourceNotice = () => (
+  <section className='e2e_confidential_notice' role='alert'>
+    <span>ADMIN ONLY</span>
+    <h2>Confidential company information</h2>
+    <p>Client and vendor details are company property and can only be viewed by administrators.</p>
+  </section>
+);
+
 const TABLES = {
   submissions: {
     title: "Submissions",
@@ -103,7 +111,7 @@ const makeColumns = (columns) => columns.map(([key, label]) => ({
 function Dashboard() {
   const navigate = useNavigate();
   const dynamicResourceRoutes = useDynamicResourceRoutes();
-  const { can } = usePermissions();
+  const { can, isAdmin } = usePermissions();
   const [selectedFilter, setSelectedFilter] = useState("today");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -234,6 +242,13 @@ function Dashboard() {
   }, []);
 
   useEffect(() => {
+    if (loading || !window.location.hash) return;
+    const section = document.querySelector(window.location.hash);
+    if (!section) return;
+    window.requestAnimationFrame(() => section.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+  }, [loading]);
+
+  useEffect(() => {
     const timer = window.setTimeout(() => setDebouncedSearch(tableSearch), 350);
     return () => window.clearTimeout(timer);
   }, [tableSearch]);
@@ -266,7 +281,13 @@ function Dashboard() {
           }
         );
         if (activeTableRequest.current !== requestId) return;
-        setTableData(result.data || []);
+        setTableData((result.data || []).map((row) => ({
+          ...row,
+          __candidateId: selectedCard === 'active_candidates'
+            ? row.id
+            : row.candidate_id || row.candidateId || null,
+          __recruiterEmployeeId: row.recruiter_employee_id || row.recruiterEmployeeId || null,
+        })));
         setTableTotal(result.total || 0);
       } catch (error) {
         if (activeTableRequest.current !== requestId) return;
@@ -292,7 +313,10 @@ function Dashboard() {
     setTableSearch("");
     setDebouncedSearch("");
     setTableSort(nextTable.columns[0][0]);
-    setTableOrder("desc");
+    setTableOrder('desc');
+    window.requestAnimationFrame(() => {
+      document.getElementById('records')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
   }, []);
 
   const handleTableSort = useCallback((column) => {
@@ -439,6 +463,7 @@ function Dashboard() {
                   ) : (
                     <>
                       {/* <DocumentExpiryWidget /> */}
+                      <span id='overview' className='dashboard-section-anchor' aria-hidden='true' />
                       <DashboardCards
                         summary={summary}
                         selectedCard={selectedCard}
@@ -456,6 +481,7 @@ function Dashboard() {
                         onCategoryChange={handleCategoryChange}
                         onApplyDateFilter={handleApplyDateFilter}
                       />
+                      <span id='workforce' className='dashboard-section-anchor' aria-hidden='true' />
                       <WorkforceSubmissionAnalytics
                         data={workforceAnalytics}
                         loading={workforceLoading}
@@ -474,9 +500,11 @@ function Dashboard() {
                           navigate(`/dashboard/records/submissions/${id}`)
                         }
                       />
+                      <span id='operations' className='dashboard-section-anchor' aria-hidden='true' />
                       <OperationsCommandCenter summary={summary} refreshToken={dashboardRefresh} />
                     </>
                   )}
+                  <span id='records' className='dashboard-section-anchor' aria-hidden='true' />
                   <DashboardTable
                     title={selectedTable.title}
                     columns={tableColumns}
@@ -504,6 +532,8 @@ function Dashboard() {
                         ? `/dashboard/candidates/${row.id}`
                         : `/dashboard/records/${selectedCard}/${row.id}`
                     )}
+                    onCandidateView={(row) => row.__candidateId && navigate(`/dashboard/candidates/${row.__candidateId}#reports`)}
+                    onRecruiterView={(row) => row.__recruiterEmployeeId && navigate(`/dashboard/employee-status/${row.__recruiterEmployeeId}#profile-performance`)}
                     onAdd={() => navigate(
                       selectedCard === "active_candidates"
                         ? "/dashboard/candidates"
@@ -514,6 +544,12 @@ function Dashboard() {
               }
             />
             {dynamicResourceRoutes}
+            {!isAdmin && (
+              <>
+                <Route path='clients/*' element={<ConfidentialResourceNotice />} />
+                <Route path='vendors/*' element={<ConfidentialResourceNotice />} />
+              </>
+            )}
             <Route
               path="records/:recordType/:recordId"
               element={<DashboardRecordView />}

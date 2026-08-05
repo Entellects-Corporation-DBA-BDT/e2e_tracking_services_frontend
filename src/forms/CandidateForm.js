@@ -471,6 +471,8 @@ const CandidateForm = ({
                                         <option>CPT</option>
 
                                         <option>GC</option>
+                                        <option>H4EAD</option>
+
 
                                         <option>Citizen</option>
 

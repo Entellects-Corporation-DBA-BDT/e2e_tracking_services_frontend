@@ -43,6 +43,8 @@ function DashboardTable({
   onRefresh,
   onExport,
   onView,
+  onCandidateView,
+  onRecruiterView,
   onAdd,
 }) {
   const totalPages = Math.max(1, Math.ceil(pagination.total / pagination.limit));
@@ -142,7 +144,11 @@ function DashboardTable({
               : data.map((row) => (
                 <tr key={row.id}>
                   {columns.map((column) => (
-                    <td key={column.key}>{renderCell(column, row[column.key])}</td>
+                    <td key={column.key}>{column.key === 'candidate' && row.__candidateId
+                      ? <button type='button' className='e2e_candidate_report_link' onClick={() => onCandidateView(row)}>{displayValue(row[column.key])}</button>
+                      : column.key === 'recruiter' && row.__recruiterEmployeeId
+                        ? <button type='button' className='e2e_candidate_report_link' onClick={() => onRecruiterView(row)}>{displayValue(row[column.key])}</button>
+                        : renderCell(column, row[column.key])}</td>
                   ))}
                   <td>
                     <div className="e2e_action_buttons">

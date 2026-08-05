@@ -16,14 +16,17 @@ function AttendancePanel({ employeeId, employeeCode, isOwn = false, canManage = 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [correction, setCorrection] = useState(null);
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   const load = useCallback(async () => {
     setLoading(true); setError("");
-    try { setPayload(await getEmployeeAttendance(employeeId, { start_date: startDate, end_date: endDate, limit: 31 })); }
+    try { setPayload(await getEmployeeAttendance(employeeId, { start_date: startDate, end_date: endDate, page, limit: pageSize })); }
     catch (requestError) { setError(requestError?.response?.data?.message || "Attendance could not be loaded."); }
     finally { setLoading(false); }
-  }, [employeeId, endDate, startDate]);
+  }, [employeeId, endDate, startDate, page, pageSize]);
   useEffect(() => { load(); }, [load]);
+  useEffect(() => { setPage(1); }, [startDate, endDate]);
 
   const cards = [
     ["Present Days", payload.summary.present_days || 0, <FaCalendarCheck />],
@@ -31,6 +34,9 @@ function AttendancePanel({ employeeId, employeeCode, isOwn = false, canManage = 
     ["Late Records", payload.summary.late_days || 0, <FaHistory />],
     ["Half Days", payload.summary.half_days || 0, <FaClock />],
   ];
+  const totalRecords = Number(payload.pagination?.total ?? payload.total ?? 0);
+  const currentPage = Number(payload.pagination?.page ?? payload.page ?? page);
+  const totalPages = Math.max(1, Number(payload.pagination?.total_pages) || Math.ceil(totalRecords / pageSize) || 1);
   const correctRecord = async (row) => {
     const timeIn = window.prompt("Time in (HH:MM, Eastern Time)", row.time_in?.slice(0,5));
     if (timeIn === null) return;
@@ -54,7 +60,12 @@ function AttendancePanel({ employeeId, employeeCode, isOwn = false, canManage = 
       <AttendanceCalendar employeeId={employeeId} records={payload.calendar || payload.data}
         holidays={payload.holidays || []} leaves={payload.leaves || []} canManage={canManage} onChanged={load} />
       <div className="attendance-history"><h3>Recent Attendance</h3><div><table><thead><tr><th>Date (ET)</th><th>Time In</th><th>Time Out</th><th>Hours</th><th>Day Status</th><th>Punctuality</th>{canManage&&<th>Action</th>}</tr></thead><tbody>{payload.data.map(row=><tr key={row.id}><td>{row.date}</td><td>{row.time_in}</td><td>{row.time_out==="00:00:00"?"Working":row.time_out}</td><td>{`${row.hours ?? 0} h`}</td><td><span className={`day-status ${row.work_status}`}>{(row.work_status||"completed").replace("_"," ")}</span></td><td><span className={row.status===1?"on-time":"late"}>{row.status===1?"On Time":"Late"}</span></td>{canManage&&<td><button className="attendance-edit" onClick={()=>correctRecord(row)}>Edit</button></td>}</tr>)}</tbody></table></div></div>
-      <ConfirmDialog open={Boolean(correction)} title="Update Attendance Record?"
+      <footer className='attendance-pagination'>
+        <label>Rows<select value={pageSize} onChange={(event)=>{setPageSize(Number(event.target.value));setPage(1)}}>{[5,10,20,50].map((size)=><option key={size} value={size}>{size}</option>)}</select></label>
+        <span>{totalRecords ? `${(currentPage-1)*pageSize+1}-${Math.min(currentPage*pageSize,totalRecords)} of ${totalRecords}` : '0 records'}</span>
+        <nav aria-label='Recent attendance pages'><button disabled={currentPage<=1} onClick={()=>setPage(currentPage-1)}>Previous</button><strong>Page {currentPage} of {totalPages}</strong><button disabled={currentPage>=totalPages} onClick={()=>setPage(currentPage+1)}>Next</button></nav>
+      </footer>
+      <ConfirmDialog open={Boolean(correction)} title='Update Attendance Record?'
         message={`Change ${correction?.row?.date} attendance to ${correction?.time_in}–${correction?.time_out} ET? Hours and half-day status will be recalculated.`}
         confirmLabel="Update Attendance" danger={false} onCancel={()=>setCorrection(null)} onConfirm={applyCorrection} />
     </>}

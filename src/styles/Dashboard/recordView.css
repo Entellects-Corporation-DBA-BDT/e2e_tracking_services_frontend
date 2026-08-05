@@ -1,3 +1,5 @@
+.profile-section-anchor{display:block;height:0;scroll-margin-top:155px}.profile-section-target{scroll-margin-top:155px}@media(max-width:992px){.profile-section-anchor,.profile-section-target{scroll-margin-top:225px}}@media(max-width:768px){.profile-section-anchor,.profile-section-target{scroll-margin-top:205px}}
+
 .e2e_record_page {
   --record-accent: #2563eb;
   --record-soft: #eff6ff;

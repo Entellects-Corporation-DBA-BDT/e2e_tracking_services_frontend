@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { FaBell, FaDownload, FaEdit, FaEye, FaFileAlt, FaPaperPlane, FaTimes } from "react-icons/fa";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from 'react-router-dom';
 import { baseUrlImg } from "../../Config/env";
 import {
   disableDocumentReminder,
@@ -128,7 +128,7 @@ function DocumentReminders() {
           <tbody>
             {loading ? <tr><td colSpan="7" className="document-reminders-empty">Loading reminders...</td></tr> : rows.length === 0 ? <tr><td colSpan="7" className="document-reminders-empty">No reminders found.</td></tr> : rows.map((row) => (
               <tr key={row.id}>
-                <td><strong>{row.candidate_name}</strong><small>{row.candidate_email}</small></td>
+                <td>{row.candidate_id ? <Link className='document-candidate-link' to={`/dashboard/candidates/${row.candidate_id}#documents`}><strong>{row.candidate_name}</strong></Link> : <strong>{row.candidate_name}</strong>}<small>{row.candidate_email}</small></td>
                 <td>{row.document_type}</td><td>{displayDate(row.expiry_date)}</td>
                 <td><span className={Number(row.days_left) <= 30 ? "days-critical" : ""}>{row.days_left}</span></td>
                 <td>{displayDate(row.next_reminder_date)}</td><td><span className={`reminder-status ${row.status.toLowerCase()}`}>{row.status}</span></td>

@@ -47,6 +47,11 @@ function EmployeeView() {
   }, [employeeId]);
 
   useEffect(() => { loadEmployee(); }, [loadEmployee]);
+  useEffect(() => {
+    if (!employee || !window.location.hash) return;
+    const section = document.querySelector(window.location.hash);
+    if (section) window.requestAnimationFrame(() => section.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+  }, [employee]);
 
   const handleRemove = async () => {
     try {
@@ -64,8 +69,9 @@ function EmployeeView() {
   if (!employee) return <div className="e2e_record_state e2e_record_error"><div>!</div><h2>Unable to open employee</h2><p>{error}</p><span><button onClick={() => navigate("/dashboard/employee-status")}><FaArrowLeft /> Back</button><button onClick={loadEmployee}><FaRedo /> Try Again</button></span></div>;
 
   return (
-    <article className="e2e_record_page e2e_record_blue">
-      <button className="e2e_record_back" onClick={() => navigate("/dashboard/employee-status")}><FaArrowLeft /> Back to Employees</button>
+    <article className='e2e_record_page e2e_record_blue'>
+      <span id='profile-overview' className='profile-section-anchor' aria-hidden='true' />
+      {!location.pathname.startsWith('/dashboard/my-profile/') && <button className='e2e_record_back' onClick={() => navigate('/dashboard/employee-status')}><FaArrowLeft /> Back to Employees</button>}
       <header className="e2e_record_hero"><div className="e2e_record_avatar"><FaUser /></div><div><p>Employee Â· {employee.employee_id}</p><h1>{employee.legal_name}</h1><span>{employee.company_name ? `Company Name: ${employee.company_name}` : "Company Name not assigned"}</span></div><strong className={`e2e_record_status ${employee.user_id ? "" : "unassigned"}`}>{employee.user_id ? "Assigned" : "Not Assigned"}</strong></header>
 
       {error && <div className="e2e_empstatus_error" role="alert">{error}</div>}
@@ -76,17 +82,21 @@ function EmployeeView() {
         </dl>
       </section>
 
+      <span id='profile-performance' className='profile-section-anchor' aria-hidden='true' />
       {employee.user_id && hasSubmissionPerformance(employee.role) && (
+        <div className='profile-section-target'>
         <ProfilePerformance
           userId={employee.user_id}
           title={`${employee.company_name || employee.legal_name} Â· Performance`}
         />
+        </div>
       )}
+      <span id='profile-attendance' className='profile-section-anchor' aria-hidden='true' />
       <AttendancePanel employeeId={employee.id} employeeCode={employee.employee_id}
         isOwn={location.pathname.startsWith("/dashboard/my-profile/")}
         canManage={can("attendance", "edit")} />
 
-      <section className="e2e_record_card e2e_company_identity_card">
+      <section id='profile-identity' className='e2e_record_card e2e_company_identity_card profile-section-target'>
         <div className="e2e_record_card_title"><FaUserTag /><div><h2>Company Identity</h2><p>The alias used across dashboards, applications, interviews, placements, and reports.</p></div></div>
         <dl className="e2e_record_grid">
           <div className="e2e_record_field"><dt><FaUser /> Legal Name</dt><dd>{employee.legal_name}</dd></div>

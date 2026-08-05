@@ -208,6 +208,22 @@
   white-space: nowrap;
 }
 
+.e2e_candidate_report_link {
+  max-width:100%;
+  padding:0;
+  overflow:hidden;
+  border:0;
+  background:transparent;
+  color:#2563eb;
+  font:inherit;
+  font-weight:800;
+  text-align:left;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  cursor:pointer;
+}
+.e2e_candidate_report_link:hover,.e2e_candidate_report_link:focus-visible{color:#4338ca;text-decoration:underline;outline:none}
+
 .e2e_dashboard_table tbody tr:nth-child(even) {
   background: #fafcff;
 }

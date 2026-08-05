@@ -17,7 +17,8 @@ export function PermissionProvider({children}){
  const value=useMemo(()=>{
   const resources=profile?.resources||[];
   const roleName=String(profile?.user?.role?.name||profile?.user?.role||profile?.user?.user_type||"").toLowerCase();
-  const isAdmin=Boolean(profile?.user?.super_admin||profile?.user?.is_admin||["admin","administrator","super admin","super_admin"].includes(roleName));
+  const positionName=String(profile?.user?.position||profile?.user?.position_name||"").toLowerCase();
+  const isAdmin=Boolean(profile?.user?.super_admin||profile?.user?.is_admin||[1,2].includes(Number(profile?.user?.position_id))||["admin","administrator","super admin","super_admin"].includes(roleName)||["admin","super admin"].includes(positionName));
   const getResource=name=>PermissionService.resource(profile,name);
   return {profile,user:profile?.user,resources,loading,error,refresh,getResource,isAdmin,logout:()=>{
    Cookies.remove("jwtToken");localStorage.removeItem("userData");setProfile(null);setToken(null);setError("");

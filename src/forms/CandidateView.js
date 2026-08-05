@@ -1,7 +1,6 @@
-import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useEffect, useMemo, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import {
-  FaArrowLeft,
   FaBriefcase,
   FaCheckCircle,
   FaEnvelope,
@@ -60,7 +59,6 @@ const emptyDocumentDetails = (documentType = "H1B") => ({
 
 const CandidateView = () => {
   const { candidateId } = useParams();
-  const navigate = useNavigate();
   const [candidate, setCandidate] = useState(null);
   const [matchedJobs, setMatchedJobs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -74,6 +72,14 @@ const CandidateView = () => {
   const [documentMessage, setDocumentMessage] = useState(null);
   const [jsonDocument, setJsonDocument] = useState(null);
   const [editDocument, setEditDocument] = useState(null);
+  const [documentTypeFilter, setDocumentTypeFilter] = useState('All');
+  const [documentStatusFilter, setDocumentStatusFilter] = useState('All');
+
+  const filteredDocuments = useMemo(() => (candidate?.documents || []).filter((document) => {
+    const typeMatches = documentTypeFilter === 'All' || document.document_type === documentTypeFilter;
+    const status = document.reminder_status || document.status || 'No Reminder';
+    return typeMatches && (documentStatusFilter === 'All' || status === documentStatusFilter);
+  }), [candidate?.documents, documentTypeFilter, documentStatusFilter]);
 
   const loadCandidate = async () => {
     const response = await getCandidateById(candidateId);
@@ -131,6 +137,13 @@ const CandidateView = () => {
       active = false;
     };
   }, [candidateId]);
+
+  useEffect(() => {
+    if (!candidate || !window.location.hash) return;
+    const section = document.querySelector(window.location.hash);
+    if (!section) return;
+    window.requestAnimationFrame(() => section.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+  }, [candidate]);
 
   const handleMatchJobs = async () => {
     try {
@@ -226,13 +239,7 @@ const CandidateView = () => {
 
   return (
     <div className="candidate-view-page">
-      <button
-        type="button"
-        className="candidate-view-back"
-        onClick={() => navigate("/dashboard/candidates")}
-      >
-        <FaArrowLeft /> Back to Candidates
-      </button>
+      <span id='overview' className='candidate-section-anchor' aria-hidden='true' />
 
       <section className="candidate-view-header">
         <div className="candidate-view-identity">
@@ -259,17 +266,37 @@ const CandidateView = () => {
         </div>
       </section>
 
+      <span id='reports' className='candidate-section-anchor' aria-hidden='true' />
+      <section className='candidate-section-group' aria-labelledby='candidate-reports-heading'>
+        <header className='candidate-section-heading'>
+          <span>REPORTS & ACTIVITY</span>
+          <h2 id='candidate-reports-heading'>Submission and performance reports</h2>
+          <p>Applications, interviews, placements, and related candidate activity.</p>
+        </header>
       <ProfilePerformance
         candidateId={candidateId}
         title={`${candidate.name} · Submission Performance`}
       />
+      </section>
 
       <section className="candidate-view-card candidate-documents-card">
         <div className="candidate-view-title candidate-documents-title">
           <FaFileAlt />
-          <div><h2>Immigration Documents</h2><p>Upload H1B, PERM Labor, or I-140 documents and schedule the appropriate follow-up reminders.</p></div>
+          <div><h2 id='documents'>Immigration Documents</h2><p>Upload H1B, PERM Labor, or I-140 documents and schedule the appropriate follow-up reminders.</p></div>
         </div>
-        <form className="candidate-document-upload" onSubmit={handleDocumentUpload}>
+        <div className='candidate-case-shell'>
+          <div className='candidate-case-name'><span>CANDIDATE NAME</span><strong>{candidate.name}</strong></div>
+          <div className='candidate-document-filters'>
+            <label>Document Type<select value={documentTypeFilter} onChange={(event) => setDocumentTypeFilter(event.target.value)}>{['All', 'H1B', 'PERM Labor', 'I-140'].map((type) => <option key={type}>{type}</option>)}</select></label>
+            <label>Status<select value={documentStatusFilter} onChange={(event) => setDocumentStatusFilter(event.target.value)}>{['All', 'Pending', 'Completed', 'Expired', 'Disabled', 'No Reminder'].map((status) => <option key={status}>{status}</option>)}</select></label>
+            <button type='button' onClick={() => { setDocumentTypeFilter('All'); setDocumentStatusFilter('All'); }}>Reset Filters</button>
+          </div>
+          <div className='candidate-case-sections'>
+            {['H1B', 'PERM Labor', 'I-140'].filter((type) => documentTypeFilter === 'All' || documentTypeFilter === type).map((type) => <ImmigrationCaseSection key={type} type={type} document={filteredDocuments.find((item) => item.document_type === type)} />)}
+          </div>
+        </div>
+
+        <form className='candidate-document-upload' onSubmit={handleDocumentUpload}>
           <div className="candidate-document-form-grid">
             <label>Document Type<select value={documentDetails.document_type} onChange={(e) => setDocumentDetails(emptyDocumentDetails(e.target.value))}>{["H1B","PERM Labor","I-140"].map((type) => <option key={type}>{type}</option>)}</select></label>
             <label>Candidate Name<input required value={documentDetails.candidate_name || candidate.name} onChange={(e) => setDocumentDetails({ ...documentDetails, candidate_name: e.target.value })} /></label>
@@ -298,7 +325,7 @@ const CandidateView = () => {
         </form>
         {documentMessage && <div className={`candidate-match-alert ${documentMessage.type}`}>{documentMessage.text}</div>}
 
-        {(candidate.documents || []).length ? <div className="candidate-documents-list">{candidate.documents.map((document) => {
+        {filteredDocuments.length ? <div className='candidate-documents-list'>{filteredDocuments.map((document) => {
           const details = document.document_details || {};
           return <article className="candidate-document-item" key={document.id}>
             <div className="candidate-document-item-top"><div><FaFileAlt /><span><strong>{document.document_type}</strong><small>{details.candidate_name || candidate.name}</small></span></div><span className={`reminder-status ${String(document.reminder_status || "disabled").toLowerCase()}`}>{document.reminder_status || "No Reminder"}</span></div>
@@ -315,12 +342,12 @@ const CandidateView = () => {
               {document.reminder_id && document.reminder_status !== "Disabled" && <button className="danger" onClick={() => window.confirm("Disable this reminder?") && documentAction(() => disableDocumentReminder(document.reminder_id), "Reminder disabled.")}><FaTimes /> Disable</button>}
             </div>
           </article>;
-        })}</div> : <div className="candidate-match-empty"><FaFileAlt /><h3>No documents uploaded</h3><p>Upload the candidate's immigration document above.</p></div>}
+        })}</div> : <div className='candidate-match-empty'><FaFileAlt /><h3>No matching documents</h3><p>Adjust the filters or upload an immigration document above.</p></div>}
       </section>
 
       <section className="candidate-view-card">
         <div className="candidate-view-title">
-          <FaMedal /> <h2>Skills and Resume</h2>
+          <FaMedal /> <h2 id='resume'>Skills and Resume</h2>
         </div>
         <div className="candidate-view-content">
           <h3>Skills</h3>
@@ -339,7 +366,7 @@ const CandidateView = () => {
       <section className="candidate-view-card candidate-match-card">
         <div>
           <div className="candidate-view-title">
-            <FaBriefcase /> <h2>AI Job Matching</h2>
+            <FaBriefcase /> <h2 id='job-matches'>AI Job Matching</h2>
           </div>
           <p>Compare this candidate's parsed resume against all available open jobs.</p>
         </div>
@@ -423,6 +450,21 @@ const CandidateView = () => {
       {editDocument && <div className="reminder-modal-backdrop"><form className="reminder-modal reminder-edit-modal" onSubmit={saveDocumentReminder}><div className="reminder-modal-header"><h2>{editDocument.reminder_id ? "Edit Reminder" : "Enter Target Date"}</h2><button type="button" onClick={() => setEditDocument(null)}><FaTimes /></button></div><label>Target Date<input required type="date" value={editDocument.expiry_date || ""} onChange={(e) => setEditDocument({ ...editDocument, expiry_date: e.target.value })} /></label>{editDocument.reminder_id && <><label>Next Reminder<input type="date" value={editDocument.next_reminder_date || ""} onChange={(e) => setEditDocument({ ...editDocument, next_reminder_date: e.target.value })} /></label><label>Status<select value={editDocument.reminder_status} onChange={(e) => setEditDocument({ ...editDocument, reminder_status: e.target.value })}>{["Pending","Completed","Expired","Disabled"].map((status) => <option key={status}>{status}</option>)}</select></label></>}<div className="reminder-modal-actions"><button type="button" className="secondary" onClick={() => setEditDocument(null)}>Cancel</button><button>Save Reminder</button></div></form></div>}
     </div>
   );
+};
+
+const ImmigrationCaseSection = ({ type, document }) => {
+  const details = document?.document_details || {};
+  const status = document?.reminder_status || document?.status || (details.approved_date ? 'Approved' : 'Not configured');
+  const fields = type === 'H1B'
+    ? [['Prevailing Wage', details.prevailing_wage], ['Applied Date', details.applied_date], ['Receipt Number', details.receipt_number], ['Valid From', details.issue_date], ['Valid Through', document?.expiry_date || details.expiry_date], ['Notification', document?.next_reminder_date || status]]
+    : type === 'PERM Labor'
+      ? [['Applied Date', details.applied_date], ['PERM Number', details.perm_number || details.case_number], ['Priority Date', details.priority_date], ['Status', status]]
+      : [['Applied Date', details.applied_date], ['Receipt Number', details.receipt_number || details.case_number], ['Status', status]];
+  const title = type === 'PERM Labor' ? 'PERM Details' : `${type} Details`;
+  return <section className='candidate-case-section'>
+    <h3><FaFileAlt /> {title}</h3>
+    <div className='candidate-case-fields'>{fields.map(([label, value]) => <div key={label}><span>{label}</span>{label === 'Status' || label === 'Notification' ? <strong className={`candidate-case-status ${String(value || '').toLowerCase().replaceAll(' ', '-')}`}>{value || 'Not configured'}</strong> : <strong>{value || '—'}</strong>}</div>)}</div>
+  </section>;
 };
 
 const Info = ({ icon, label, value }) => (

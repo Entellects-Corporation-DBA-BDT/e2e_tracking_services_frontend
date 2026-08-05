@@ -22,21 +22,33 @@ export default function ProfilePerformance({ candidateId, userId, title }) {
   const [refresh, setRefresh] = useState(0);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [period, setPeriod] = useState('this_week');
+  const [customStart, setCustomStart] = useState('');
+  const [customEnd, setCustomEnd] = useState('');
+  const [workingEmployee, setWorkingEmployee] = useState('');
 
   useEffect(() => {
     let active = true;
     setLoading(true);
     setError("");
-    getProfilePerformance({ candidateId, userId, page, limit: pageSize, relatedId: selectedRelated }).then((result) => {
+    getProfilePerformance({
+      candidateId,
+      userId,
+      page,
+      limit: pageSize,
+      relatedId: workingEmployee || selectedRelated,
+      period,
+      startDate: period === 'custom' ? customStart : '',
+      endDate: period === 'custom' ? customEnd : '',
+    }).then((result) => {
       if (active) {
         setData(result || {});
-        setSelectedRelated(null);
       }
     }).catch((requestError) => {
       if (active) setError(requestError?.response?.data?.message || "Performance data could not be loaded.");
     }).finally(() => { if (active) setLoading(false); });
     return () => { active = false; };
-  }, [candidateId, userId, page, pageSize, refresh, selectedRelated]);
+  }, [candidateId, userId, page, pageSize, refresh, selectedRelated, workingEmployee, period, customStart, customEnd]);
 
   const summary = data.summary || {};
   const breakdown = Array.isArray(data.breakdown) ? data.breakdown : [];
@@ -52,6 +64,7 @@ export default function ProfilePerformance({ candidateId, userId, title }) {
     { name: "Placed", value: number(summary.placements), color: "#28b879" },
   ];
   const chartData = breakdown.map((item, index) => ({ ...item, value: number(item[metric]), color: COLORS[index % COLORS.length] }));
+  const employeeOptions = candidateId ? breakdown : [];
   const visibleApplications = applications;
   const pagination = data.pagination || {};
   const currentPage = number(pagination.page) || page;
@@ -75,6 +88,12 @@ export default function ProfilePerformance({ candidateId, userId, title }) {
         <div><span>PERFORMANCE & SUBMISSIONS</span><h2>{title || (profileType === "candidate" ? "Candidate Submission Performance" : "User Performance")}</h2><p>{profileType === "candidate" ? "Users who submitted this candidate and the resulting outcomes." : "Candidates this user worked on and every submission outcome."}</p></div>
         <label>Metric<select value={metric} onChange={(event) => setMetric(event.target.value)}><option value="submissions">Submissions</option><option value="interviews">Interviews</option><option value="placements">Placements</option></select></label>
       </header>
+      <div className='profile-performance-filters' aria-label='Report filters'>
+        <label>Period<select value={period} onChange={(event) => { setPeriod(event.target.value); setPage(1); }}><option value='today'>Today</option><option value='this_week'>This Week</option><option value='this_month'>This Month</option><option value='custom'>Custom Date</option></select></label>
+        {period === 'custom' && <><label>From<input type='date' value={customStart} max={customEnd || undefined} onChange={(event) => { setCustomStart(event.target.value); setPage(1); }} /></label><label>To<input type='date' value={customEnd} min={customStart || undefined} onChange={(event) => { setCustomEnd(event.target.value); setPage(1); }} /></label></>}
+        {candidateId && <label>Working Employee<select value={workingEmployee} onChange={(event) => { setWorkingEmployee(event.target.value); setSelectedRelated(null); setPage(1); }}><option value=''>All Employees</option>{employeeOptions.map((employee) => <option key={employee.related_id} value={employee.related_id}>{employee.related_name}</option>)}</select></label>}
+        <button type='button' onClick={() => { setPeriod('this_week'); setCustomStart(''); setCustomEnd(''); setWorkingEmployee(''); setSelectedRelated(null); setPage(1); }}>Reset Filters</button>
+      </div>
       <div className="profile-performance-summary">
         <Summary label="Submissions" value={summary.submissions} />
         <Summary label="Interviews" value={summary.interviews} amber />
