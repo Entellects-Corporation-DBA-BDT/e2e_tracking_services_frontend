@@ -53,13 +53,6 @@ const getPresetDateRange = (filter) => {
   };
 };
 
-const ConfidentialResourceNotice = () => (
-  <section className='e2e_confidential_notice' role='alert'>
-    <span>ADMIN ONLY</span>
-    <h2>Confidential company information</h2>
-    <p>Client and vendor details are company property and can only be viewed by administrators.</p>
-  </section>
-);
 
 const TABLES = {
   submissions: {
@@ -111,7 +104,7 @@ const makeColumns = (columns) => columns.map(([key, label]) => ({
 function Dashboard() {
   const navigate = useNavigate();
   const dynamicResourceRoutes = useDynamicResourceRoutes();
-  const { can, isAdmin } = usePermissions();
+  const { can } = usePermissions();
   const [selectedFilter, setSelectedFilter] = useState("today");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -544,12 +537,7 @@ function Dashboard() {
               }
             />
             {dynamicResourceRoutes}
-            {!isAdmin && (
-              <>
-                <Route path='clients/*' element={<ConfidentialResourceNotice />} />
-                <Route path='vendors/*' element={<ConfidentialResourceNotice />} />
-              </>
-            )}
+
             <Route
               path="records/:recordType/:recordId"
               element={<DashboardRecordView />}

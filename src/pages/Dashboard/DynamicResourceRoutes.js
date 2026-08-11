@@ -59,13 +59,12 @@ const DETAIL_COMPONENTS = {
 const relativePath = (route) => route.replace(/^\/dashboard\/?/, "").replace(/^\/|\/$/g, "");
 
 export default function useDynamicResourceRoutes() {
-  const { resources, isAdmin } = usePermissions();
+  const { resources } = usePermissions();
   return resources
     .filter((resource) => resource.resource_type === "PAGE"
       && resource.permissions?.view
       && resource.route
       && resource.component_key
-      && (isAdmin || !["clients", "prime_vendors"].includes(resource.resource))
       && resource.component_key !== "dashboard")
     .flatMap((resource) => {
       const component = PAGE_COMPONENTS[resource.component_key];

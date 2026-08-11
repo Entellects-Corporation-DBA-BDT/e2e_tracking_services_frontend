@@ -34,7 +34,7 @@ export const getEmployeeAttendance = async (employeeId, params = {}) => {
 export const setEmployeeAttendanceDate = async (employeeId, date, present = true) => {
   const response = await axiosInstance.put(`/employees/${employeeId}/attendance/${date}`, { present });
   return response.data;
-};
+}; 
 export const createEmployee = async (data) => (await axiosInstance.post("/employees", data)).data;
 export const updateEmployee = async (id, data) => (await axiosInstance.put(`/employees/${id}`, data)).data;
 export const deleteEmployee = async (id) => (await axiosInstance.delete(`/employees/${id}`)).data;

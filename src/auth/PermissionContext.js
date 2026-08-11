@@ -6,7 +6,7 @@ import { PermissionService } from "./PermissionService";
 const PermissionContext=createContext(null);
 export function PermissionProvider({children}){
  const [token,setToken]=useState(()=>Cookies.get("jwtToken")||null),[profile,setProfile]=useState(null),[loading,setLoading]=useState(Boolean(token)),[error,setError]=useState("");
- const refresh=useCallback(async()=>{if(!token){setProfile(null);setLoading(false);return}setLoading(true);try{setProfile(await getAuthorizationProfile());setError("")}catch(e){setError(e?.response?.status===403?"forbidden":"unauthorized");if(e?.response?.status===401)Cookies.remove("jwtToken")}finally{setLoading(false)}},[token]);
+ const refresh=useCallback(async({silent=false}={})=>{if(!token){setProfile(null);setLoading(false);return}if(!silent)setLoading(true);try{setProfile(await getAuthorizationProfile());setError("")}catch(e){setError(e?.response?.status===403?"forbidden":"unauthorized");if(e?.response?.status===401)Cookies.remove("jwtToken")}finally{if(!silent)setLoading(false)}},[token]);
  useEffect(()=>{refresh()},[refresh]);
  useEffect(()=>{
   const sessionChanged=()=>{setProfile(null);setError("");setToken(Cookies.get("jwtToken")||null)};
@@ -14,6 +14,16 @@ export function PermissionProvider({children}){
   window.addEventListener("storage",sessionChanged);
   return()=>{window.removeEventListener("e2e-auth-changed",sessionChanged);window.removeEventListener("storage",sessionChanged)};
  },[]);
+ useEffect(()=>{
+  if(!token)return undefined;
+  const refreshPermissions=()=>refresh({silent:true});
+  const onVisibilityChange=()=>{if(document.visibilityState==="visible")refreshPermissions()};
+  const interval=window.setInterval(refreshPermissions,30000);
+  window.addEventListener("focus",refreshPermissions);
+  window.addEventListener("e2e-permissions-changed",refreshPermissions);
+  document.addEventListener("visibilitychange",onVisibilityChange);
+  return()=>{window.clearInterval(interval);window.removeEventListener("focus",refreshPermissions);window.removeEventListener("e2e-permissions-changed",refreshPermissions);document.removeEventListener("visibilitychange",onVisibilityChange)};
+ },[token,refresh]);
  const value=useMemo(()=>{
   const resources=profile?.resources||[];
   const roleName=String(profile?.user?.role?.name||profile?.user?.role||profile?.user?.user_type||"").toLowerCase();
