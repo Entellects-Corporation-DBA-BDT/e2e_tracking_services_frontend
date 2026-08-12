@@ -269,7 +269,7 @@ export default function RecruiterPerformance({ onClose }) {
           </ChartCard>
         </div>
 
-        <ChartCard title="Submission Activity Trend" subtitle="Daily submissions, interviews and placements">
+        <ChartCard title="Activity Trend" subtitle="Daily submissions by submitted date, interviews and placements by status update date">
           <ResponsiveContainer width="100%" height={270}>
             <LineChart data={trend} margin={{ top: 10, right: 18, left: -14, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#edf0f6" />
@@ -317,7 +317,7 @@ export default function RecruiterPerformance({ onClose }) {
           <div className="performance-table-wrap">
             <table><thead><tr><th>Date</th><th>Candidate</th><th>Employee</th><th>Technology</th><th>Client / Vendor</th><th>Status</th><th>Rate</th><th /></tr></thead>
               <tbody>{applications.length ? applications.map((item) => <tr key={item.id}>
-                <td>{dateLabel(item.date_created)}</td><td><strong>{item.candidate_name || "-"}</strong></td><td>{item.employee_name || "-"}</td><td>{item.role || "-"}</td><td>{item.client || item.vendor || "-"}</td><td><span className={`performance-status process-${item.process_id}`}>{item.status}</span></td><td>{item.rate ? `$${item.rate}` : "-"}</td><td><a href={`/dashboard/bench-sales/${item.id}`}>View</a></td>
+                <td>{dateLabel(item.activity_date || item.date_created)}</td><td><strong>{item.candidate_name || "-"}</strong></td><td>{item.employee_name || "-"}</td><td>{item.role || "-"}</td><td>{item.client || item.vendor || "-"}</td><td><span className={`performance-status process-${item.process_id}`}>{item.status}</span></td><td>{item.rate ? `$${item.rate}` : "-"}</td><td><a href={`/dashboard/bench-sales/${item.id}`}>View</a></td>
               </tr>) : <tr><td colSpan="8"><Empty /></td></tr>}</tbody>
             </table>
           </div>

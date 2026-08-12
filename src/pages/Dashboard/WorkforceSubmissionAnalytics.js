@@ -208,7 +208,7 @@ function WorkforceSubmissionAnalytics({
               <button key={submission.id} className="submitted-candidate" onClick={() => onSubmissionOpen(submission.id)}>
                 <div className="submitted-candidate-top">
                   <span className={`submission-status process-${submission.process_id}`}>{submission.status}</span>
-                  <small>{formatDate(submission.submission_date)}</small>
+                  <small>{formatDate(submission.activity_date || submission.submission_date)}</small>
                 </div>
                 <h4>{submission.candidate_name || "Unnamed candidate"}</h4>
                 <p>{submission.technology || submission.role || "Technology not entered"}</p>

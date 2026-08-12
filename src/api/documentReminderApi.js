@@ -19,10 +19,9 @@ export const uploadCandidateDocument = async (formData) => {
   return response.data;
 };
 
-export const createManualReminder = async (documentId, expiryDate) => {
-  const response = await axiosInstance.post(`/document-reminders/documents/${documentId}/manual`, {
-    expiry_date: expiryDate,
-  });
+export const createManualReminder = async (documentId, data) => {
+  const payload = typeof data === 'object' ? data : { expiry_date: data };
+  const response = await axiosInstance.post(`/document-reminders/documents/${documentId}/manual`, payload);
   return response.data;
 };
 
