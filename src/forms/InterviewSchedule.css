@@ -83,3 +83,87 @@
     grid-column: auto;
   }
 }
+
+/* Keep scheduling usable inside scrolling application-detail layouts. */
+.confirm-overlay {
+  position: fixed !important;
+  z-index: 2147483000 !important;
+  inset: 0 !important;
+  display: grid !important;
+  place-items: center !important;
+  padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)) !important;
+  overflow: auto !important;
+  overscroll-behavior: contain;
+  background: rgba(15, 23, 42, .68);
+  backdrop-filter: blur(5px);
+}
+
+.confirm-modal:has(.interview-schedule-form) {
+  width: min(560px, 100%) !important;
+  max-width: calc(100vw - 32px) !important;
+  max-height: calc(100dvh - 32px) !important;
+  margin: auto;
+  padding: 26px 28px 22px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+
+.confirm-modal:has(.interview-schedule-form) .confirm-icon {
+  width: 52px;
+  height: 52px;
+  font-size: 24px;
+}
+
+.confirm-modal:has(.interview-schedule-form) h2 {
+  margin: 13px 0 7px;
+  font-size: 21px;
+}
+
+.confirm-modal:has(.interview-schedule-form) > p {
+  margin: 0 auto 18px;
+  max-width: 470px;
+  line-height: 1.5;
+}
+
+.confirm-modal:has(.interview-schedule-form) .confirm-buttons {
+  position: sticky;
+  z-index: 2;
+  bottom: -22px;
+  margin: 0 -28px -22px;
+  padding: 14px 28px 22px;
+  border-top: 1px solid #e5e7eb;
+  background: #fff;
+}
+
+@media (max-height: 680px) {
+  .confirm-modal:has(.interview-schedule-form) {
+    padding-top: 18px;
+  }
+  .confirm-modal:has(.interview-schedule-form) .confirm-icon {
+    width: 42px;
+    height: 42px;
+    font-size: 20px;
+  }
+  .confirm-modal:has(.interview-schedule-form) h2 {
+    margin-top: 8px;
+  }
+}
+
+@media (max-width: 600px) {
+  .confirm-overlay {
+    padding: 10px !important;
+  }
+  .confirm-modal:has(.interview-schedule-form) {
+    max-width: calc(100vw - 20px) !important;
+    max-height: calc(100dvh - 20px) !important;
+    padding: 20px 16px 16px !important;
+    border-radius: 16px;
+  }
+  .confirm-modal:has(.interview-schedule-form) .confirm-buttons {
+    bottom: -16px;
+    margin: 0 -16px -16px;
+    padding: 12px 16px 16px;
+  }
+}

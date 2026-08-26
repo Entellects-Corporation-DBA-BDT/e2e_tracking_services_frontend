@@ -492,6 +492,8 @@ function Dashboard() {
                         onSubmissionOpen={(id) =>
                           navigate(`/dashboard/records/submissions/${id}`)
                         }
+                        onCandidateOpen={(id) => navigate("/dashboard/candidates/" + id + "#reports")}
+                        onRecruiterOpen={(id) => navigate("/dashboard/employee-status/" + id + "#profile-performance")}
                       />
                       <span id='operations' className='dashboard-section-anchor' aria-hidden='true' />
                       <OperationsCommandCenter summary={summary} refreshToken={dashboardRefresh} />

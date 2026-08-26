@@ -61,6 +61,8 @@ export default function RecruiterPerformance({ onClose }) {
   const [period, setPeriod] = useState("this_month");
   const [viewBy, setViewBy] = useState("users");
   const [metric, setMetric] = useState("submissions");
+  const [applicationPage, setApplicationPage] = useState(1);
+  const [applicationLimit, setApplicationLimit] = useState(10);
 
   useEffect(() => {
     let active = true;
@@ -80,6 +82,8 @@ export default function RecruiterPerformance({ onClose }) {
       ...filters,
       employee_id: selectedEmployee || undefined,
       candidate_id: selectedCandidate || undefined,
+      application_page: applicationPage,
+      application_limit: applicationLimit,
     }).then((response) => {
       if (active && response.success) setData(response.data || {});
     }).catch((requestError) => {
@@ -88,16 +92,17 @@ export default function RecruiterPerformance({ onClose }) {
       if (active) setLoading(false);
     });
     return () => { active = false; };
-  }, [filters, selectedEmployee, selectedCandidate]);
+  }, [filters, selectedEmployee, selectedCandidate, applicationPage, applicationLimit]);
 
   const employees = Array.isArray(data.employees) ? data.employees : [];
   const candidates = Array.isArray(data.candidates) ? data.candidates : [];
   const applications = Array.isArray(data.applications) ? data.applications : [];
   const trend = Array.isArray(data.trend) ? data.trend : [];
   const summary = data.summary || {};
+  const applicationPagination = data.applications_pagination || { page: 1, total_pages: 1, total: applications.length };
 
   const statusData = [
-    { name: "Submitted", value: Math.max(0, number(summary.total_submissions) - number(summary.interviews) - number(summary.placements)), color: "#5b35f5" },
+    { name: "Submitted", value: Math.max(0, number(summary.total_submissions) - number(summary.interviews) - number(summary.placements)), color: "#f97316" },
     { name: "Interview", value: number(summary.interviews), color: "#ff9f0a" },
     { name: "Placed", value: number(summary.placements), color: "#28b879" },
   ];
@@ -108,6 +113,7 @@ export default function RecruiterPerformance({ onClose }) {
       setError("Start date cannot be after end date.");
       return;
     }
+    setApplicationPage(1);
     setFilters({ ...draft });
   };
 
@@ -313,14 +319,15 @@ export default function RecruiterPerformance({ onClose }) {
         </div>
 
         <article className="performance-details">
-          <div className="chart-card-heading"><div><h3><FaUser /> Submission Details</h3><p>{applications.length} matching records · click View to open the application</p></div></div>
+          <div className="chart-card-heading"><div><h3><FaUser /> Submission Details</h3><p>{applicationPagination.total} matching records · click a person or View for details</p></div><label className="performance-page-size">Show <select value={applicationLimit} onChange={(event) => { setApplicationLimit(Number(event.target.value)); setApplicationPage(1); }}>{[10, 20, 50].map((value) => <option key={value} value={value}>{value}</option>)}</select></label></div>
           <div className="performance-table-wrap">
             <table><thead><tr><th>Date</th><th>Candidate</th><th>Employee</th><th>Technology</th><th>Client / Vendor</th><th>Status</th><th>Rate</th><th /></tr></thead>
               <tbody>{applications.length ? applications.map((item) => <tr key={item.id}>
-                <td>{dateLabel(item.activity_date || item.date_created)}</td><td><strong>{item.candidate_name || "-"}</strong></td><td>{item.employee_name || "-"}</td><td>{item.role || "-"}</td><td>{item.client || item.vendor || "-"}</td><td><span className={`performance-status process-${item.process_id}`}>{item.status}</span></td><td>{item.rate ? `$${item.rate}` : "-"}</td><td><a href={`/dashboard/bench-sales/${item.id}`}>View</a></td>
+                <td>{dateLabel(item.activity_date || item.date_created)}</td><td>{item.candidate_id ? <button className="performance-record-link" onClick={() => navigate("/dashboard/candidates/" + item.candidate_id + "#reports")}>{item.candidate_name || "-"}</button> : <strong>{item.candidate_name || "-"}</strong>}</td><td><button className="performance-record-link" onClick={() => navigate("/dashboard/employee-status/" + item.employee_id + "#profile-performance")}>{item.employee_name || "-"}</button></td><td>{item.role || "-"}</td><td>{item.client || item.vendor || "-"}</td><td><span className={`performance-status process-${item.process_id}`}>{item.status}</span></td><td>{item.rate ? `$${item.rate}` : "-"}</td><td><a href={`/dashboard/bench-sales/${item.id}`}>View</a></td>
               </tr>) : <tr><td colSpan="8"><Empty /></td></tr>}</tbody>
             </table>
           </div>
+          <nav className="performance-pagination" aria-label="Submission detail pages"><button type="button" disabled={applicationPage <= 1} onClick={() => setApplicationPage((page) => page - 1)}>Previous</button><span>Page <strong>{applicationPagination.page}</strong> of <strong>{applicationPagination.total_pages}</strong></span><button type="button" disabled={applicationPage >= applicationPagination.total_pages} onClick={() => setApplicationPage((page) => page + 1)}>Next</button></nav>
         </article>
       </>}
     </div>

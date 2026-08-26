@@ -13,6 +13,7 @@ import {
   FaIdBadge,
   FaBell,
   FaCalendarCheck,
+  FaFileInvoiceDollar,
 } from "react-icons/fa";
 
 export const sidebarConfig = {
@@ -88,4 +89,9 @@ export const sidebarConfig = {
     icon: <FaIdBadge className="menuIcon indigoIcon" />,
     route: "/dashboard/permissions",
   },
+  w2_forms: {
+    icon: <FaFileInvoiceDollar className="menuIcon greenIcon" />,
+    route: "/dashboard/w2-forms",
+  },
 };
+

@@ -1,7 +1,33 @@
+/* Shared dashboard application statuses */
 .submission-status {
   border: 1px solid #d0d5dd;
   background: #f2f4f7;
   color: #475467;
+}
+
+.submission-status.process-1,
+.performance-status.process-1,
+.e2e_table_status_submitted,
+.e2e_benchsales_process_submitted,
+.employee-drilldown .submission-status.process-1 {
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: #ea580c !important;
+  font-weight: 800;
+}
+
+.submission-status.process-1::before,
+.performance-status.process-1::before,
+.e2e_table_status_submitted::before,
+.e2e_benchsales_process_submitted::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  flex: 0 0 6px;
+  margin-right: 5px;
+  border-radius: 50%;
+  background: #f97316;
 }
 
 .submission-status.process-2 {
@@ -15,3 +41,5 @@
   background: #f0fdf4;
   color: #15803d;
 }
+.e2e_table_status_submitted::before { display: none; }
+.e2e_table_status_submitted i { background: #f97316 !important; }

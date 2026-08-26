@@ -196,7 +196,7 @@ function BenchSales() {
                   <td className="e2e_benchsales_td_id">{(currentPage - 1) * entries + index + 1} </td>
                   <td className="e2e_benchsales_td_candidate">
                     <div className="e2e_benchsales_details">
-                      <p>Name : <strong>{item.candidate_name}</strong></p>
+                      <p>Name : {item.candidate_id ? <button type="button" className="e2e_benchsales_record_link" onClick={() => navigate("/dashboard/candidates/" + item.candidate_id + "#reports")}>{item.candidate_name}</button> : <strong>{item.candidate_name}</strong>}</p>
                       <p>Technology :<strong>{item.role}</strong></p>
                     </div>
                   </td>
@@ -214,7 +214,7 @@ function BenchSales() {
                           : "400",
                     }}
                   >
-                    {item.employee_name}
+                    <button type="button" className="e2e_benchsales_record_link" onClick={() => navigate("/dashboard/employee-status/" + item.employee_id + "#profile-performance")}>{item.employee_name}</button>
                   </td>
 
                   <td className="e2e_benchsales_td_poc">{item.poc}</td>

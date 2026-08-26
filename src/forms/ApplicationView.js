@@ -1,4 +1,5 @@
 import React, { useCallback, useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import {
   FaUser,
   FaBuilding,
@@ -306,11 +307,12 @@ const ApplicationView = ({
           ))}
         </div>
       </div>
-      {showConfirm && (
-        <div className="confirm-overlay">
-          <div className="confirm-modal">
+      {showConfirm && createPortal(
+        <div className="confirm-overlay" onMouseDown={() => !updating && setShowConfirm(false)}>
+          
+          <div className="confirm-modal" role="alertdialog" aria-modal="true" aria-labelledby="process-confirm-title" onMouseDown={(event) => event.stopPropagation()}>
             <div className="confirm-icon">⚠️</div>
-            <h2>
+            <h2 id="process-confirm-title">
               {nextProcess === 2
                 ? "Schedule Interview?"
                 : "Mark Candidate as Placed?"}
@@ -371,7 +373,7 @@ const ApplicationView = ({
             </div>
           </div>
         </div>
-      )
+      , document.body)
       }
     </div>
   );

@@ -31,14 +31,27 @@ import "../../styles/Dashboard/submissionStatusOverrides.css";
 const COLORS = ["#5b35f5", "#4087f4", "#ff9f0a", "#ff4d5e", "#28b879", "#15b8a6", "#8d5cf6", "#f97352"];
 
 const number = (value) => Number(value) || 0;
-const formatDate = (value) => value
-  ? new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", month: "short", day: "numeric", year: "numeric" }).format(new Date(value))
-  : "Not entered";
-const formatDateTime = (value) => value
-  ? new Intl.DateTimeFormat("en-US", {
-      timeZone: "America/New_York", timeZoneName: "short", month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit",
-    }).format(new Date(value))
-  : "Not entered";
+const parseDate = (value) => {
+  if (value === null || value === undefined || String(value).trim() === "") return null;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+};
+
+const formatDate = (value) => {
+  const date = parseDate(value);
+  return date
+    ? new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", month: "short", day: "numeric", year: "numeric" }).format(date)
+    : "Not entered";
+};
+
+const formatDateTime = (value) => {
+  const date = parseDate(value);
+  return date
+    ? new Intl.DateTimeFormat("en-US", {
+        timeZone: "America/New_York", timeZoneName: "short", month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit",
+      }).format(date)
+    : "Not entered";
+};
 
 function WorkforceSubmissionAnalytics({
   data = {},
@@ -50,6 +63,8 @@ function WorkforceSubmissionAnalytics({
   onEmployeeSelect,
   onRetry,
   onSubmissionOpen,
+  onCandidateOpen,
+  onRecruiterOpen,
 }) {
   const [metric, setMetric] = useState("submissions");
   const [latestIndex, setLatestIndex] = useState(0);
@@ -205,16 +220,16 @@ function WorkforceSubmissionAnalytics({
         <div className="submitted-candidate-grid">
           {loading ? <div className="candidate-detail-empty">Refreshing employee details...</div>
             : submissions.length ? submissions.map((submission) => (
-              <button key={submission.id} className="submitted-candidate" onClick={() => onSubmissionOpen(submission.id)}>
+              <article key={submission.id} className="submitted-candidate">
                 <div className="submitted-candidate-top">
-                  <span className={`submission-status process-${submission.process_id}`}>{submission.status}</span>
+                  <span className={"submission-status process-" + submission.process_id}>{submission.status}</span>
                   <small>{formatDate(submission.activity_date || submission.submission_date)}</small>
                 </div>
-                <h4>{submission.candidate_name || "Unnamed candidate"}</h4>
+                <button type="button" className="submission-candidate-link" disabled={!submission.candidate_id} onClick={() => submission.candidate_id && onCandidateOpen(submission.candidate_id)}>{submission.candidate_name || "Unnamed candidate"}</button>
                 <p>{submission.technology || submission.role || "Technology not entered"}</p>
                 <div><span><FaBriefcase />{submission.client || submission.vendor || "Client not entered"}</span><span><FaMapMarkerAlt />{submission.candidate_loc || submission.current_location || "Location not entered"}</span></div>
-                <footer><span>{submission.visa_status || "Visa N/A"}</span><strong>{submission.rate ? `$${submission.rate}` : "Rate N/A"}</strong></footer>
-              </button>
+                <footer><span>{submission.visa_status || "Visa N/A"}</span><strong>{submission.rate ? "$" + submission.rate : "Rate N/A"}</strong><button type="button" className="submission-view-button" onClick={() => onSubmissionOpen(submission.id)}>View</button></footer>
+              </article>
             )) : <div className="candidate-detail-empty">No candidates were submitted by this employee during the current week.</div>}
         </div>
       </div>
@@ -228,7 +243,7 @@ function WorkforceSubmissionAnalytics({
             <button type="button" aria-label="Next submission" onClick={() => setLatestIndex((current) => (current + 1) % latest.length)}><FaChevronRight /></button>
           </div>}
         </div>
-        {latest.length ? <LatestSubmissionCard submission={latest[latestIndex]} onOpen={onSubmissionOpen} />
+        {latest.length ? <LatestSubmissionCard submission={latest[latestIndex]} onOpen={onSubmissionOpen} onCandidateOpen={onCandidateOpen} onRecruiterOpen={onRecruiterOpen} />
           : <div className="candidate-detail-empty">No recent submissions are available.</div>}
       </article>
     </section>
@@ -247,11 +262,11 @@ const Trend = ({ value }) => {
   </span>;
 };
 
-const LatestSubmissionCard = ({ submission, onOpen }) => (
-  <div className="latest-carousel-card" role="button" tabIndex="0" onClick={() => onOpen(submission.id)} onKeyDown={(event) => { if (event.key === "Enter") onOpen(submission.id); }}>
+const LatestSubmissionCard = ({ submission, onOpen, onCandidateOpen, onRecruiterOpen }) => (
+  <div className="latest-carousel-card">
     <section>
-      <Detail label="B.S Recruiter" value={submission.employee_name} />
-      <Detail label="Candidate Name" value={submission.candidate_name} strong />
+      <Detail label="B.S Recruiter" value={submission.employee_name} onClick={() => onRecruiterOpen(submission.employee_id)} clickable={submission.employee_id} />
+      <Detail label="Candidate Name" value={submission.candidate_name} strong onClick={() => onCandidateOpen(submission.candidate_id)} clickable={submission.candidate_id} />
       <Detail label="Technology" value={submission.technology || submission.role} />
       <Detail label="Sub Bill Rate" value={submission.rate ? `$${submission.rate}/Hr` : null} />
       <Detail label="Vendor" value={submission.vendor} />
@@ -269,15 +284,17 @@ const LatestSubmissionCard = ({ submission, onOpen }) => (
       <Detail label="Interview Slot" value={submission.interview_slot ? formatDateTime(submission.interview_slot) : null} />
       <Detail label="Status" value={submission.status} status={submission.process_id} />
       <Detail label="Feedback" value={submission.feedback} feedback />
+      <button type="button" className="latest-submission-view" onClick={() => onOpen(submission.id)}>View submission</button>
     </section>
   </div>
 );
 
-const Detail = ({ label, value, strong, status, feedback }) => (
+const Detail = ({ label, value, strong, status, feedback, clickable, onClick }) => (
   <div className={`latest-detail${feedback ? " feedback" : ""}`}>
     <span>{label}</span><i>:</i>
     {status ? <em className={`submission-status process-${status}`}>{value || "Not entered"}</em>
-      : <strong className={strong ? "primary" : ""}>{value || "Not entered"}</strong>}
+      : clickable ? <button type="button" className={"latest-detail-link" + (strong ? " primary" : "")} onClick={onClick}>{value || "Not entered"}</button>
+        : <strong className={strong ? "primary" : ""}>{value || "Not entered"}</strong>}
   </div>
 );
 

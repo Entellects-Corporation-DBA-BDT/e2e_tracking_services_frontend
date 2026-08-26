@@ -22,6 +22,7 @@ import JobView from "../../forms/JobView";
 import AccessCatalog from "./AccessCatalog";
 import AttendanceManagement from "./AttendanceManagement";
 import RecruiterPerformance from "./RecruiterPerformance.";
+import W2Forms from "./W2Forms";
 
 const PAGE_COMPONENTS = {
   recruiting: <Recruiting />,
@@ -41,6 +42,7 @@ const PAGE_COMPONENTS = {
   positions: <AccessCatalog type="positions" />,
   resources: <AccessCatalog type="resources" />,
   "document-reminders": <DocumentReminders />,
+  "w2-forms": <W2Forms />,
 };
 
 const DETAIL_COMPONENTS = {
@@ -78,3 +80,4 @@ export default function useDynamicResourceRoutes() {
       return routes;
     });
 }
+

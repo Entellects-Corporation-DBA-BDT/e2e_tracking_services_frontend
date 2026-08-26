@@ -250,3 +250,10 @@
     min-width: 0;
   }
 }
+.performance-pagination{display:flex;align-items:center;justify-content:flex-end;gap:12px;padding:14px 0}
+.performance-pagination button{border:1px solid #ddd6fe;border-radius:8px;padding:8px 13px;background:#fff;color:#4f46e5;font-weight:700;cursor:pointer}
+.performance-pagination button:disabled{opacity:.45;cursor:not-allowed}
+.performance-page-size{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:700}
+.performance-page-size select{border:1px solid #d0d5dd;border-radius:7px;padding:6px}
+.performance-record-link{border:0;padding:0;background:transparent;color:#4f46e5;font:inherit;font-weight:700;cursor:pointer}
+.performance-record-link:hover{text-decoration:underline}

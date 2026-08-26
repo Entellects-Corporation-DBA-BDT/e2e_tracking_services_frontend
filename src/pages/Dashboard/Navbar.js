@@ -6,6 +6,8 @@ import { createPortal } from "react-dom";
 import { usePermissions } from "../../auth/PermissionContext";
 import { sidebarConfig } from "./SidebarConfig";
 import { useTheme } from "../../auth/ThemeContext";
+import { getCandidateData } from "../../api/candidateApi";
+import { getBenchSalesData, getRecruiterApplications } from "../../api/applicationApi";
 
 function Navbar() {
   const location = useLocation();
@@ -15,6 +17,8 @@ function Navbar() {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
   const [activeSuggestion, setActiveSuggestion] = useState(-1);
+  const [recordSuggestions, setRecordSuggestions] = useState([]);
+  const [searchLoading, setSearchLoading] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [showLogoutConfirmation, setShowLogoutConfirmation] = useState(false);
   const { darkMode, toggleTheme } = useTheme();
@@ -45,15 +49,48 @@ function Navbar() {
   };
 
 
+  useEffect(() => {
+    const query = searchTerm.trim();
+    if (query.length < 2) {
+      setRecordSuggestions([]);
+      setSearchLoading(false);
+      return undefined;
+    }
+    let active = true;
+    setSearchLoading(true);
+    const timer = window.setTimeout(async () => {
+      const results = await Promise.allSettled([
+        getCandidateData(1, 6, query),
+        getRecruiterApplications(1, 6, query),
+        getBenchSalesData(1, 6, query),
+      ]);
+      if (!active) return;
+      const rows = [];
+      const candidates = results[0].status === "fulfilled" ? results[0].value?.data || [] : [];
+      const recruiters = results[1].status === "fulfilled" ? results[1].value?.data || [] : [];
+      const submissions = results[2].status === "fulfilled" ? results[2].value?.data || [] : [];
+      candidates.forEach((item) => rows.push({ key: "candidate-" + item.id, title: item.name || "Unnamed candidate", subtitle: "Candidate · " + (item.email || item.skills || "Open profile"), route: "/dashboard/candidates/" + item.id + "#overview", icon: <FaUserTie /> }));
+      recruiters.forEach((item) => rows.push({ key: "recruiter-" + item.id, title: item.employee_name || item.recruiter_name || item.candidate_name || "Recruiter record", subtitle: "Recruiter · Open user details", route: item.employee_id ? "/dashboard/employee-status/" + item.employee_id + "#profile-performance" : "/dashboard/recruiting/" + item.id, icon: <FaUserTie /> }));
+      submissions.forEach((item) => rows.push({ key: "submission-" + item.id, title: item.candidate_name || "Submission #" + item.id, subtitle: "Submission · " + (item.employee_name || item.role || "Open record"), route: "/dashboard/bench-sales/" + item.id, icon: <FaFileAlt /> }));
+      setRecordSuggestions(rows);
+      setSearchLoading(false);
+    }, 300);
+    return () => {
+      active = false;
+      window.clearTimeout(timer);
+    };
+  }, [searchTerm]);
+
   const suggestions = useMemo(() => {
     const query = searchTerm.trim().toLowerCase();
     if (!query) return [];
-    return resources.filter((item) => item.permissions?.view && item.resource_type === "PAGE" && item.component_key && sidebarConfig[item.resource]).filter((item) =>
-      `${item.display_name || ""} ${item.resource || ""}`.replaceAll("_", " ").toLowerCase().includes(query)
-    );
-  }, [resources, searchTerm]);
-
-  const selectResource = (resource) => {
+    const pages = resources
+      .filter((item) => item.permissions?.view && item.resource_type === "PAGE" && item.component_key && sidebarConfig[item.resource])
+      .filter((item) => ((item.display_name || "") + " " + (item.resource || "")).replaceAll("_", " ").toLowerCase().includes(query))
+      .map((item) => ({ key: "page-" + item.resource, title: item.display_name || item.resource.replaceAll("_", " "), subtitle: "Application page", route: item.route, icon: sidebarConfig[item.resource].icon }));
+    return [...recordSuggestions, ...pages].slice(0, 18);
+  }, [resources, searchTerm, recordSuggestions]);
+const selectResource = (resource) => {
     navigate(resource.route);
     setSearchTerm("");
     setSearchOpen(false);
@@ -132,7 +169,7 @@ function Navbar() {
           <FaSearch className="e2e_navbar_search_icon" aria-hidden="true" />
           <input
             type="search"
-            placeholder="Search your resources..."
+            placeholder="Search candidates, recruiters, submissions..."
             className="e2e_navbar_search"
             value={searchTerm}
             onChange={(event) => {
@@ -143,7 +180,7 @@ function Navbar() {
             onFocus={() => setSearchOpen(Boolean(searchTerm.trim()))}
             onKeyDown={handleSearchKeyDown}
             role="combobox"
-            aria-label="Search accessible resources"
+            aria-label="Search the application"
             aria-expanded={searchOpen}
             aria-controls="resource-search-suggestions"
             aria-autocomplete="list"
@@ -152,13 +189,13 @@ function Navbar() {
             <div className="e2e_navbar_suggestions" id="resource-search-suggestions" role="listbox">
               {suggestions.length ? suggestions.map((resource, index) => (
                 <button type="button" role="option" aria-selected={index === activeSuggestion}
-                  className={`e2e_navbar_suggestion ${index === activeSuggestion ? "is-active" : ""}`}
-                  key={resource.id || resource.resource}
+                  className={"e2e_navbar_suggestion " + (index === activeSuggestion ? "is-active" : "")}
+                  key={resource.key}
                   onMouseEnter={() => setActiveSuggestion(index)} onClick={() => selectResource(resource)}>
-                  <span className="e2e_navbar_suggestion_icon">{sidebarConfig[resource.resource].icon}</span>
-                  <span><strong>{resource.display_name || resource.resource.replaceAll("_", " ")}</strong><small>Open resource</small></span>
+                  <span className="e2e_navbar_suggestion_icon">{resource.icon}</span>
+                  <span><strong>{resource.title}</strong><small>{resource.subtitle}</small></span>
                 </button>
-              )) : <div className="e2e_navbar_no_suggestion">No accessible resource found</div>}
+              )) : <div className="e2e_navbar_no_suggestion">{searchLoading ? "Searching the application..." : searchTerm.trim().length < 2 ? "Type at least 2 characters" : "No matching records found"}</div>}
             </div>
           )}
         </div>

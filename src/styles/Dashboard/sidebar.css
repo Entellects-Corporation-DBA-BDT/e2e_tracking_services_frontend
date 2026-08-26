@@ -398,8 +398,8 @@
 }
 
 @media(max-width:480px) {
-  .e2e_logout_dialog_backdrop { align-items: end; padding: 8px 8px max(8px, env(safe-area-inset-bottom)); }
-  .e2e_logout_dialog { padding: 24px 18px 18px; border-radius: 22px 22px 14px 14px; }
+  .e2e_logout_dialog_backdrop { place-items: center; padding: max(10px, env(safe-area-inset-top)) 10px max(10px, env(safe-area-inset-bottom)); overflow: auto; }
+  .e2e_logout_dialog { max-height: calc(100dvh - 20px); padding: 24px 18px 18px; overflow: auto; border-radius: 20px; }
   .e2e_logout_dialog_actions { grid-template-columns: 1fr; }
   .e2e_logout_confirm { order: -1; }
 }

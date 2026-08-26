@@ -28,242 +28,141 @@ const CandidateForm = ({
 }) => {
 
     const [loading, setLoading] = useState(false);
-
     const [resume, setResume] = useState(null);
-
     const [dragActive, setDragActive] = useState(false);
-
     const [existingResume, setExistingResume] = useState("");
-
     const [errors, setErrors] = useState({});
-
     const [submitError, setSubmitError] = useState("");
-
     const [formData, setFormData] = useState({
-
         name: "",
-
         email: "",
-
         phone: "",
-
         current_location: "",
-
         visa_status: "",
-
         skills: "",
-
         remarks: "",
-
         status: "Active"
-
     });
 
     useEffect(() => {
-
         if (!isEdit || !candidateId) return;
-
         loadCandidate();
-
     }, [candidateId]);
 
     const loadCandidate = async () => {
-
         try {
-
             const response = await getCandidateById(candidateId);
-
             const candidate = response.data;
-
             setFormData({
-
                 name: candidate.name || "",
-
                 email: candidate.email || "",
-
                 phone: candidate.phone || "",
-
                 current_location: candidate.current_location || "",
-
                 visa_status: candidate.visa_status || "",
-
                 skills: candidate.skills || "",
-
                 remarks: candidate.remarks || "",
-
                 status: candidate.status || "Active"
-
             });
-
             setExistingResume(candidate.resume_path || "");
-
         } catch (err) {
-
             console.log(err);
-
         }
-
     };
+
     const validate = () => {
-
         const newErrors = {};
-
         if (!formData.name.trim())
             newErrors.name = "Candidate name is required";
-
         if (!formData.email.trim())
             newErrors.email = "Email is required";
-
         if (!/\S+@\S+\.\S+/.test(formData.email))
             newErrors.email = "Enter valid email";
-
         if (!formData.phone.trim())
             newErrors.phone = "Phone number is required";
-
         if (!formData.current_location.trim())
             newErrors.current_location = "Location is required";
-
         if (!isEdit && !resume)
             newErrors.resume = "Resume is required";
-
         setErrors(newErrors);
-
         return Object.keys(newErrors).length === 0;
-
     };
 
         const handleChange = (e) => {
-
         const { name, value } = e.target;
-
         setFormData((prev) => ({
-
             ...prev,
-
             [name]: value
-
         }));
-
         if (errors[name]) {
-
             setErrors((prev) => ({
-
                 ...prev,
-
                 [name]: ""
-
             }));
-
         }
-
     };
 
         const handleResume = (e) => {
-
         if (!e.target.files.length) return;
-
         setResume(e.target.files[0]);
-
     };
 
         const handleDrop = (e) => {
-
         e.preventDefault();
-
         setDragActive(false);
-
         if (!e.dataTransfer.files.length) return;
-
         setResume(e.dataTransfer.files[0]);
-
     };
 
     const handleDragOver = (e) => {
-
         e.preventDefault();
-
         setDragActive(true);
-
     };
 
     const handleDragLeave = () => {
-
         setDragActive(false);
-
     };
 
         const handleSubmit = async (e) => {
-
         e.preventDefault();
-
         if (loading) return;
-
         if (!validate()) return;
-
         setLoading(true);
-
         setSubmitError("");
-
         try {
-
             const payload = new FormData();
-
             Object.keys(formData).forEach((key) => {
-
                 payload.append(key, formData[key]);
-
             });
-
             if (resume) {
-
                 payload.append("resume_file", resume);
-
             }
-
             let response;
-
             if (isEdit) {
-
                 response = await updateCandidate(candidateId, payload);
-
             } else {
-
                 response = await createCandidate(payload);
-
             }
-
             await refreshData?.();
-
             if (response?.warning) {
                 alert(response.warning);
             }
-
             onClose();
-
         } catch (err) {
-
             setSubmitError(
                 err?.response?.data?.message ||
                 err?.message ||
                 `Failed to ${isEdit ? "update" : "create"} candidate.`
             );
-
         } finally {
-
             setLoading(false);
-
         }
 
     };
 
         return (
-
         <div className="candidate-page">
-
             <div className="candidate-card">
-
                 {/* HEADER */}
-
                 <div className="candidate-header">
                         <h2>
                             {isEdit
@@ -271,27 +170,18 @@ const CandidateForm = ({
                                 : "Add Candidate"}
                         </h2>
                 </div>
-
                 <form onSubmit={handleSubmit}>
-
                     {submitError && (
                         <div role="alert" className="candidate-submit-error">
                             <FiAlertCircle /> {submitError}
                         </div>
                     )}
-                  
-                                      <div className="section">
-
+                    <div className="section">
                         <div className="section-title">
-
                             <FiUser />
-
                             Personal Information
-
                         </div>
-
                         <div className="candidate-grid">
-
                             {/* Name */}
 
                             <div className="form-group">
@@ -472,6 +362,7 @@ const CandidateForm = ({
 
                                         <option>GC</option>
                                         <option>H4EAD</option>
+                                        <option>L2</option>
 
 
                                         <option>Citizen</option>
@@ -796,19 +687,12 @@ const CandidateForm = ({
                                     )
 
                             }
-
                         </button>
-
                     </div>
-
                 </form>
-
             </div>
-
         </div>
-
     );
-
 };
 
 export default CandidateForm;

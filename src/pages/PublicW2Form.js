@@ -1,0 +1,1 @@
+import W2Form from '../forms/W2Form';import '../styles/w2.css';export default function PublicW2Form(){return <main className="w2-public"><section className="w2-intro"><img src="/beedata-logo.png" alt="Bee Data Technology"/><div><h1>Secure W-2 Information Form</h1><p>Complete and submit your Wage and Tax Statement information.</p></div></section><W2Form/></main>}

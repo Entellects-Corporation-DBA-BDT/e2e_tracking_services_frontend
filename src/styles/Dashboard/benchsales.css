@@ -719,3 +719,6 @@ border:none;
 .e2e_benchsales_td_action{
   width:220px;
 }
+
+.e2e_benchsales_record_link{border:0;padding:0;background:transparent;color:#4f46e5;font:inherit;font-weight:700;text-align:left;cursor:pointer}
+.e2e_benchsales_record_link:hover{text-decoration:underline;color:#3730a3}
