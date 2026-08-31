@@ -201,6 +201,8 @@ const selectResource = (resource) => {
           )}
         </div>
 
+        <HeaderCollaboration location={location} navigate={navigate} title={currentPageTitle} />
+
         <button type="button" className="e2e_navbar_utility" title="Refresh dashboard"
           onClick={() => window.dispatchEvent(new CustomEvent("e2e-dashboard-refresh"))}>
           <FaRedo />
@@ -212,12 +214,7 @@ const selectResource = (resource) => {
         <button type="button" className="e2e_navbar_utility" title={darkMode ? "Use light theme" : "Use dark theme"}
           onClick={toggleTheme}>
           {darkMode ? <FaSun /> : <FaMoon />}
-        </button>
-
-        <HeaderCollaboration location={location} navigate={navigate} title={currentPageTitle} />
-
-
-        <div className="e2e_navbar_account" ref={profileRef}>
+        </button><div className="e2e_navbar_account" ref={profileRef}>
           <button type="button" className="e2e_navbar_profile" onClick={() => setProfileOpen((value) => !value)}
             aria-label="Open account menu" aria-expanded={profileOpen}>
             <div className="e2e_navbar_avatar">{user?.username?.charAt(0)?.toUpperCase() || "U"}</div>
