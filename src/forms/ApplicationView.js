@@ -12,11 +12,15 @@ import {
   FaCalendarAlt,
   FaArrowLeft,
   FaRedo,
+  FaCheckCircle,
+  FaClock,
+  FaCommentDots,
 } from "react-icons/fa";
 import { getBenchSalesById, getRecruiterApplicationById, updateApplicationProcess, updateRecruiterApplicationProcess } from "../api/applicationApi";
 import { baseUrlImg } from "../Config/env";
 import "./ApplicationView.css";
 import "./InterviewSchedule.css";
+import EmbeddedDiscussion from "../components/Discussion/EmbeddedDiscussion";
 
 const ApplicationView = ({
   applicationId,
@@ -38,6 +42,7 @@ const ApplicationView = ({
     interview_end_time: "",
     feedback: "",
   });
+  const [placementFeedback, setPlacementFeedback] = useState("");
 
   const fetchApplication = useCallback(async () => {
     try {
@@ -83,7 +88,7 @@ const ApplicationView = ({
       setUpdating(true);
       setProcessError("");
       const updateProcess = module === "recruiter" ? updateRecruiterApplicationProcess : updateApplicationProcess;
-      const details = nextProcess === 2 ? interviewForm : {};
+      const details = nextProcess === 2 ? interviewForm : { feedback: placementFeedback };
       const res = await updateProcess(
         application.id,
         nextProcess,
@@ -91,8 +96,10 @@ const ApplicationView = ({
       );
 
       if (res.success) {
-        fetchApplication();
+        await fetchApplication();
         setShowConfirm(false);
+        setInterviewForm({ interview_date: "", interview_start_time: "", interview_end_time: "", feedback: "" });
+        setPlacementFeedback("");
       }
 
     } catch (err) {
@@ -117,6 +124,19 @@ const ApplicationView = ({
     ["MSC Copy", application.msc_path, <FaFilePdf />],
   ];
 
+  const processHistory = Array.isArray(application.process_history) ? application.process_history : [];
+  const interviewRounds = processHistory.filter((event) => event.event_type === "interview");
+  const nextRound = interviewRounds.reduce((highest, event) => Math.max(highest, Number(event.round_number) || 0), 0) + 1;
+  const timelineEvents = [
+    { id: "submitted", event_type: "submitted", title: "Application Submitted", created_at: application.date_created, feedback: "Candidate profile submitted for this opportunity." },
+    ...processHistory.map((event) => ({ ...event, title: event.event_type === "interview" ? `Interview Round ${event.round_number || 1} Scheduled` : "Candidate Placed" })),
+  ];
+  const formatTimelineDate = (value) => {
+    if (!value) return "";
+    const parsed = new Date(String(value).replace(" ", "T"));
+    return Number.isNaN(parsed.getTime()) ? value : parsed.toLocaleString([], { dateStyle: "medium", timeStyle: "short" });
+  };
+
   return (
     <div className={`application-view${standalone ? " application-view-standalone" : ""}`}>
       {standalone && (
@@ -138,47 +158,27 @@ const ApplicationView = ({
         <div className="candidate-status">
           <div className={`status-badge process-${application.process_id}`}>
             {application.process_id === 1 && "Submitted"}
-            {application.process_id === 2 && "Interview Scheduled"}
+            {application.process_id === 2 && `Interview Round ${Math.max(interviewRounds.length, 1)} Scheduled`}
             {application.process_id === 3 && "Placed"}
           </div>
-          {application.process_id !== 3 && (
-            <button
-              className="process-btn"
-              disabled={updating}
-              onClick={() => {
-                if (application.process_id === 1) {
-                  setNextProcess(2);
-                  setInterviewForm({
-                    interview_date: "",
-                    interview_start_time: "",
-                    interview_end_time: "",
-                    feedback: application.feedback || "",
-                  });
-                } else {
-                  setNextProcess(3);
-                }
+          <div className="application-process-actions">
+            {application.process_id !== 3 && (
+              <button className="process-btn interview-action" disabled={updating} onClick={() => {
+                setNextProcess(2); setProcessError("");
+                setInterviewForm({ interview_date: "", interview_start_time: "", interview_end_time: "", feedback: "" });
                 setShowConfirm(true);
-              }}
-            >
-              {updating
-                ? "Updating..."
-                : application.process_id === 1
-                  ? "Schedule Interview"
-                  : "Mark as Placed"}
-            </button>
-          )}
-
-          {application.process_id === 3 && (
-            <button
-              className="process-btn completed"
-              disabled
-            >
-              ✓ Candidate Placed
-            </button>
-          )}
-
+              }}>Schedule Interview Round {nextRound}</button>
+            )}
+            {application.process_id === 2 && (
+              <button className="process-btn placement-action" disabled={updating} onClick={() => {
+                setNextProcess(3); setPlacementFeedback(""); setProcessError(""); setShowConfirm(true);
+              }}>Mark as Placed</button>
+            )}
+            {application.process_id === 3 && <button className="process-btn completed" disabled><FaCheckCircle /> Candidate Placed</button>}
+          </div>
         </div>
       </div>
+
 
       {/* Submission Info */}
       <div className="view-card">
@@ -256,31 +256,25 @@ const ApplicationView = ({
         </div>
       </div>
 
-      {(application.interview_slot || application.process_id >= 2) && (
-        <div className="view-card interview-detail-card">
-          <h3>Interview Details</h3>
-          <div className="info-grid">
-            <div className="info-item">
-              <FaCalendarAlt />
-              <div><label>Interview Slot Date & Time (ET)</label><span>{application.interview_slot || "Not entered"}</span></div>
-            </div>
-            <div className="info-item interview-feedback-item">
-              <FaUser />
-              <div><label>Feedback</label><span>{application.feedback || "No feedback entered"}</span></div>
-            </div>
-          </div>
+      <div className="view-card application-process-card">
+        <div className="application-process-heading">
+          <div><small>PROCESS JOURNEY</small><h3>Submission Timeline</h3><p>Every interview round and its feedback stays available here.</p></div>
+          <span>{interviewRounds.length} interview {interviewRounds.length === 1 ? "round" : "rounds"}</span>
         </div>
-      )}
-
-      {/* Feedback */}
-      <div className="view-card">
-        <h3>Feedback</h3>
-
-        <div className="remarks-box">
-          {application.feedback || "No Feedback Available"}
+        <div className="application-process-timeline">
+          {timelineEvents.map((event) => (
+            <div className={`application-timeline-event ${event.event_type}`} key={`${event.event_type}-${event.id}`}>
+              <div className="application-timeline-marker">{event.event_type === "interview" ? <FaCalendarAlt /> : <FaCheckCircle />}</div>
+              <div className="application-timeline-content">
+                <div className="application-timeline-title"><h4>{event.title}</h4><time><FaClock /> {formatTimelineDate(event.created_at)}</time></div>
+                {event.interview_slot && <div className="application-timeline-slot"><FaCalendarAlt /> {event.interview_slot}</div>}
+                {event.feedback && <div className="application-timeline-feedback"><FaCommentDots /><div><small>Feedback / Notes</small><p>{event.feedback}</p></div></div>}
+                {event.created_by_name && <div className="application-timeline-author">Updated by {event.created_by_name}</div>}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
-
       {/* Remarks */}
       <div className="view-card">
         <h3>Remarks</h3>
@@ -307,19 +301,21 @@ const ApplicationView = ({
           ))}
         </div>
       </div>
+      <EmbeddedDiscussion type="submission" recordId={application.id} title={`${application.candidate_name} Submission Discussion`} url={`/dashboard/bench-sales/${application.id}`} />
+
       {showConfirm && createPortal(
         <div className="confirm-overlay" onMouseDown={() => !updating && setShowConfirm(false)}>
           
           <div className="confirm-modal" role="alertdialog" aria-modal="true" aria-labelledby="process-confirm-title" onMouseDown={(event) => event.stopPropagation()}>
-            <div className="confirm-icon">⚠️</div>
+            <div className="confirm-icon"><FaCalendarAlt /></div>
             <h2 id="process-confirm-title">
               {nextProcess === 2
-                ? "Schedule Interview?"
+                ? `Schedule Interview Round ${nextRound}?`
                 : "Mark Candidate as Placed?"}
             </h2>
             <p>
               {nextProcess === 2
-                ? `Are you sure you want to move "${application.candidate_name}" to Interview Scheduled?`
+                ? `Add round ${nextRound} to ${application.candidate_name}'s interview journey. Earlier rounds and feedback will remain visible.`
                 : `Are you sure you want to mark "${application.candidate_name}" as Placed?`}
             </p>
             {nextProcess === 2 && (
@@ -339,8 +335,16 @@ const ApplicationView = ({
                   </label>
                 </div>
                 <label>
-                  <span>Feedback</span>
-                  <textarea required rows="3" placeholder="Example: Interview completed with Southwest Airlines" value={interviewForm.feedback} onChange={(event) => setInterviewForm({ ...interviewForm, feedback: event.target.value })} />
+                  <span>Round Feedback / Notes</span>
+                  <textarea required rows="4" placeholder="Add interview outcome, panel notes, next steps, or preparation details..." value={interviewForm.feedback} onChange={(event) => setInterviewForm({ ...interviewForm, feedback: event.target.value })} />
+                </label>
+              </div>
+            )}
+            {nextProcess === 3 && (
+              <div className="interview-schedule-form placement-feedback-form">
+                <label>
+                  <span>Placement Feedback / Notes</span>
+                  <textarea required rows="4" placeholder="Add the final placement outcome, joining details, or closing notes..." value={placementFeedback} onChange={(event) => setPlacementFeedback(event.target.value)} />
                 </label>
               </div>
             )}
@@ -361,13 +365,13 @@ const ApplicationView = ({
                   || !interviewForm.interview_end_time
                   || interviewForm.interview_end_time <= interviewForm.interview_start_time
                   || !interviewForm.feedback.trim()
-                ))}
+                )) || (nextProcess === 3 && !placementFeedback.trim())}
                 onClick={handleProcessUpdate}
               >
                 {updating
                   ? "Updating..."
                   : nextProcess === 2
-                    ? "Schedule Interview"
+                    ? `Schedule Round ${nextRound}`
                     : "Mark as Placed"}
               </button>
             </div>

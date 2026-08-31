@@ -9,6 +9,7 @@ import {
 
 import Sidebar from "./Sidebar";
 import Navbar from "./Navbar";
+import ApplicationAssistant from "../../components/Assistant/ApplicationAssistant";
 
 import DashboardCards from "./DashboardCards";
 import DashboardGraphs from "./DashboardGraphs";
@@ -437,6 +438,7 @@ function Dashboard() {
       <div className="e2e_dashboard_right_section">
 
         <Navbar />
+        <ApplicationAssistant />
 
         <div className="e2e_dashboard_scroll_content">
 

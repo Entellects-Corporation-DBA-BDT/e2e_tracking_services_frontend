@@ -6,3 +6,30 @@
 .leave-reviewer{display:flex;min-width:150px;flex-direction:column;gap:2px}.leave-reviewer strong{color:#334155;font-size:12px}.leave-reviewer small{color:#94a3b8;font-size:10px}
 
 .attendance-date-filter{display:grid;gap:5px;color:#64748b;font-size:10px;font-weight:900;text-transform:uppercase}.attendance-date-filter input{min-width:160px;padding:9px 11px;border:1px solid #cbd5e1;border-radius:9px;background:#fff;color:#1e293b;font:inherit;font-size:13px}.attendance-restriction-card{display:grid;gap:20px;max-width:760px}.attendance-restriction-card>div{display:flex;align-items:center;gap:14px}.attendance-restriction-card h2{margin:0 0 5px;color:#1e293b}.attendance-restriction-card p{margin:0;color:#64748b}.restriction-indicator{width:18px;height:18px;border-radius:50%;background:#ef4444;box-shadow:0 0 0 6px #fee2e2}.restriction-indicator.disabled{background:#22c55e;box-shadow:0 0 0 6px #dcfce7}.attendance-restriction-card>button{width:max-content;padding:11px 16px;border:0;border-radius:9px;color:#fff;font-weight:800;cursor:pointer}.attendance-restriction-card>button.disable{background:#16a34a}.attendance-restriction-card>button.enable{background:#dc2626}.attendance-restriction-card>button:disabled{cursor:not-allowed;opacity:.55}.attendance-restriction-card>small{color:#64748b}.restriction-search{min-width:230px;padding:10px 12px;border:1px solid #cbd5e1;border-radius:9px}.wfh-toggle{padding:8px 11px;border:0;border-radius:8px;color:#fff;font-weight:800;cursor:pointer}.wfh-toggle.grant{background:#16a34a}.wfh-toggle.remove{background:#dc2626}.wfh-toggle:disabled{cursor:not-allowed;opacity:.55}
+/* Professional Employee WFH Access table */
+.attendance-restriction-card{width:100%;max-width:none;box-sizing:border-box;gap:18px}
+.attendance-restriction-card>.attendance-section-title{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;width:100%}
+.attendance-restriction-card>.attendance-section-title>div{min-width:0;display:block}
+.attendance-restriction-card>.attendance-admin-table{display:block;width:100%;max-width:100%;overflow-x:auto;border:1px solid #e2e8f0;border-radius:13px;background:#fff;-webkit-overflow-scrolling:touch}
+.attendance-restriction-card .attendance-admin-table table{width:100%;min-width:800px;table-layout:fixed;border-collapse:separate;border-spacing:0}
+.attendance-restriction-card .attendance-admin-table th{height:42px;box-sizing:border-box;padding:10px 16px;border-bottom:1px solid #dfe7f1;background:#f6f8fb;color:#64748b;font-size:10px;font-weight:900;letter-spacing:.06em;vertical-align:middle;white-space:nowrap}
+.attendance-restriction-card .attendance-admin-table td{height:68px;box-sizing:border-box;padding:12px 16px;border-bottom:1px solid #edf1f6;color:#334155;font-size:13px;vertical-align:middle}
+.attendance-restriction-card .attendance-admin-table tbody tr:last-child td{border-bottom:0}
+.attendance-restriction-card .attendance-admin-table tbody tr:hover td{background:#fafcff}
+.attendance-restriction-card .attendance-admin-table th:nth-child(1),.attendance-restriction-card .attendance-admin-table td:nth-child(1){width:24%}
+.attendance-restriction-card .attendance-admin-table th:nth-child(2),.attendance-restriction-card .attendance-admin-table td:nth-child(2){width:23%}
+.attendance-restriction-card .attendance-admin-table th:nth-child(3),.attendance-restriction-card .attendance-admin-table td:nth-child(3){width:17%}
+.attendance-restriction-card .attendance-admin-table th:nth-child(4),.attendance-restriction-card .attendance-admin-table td:nth-child(4){width:20%}
+.attendance-restriction-card .attendance-admin-table th:nth-child(5),.attendance-restriction-card .attendance-admin-table td:nth-child(5){width:16%;text-align:right}
+.attendance-restriction-card .attendance-admin-table td strong,.attendance-restriction-card .attendance-admin-table td small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.attendance-restriction-card .attendance-admin-table td strong{color:#26354d;font-size:13px;font-weight:800}
+.attendance-restriction-card .attendance-admin-table td small{margin-top:4px;color:#8a98ab;font-size:10px}
+.attendance-restriction-card .attendance-admin-table mark{display:inline-flex;align-items:center;justify-content:center;min-width:132px;box-sizing:border-box;padding:7px 10px;border-radius:999px;font-size:10px;font-weight:850;line-height:1;white-space:nowrap}
+.attendance-restriction-card .attendance-admin-table mark.approved{border:1px solid #a7e8c0;background:#e9fbf0;color:#13713a}
+.attendance-restriction-card .attendance-admin-table mark.rejected{border:1px solid #f5c5c5;background:#fff1f1;color:#a92e2e}
+.attendance-restriction-card .wfh-toggle{display:inline-flex;align-items:center;justify-content:center;width:145px;min-height:36px;box-sizing:border-box;padding:8px 11px;border-radius:9px;box-shadow:0 4px 10px rgba(15,23,42,.08);font-size:11px;white-space:nowrap;transition:transform .15s,box-shadow .15s,opacity .15s}
+.attendance-restriction-card .wfh-toggle:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 7px 14px rgba(15,23,42,.13)}
+.attendance-restriction-card .restriction-search{width:min(300px,100%);min-width:260px;box-sizing:border-box;padding:11px 13px;border-color:#cbd7e6;outline:0;background:#fff;color:#26354d}
+.attendance-restriction-card .restriction-search:focus{border-color:#4f6fdb;box-shadow:0 0 0 3px rgba(79,111,219,.12)}
+.attendance-restriction-card>small{padding:11px 13px;border:1px solid #dbe6f4;border-radius:9px;background:#f7faff;color:#64748b;font-size:11px;line-height:1.5}
+@media(max-width:850px){.attendance-restriction-card>.attendance-section-title{align-items:stretch;flex-direction:column}.attendance-restriction-card .restriction-search{width:100%;min-width:0}.attendance-restriction-card .attendance-admin-table{border-radius:10px}}

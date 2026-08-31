@@ -9,4 +9,58 @@ export const SECTIONS = [
 export const EMPTY = Object.fromEntries(SECTIONS.flatMap(s => [...s.fields, ...(s.checks || [])].map(([n]) => [n, false])).map(([k, v]) => [k, k.startsWith('employment_') ? false : '']));
 const esc = v => String(v ?? '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
 export async function downloadInteractiveW2(data) { const logoBlob = await fetch('/beedata-logo.png').then(r => r.blob()); const logo = await new Promise(resolve => { const reader = new FileReader(); reader.onload = () => resolve(reader.result); reader.readAsDataURL(logoBlob) }); const sections = SECTIONS.map(s => `<section><h2>${s.title}</h2><div class="grid">${s.fields.map(([n, l, t = 'text']) => `<label><span>${l}</span><input type="${t}" name="${n}" value="${esc(data[n])}"></label>`).join('')}</div>${s.checks ? `<fieldset><legend>Type of Employment</legend>${s.checks.map(([n, l]) => `<label><input type="checkbox" name="${n}" ${Number(data[n]) || data[n] === true ? 'checked' : ''}> ${l}</label>`).join('')}</fieldset>` : ''}</section>`).join(''); const html = `<!doctype html><html><head><meta charset="utf-8"><title>W-2 Consultant Form - ${esc(data.consultant_name)}</title><style>body{font:14px Arial;max-width:900px;margin:25px auto;color:#111}h1{text-align:center}section{border:1px solid #777;border-radius:10px;padding:14px;margin:22px 0}h2{font-size:15px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}label span{display:block;font-size:12px;font-weight:bold;margin-bottom:3px}input{box-sizing:border-box;width:100%;padding:9px;border:1px solid #bbb}fieldset label{display:block}fieldset input{width:auto}@media(max-width:600px){.grid{grid-template-columns:1fr}}@media print{button{display:none}}</style></head><body><img src="${logo}" alt="Bee Data Technology" style="display:block;max-width:380px;width:70%;margin:0 auto 20px"><h1>W-2 Consultant Form</h1><form>${sections}<button type="button" onclick="window.print()">Print / Save as PDF</button></form></body></html>`; const blob = new Blob([html], { type: 'text/html;charset=utf-8' }), url = URL.createObjectURL(blob), a = document.createElement('a'); a.href = url; a.download = `w2-${(data.consultant_name || 'consultant').replace(/[^a-z0-9]+/gi, '-').toLowerCase()}.html`; a.click(); URL.revokeObjectURL(url) }
-export default function W2Form({ initialData, recordId, onSaved, readOnly = false }) { const [form, setForm] = useState({ ...EMPTY, ...initialData }), [status, setStatus] = useState(''); useEffect(() => setForm({ ...EMPTY, ...initialData }), [initialData]); const change = e => setForm(o => ({ ...o, [e.target.name]: e.target.type === 'checkbox' ? e.target.checked : e.target.value })); const save = async e => { e.preventDefault(); setStatus('Saving...'); try { recordId ? await updateW2Form(recordId, form) : await submitPublicW2(form); setStatus(recordId ? 'Changes saved.' : 'Your form was submitted successfully.'); onSaved?.() } catch (x) { setStatus(x.response?.data?.message || 'Unable to save the form.') } }; return <form className={`w2-sheet ${readOnly ? 'w2-readonly' : ''}`} onSubmit={save}><header><div><b>W-2 Consultant Form</b><span>Project and Invoicing Information</span></div></header>{SECTIONS.map(s => <section className="w2-section" key={s.title}><h2>{s.title}:</h2><div className="w2-section-grid">{s.fields.map(([name, label, type = 'text']) => <label key={name} className={['project_start_date', 'project_end_date', 'client_phone', 'client_fax', 'invoice_phone', 'invoice_fax'].includes(name) ? 'w2-half' : ''}><span>{label}</span><input name={name} type={type} value={form[name] ?? ''} onChange={change} /></label>)}</div>{s.checks && <fieldset><legend>Type of Employment:</legend>{s.checks.map(([name, label]) => <label key={name}><input name={name} type="checkbox" checked={!!Number(form[name]) || form[name] === true} onChange={change} />{label}</label>)}</fieldset>}</section>)}{!readOnly && <footer><button>{recordId ? 'Save changes' : 'Submit'}</button><span role="status">{status}</span></footer>}</form> }
+export default function W2Form({ initialData, recordId, onSaved, readOnly = false }) {
+  const [form, setForm] = useState({ ...EMPTY, ...initialData });
+  const [status, setStatus] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => setForm({ ...EMPTY, ...initialData }), [initialData]);
+
+  const change = event => setForm(current => ({
+    ...current,
+    [event.target.name]: event.target.type === 'checkbox' ? event.target.checked : event.target.value
+  }));
+
+  const save = async event => {
+    event.preventDefault();
+    setSaving(true);
+    setStatus('Saving your information...');
+    try {
+      recordId ? await updateW2Form(recordId, form) : await submitPublicW2(form);
+      setStatus(recordId ? 'Changes saved successfully.' : 'Your form was submitted successfully.');
+      onSaved?.();
+    } catch (error) {
+      setStatus(error.response?.data?.message || 'Unable to save the form. Please review the information and try again.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const wideFields = ['work_address', 'consultant_address', 'emergency_address', 'end_client_address', 'invoice_address', 'comments'];
+  const multilineFields = ['work_address', 'consultant_address', 'emergency_address', 'end_client_address', 'invoice_address', 'comments'];
+
+  return <form className={`w2-sheet ${readOnly ? 'w2-readonly' : ''}`} onSubmit={save}>
+    <header className="w2-sheet-header">
+      <div><span className="w2-document-label">EMPLOYMENT DOCUMENT</span><b>Data Form</b><p>Project, consultant, end-client and invoicing information</p></div>
+      <span className="w2-secure-badge">Secure form</span>
+    </header>
+
+    <div className="w2-form-content">
+      {SECTIONS.map((section, sectionIndex) => <section className="w2-section" key={section.title}>
+        <header className="w2-section-heading"><span>{String(sectionIndex + 1).padStart(2, '0')}</span><div><h2>{section.title}</h2><p>Provide the applicable information below.</p></div></header>
+        <div className="w2-section-grid">
+          {section.fields.map(([name, label, type = 'text', required = false]) => {
+            const Field = multilineFields.includes(name) ? 'textarea' : 'input';
+            return <label key={name} className={wideFields.includes(name) ? 'w2-field-wide' : ''}>
+              <span>{label}{required && <em>Required</em>}</span>
+              <Field name={name} type={Field === 'input' ? type : undefined} rows={Field === 'textarea' ? 3 : undefined} required={required} readOnly={readOnly} value={form[name] ?? ''} onChange={change} />
+            </label>;
+          })}
+        </div>
+        {section.checks && <fieldset className="w2-employment"><legend>Type of Employment</legend><div>{section.checks.map(([name, label]) => <label key={name} className={form[name] ? 'selected' : ''}><input name={name} type="checkbox" disabled={readOnly} checked={!!Number(form[name]) || form[name] === true} onChange={change} /><span>{label}</span></label>)}</div></fieldset>}
+      </section>)}
+    </div>
+
+    {!readOnly && <footer className="w2-submit-bar"><div><strong>Ready to submit?</strong><span>Review all details before sending this secure form.</span></div><div><span className="w2-form-status" role="status">{status}</span><button disabled={saving}>{saving ? 'Saving...' : recordId ? 'Save changes' : 'Submit Data Form information'}</button></div></footer>}
+  </form>;
+}

@@ -49,6 +49,17 @@ export const sidebarConfig = {
     icon: <FaUserTie className="menuIcon violetIcon" />,
     route: "/dashboard/candidates",
   },
+  chat: {
+    icon: <FaComments className="menuIcon tealIcon" />,
+    route: "/dashboard/chat",
+  },
+  chat_admin: {
+    icon: <FaComments className="menuIcon redIcon" />,
+    route: "/dashboard/admin/chat",
+  },  chat_notifications: {
+    icon: <FaBell className="menuIcon orangeIcon" />,
+    route: "/dashboard/notifications",
+  },
   document_reminders: {
     icon: <FaBell className="menuIcon orangeIcon" />,
     route: "/dashboard/document-reminders",
@@ -94,4 +105,3 @@ export const sidebarConfig = {
     route: "/dashboard/w2-forms",
   },
 };
-

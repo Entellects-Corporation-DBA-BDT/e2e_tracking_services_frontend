@@ -722,3 +722,11 @@ border:none;
 
 .e2e_benchsales_record_link{border:0;padding:0;background:transparent;color:#4f46e5;font:inherit;font-weight:700;text-align:left;cursor:pointer}
 .e2e_benchsales_record_link:hover{text-decoration:underline;color:#3730a3}
+/* Professional Process column alignment */
+.e2e_benchsales_th_process,.e2e_benchsales_td_process{width:170px;min-width:170px;box-sizing:border-box;text-align:center!important}
+.e2e_benchsales_process_content{display:flex;width:100%;min-height:52px;align-items:center;justify-content:center;flex-direction:column;gap:5px}
+.e2e_benchsales_process_badge{width:142px;min-height:32px;box-sizing:border-box;padding:6px 10px;white-space:nowrap}
+.e2e_benchsales_process_note{display:block;height:12px;margin:0;color:transparent;font-size:9px;font-weight:750;line-height:12px;white-space:nowrap;visibility:hidden}
+.e2e_benchsales_process_note.visible{color:#15803d;visibility:visible}
+.e2e_benchsales_placed_note{display:none}
+@media(max-width:768px){.e2e_benchsales_th_process,.e2e_benchsales_td_process{width:160px;min-width:160px}.e2e_benchsales_process_badge{width:134px}}

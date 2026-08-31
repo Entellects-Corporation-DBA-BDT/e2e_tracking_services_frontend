@@ -220,11 +220,15 @@ function BenchSales() {
                   <td className="e2e_benchsales_td_poc">{item.poc}</td>
                   <td className="e2e_benchsales_td_client">{item.client}</td>
                   <td className="e2e_benchsales_td_process">
-                    <span className={`e2e_benchsales_process_badge e2e_benchsales_process_${process.className}`}>
-                      {process.className === "placed" && <span aria-hidden="true">✓</span>}
-                      {process.label}
-                    </span>
-                    {process.className === "placed" && <small className="e2e_benchsales_placed_note">Submission placed</small>}
+                    <div className="e2e_benchsales_process_content">
+                      <span className={`e2e_benchsales_process_badge e2e_benchsales_process_${process.className}`}>
+                        {process.className === "placed" && <span aria-hidden="true">✓</span>}
+                        {process.label}
+                      </span>
+                      <small className={`e2e_benchsales_process_note ${process.className === "placed" ? "visible" : ""}`}>
+                        {process.className === "placed" ? "Submission placed" : "Status"}
+                      </small>
+                    </div>
                   </td>
                   <td className="e2e_benchsales_td_action">
                     <div className="e2e_benchsales_actions">

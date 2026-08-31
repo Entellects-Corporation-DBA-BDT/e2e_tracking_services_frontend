@@ -1,0 +1,22 @@
+import axios from './axiosInstance';
+export const getConversations=async()=>(await axios.get('/chat/conversations')).data.data;
+export const createConversation=async data=>(await axios.post('/chat/conversations',data)).data.data;
+export const getMessages=async(id,before)=>(await axios.get(`/chat/conversations/${id}/messages`,{params:before?{before}:{}})).data.data;
+export const sendMessage=async(id,data)=>(await axios.post(`/chat/conversations/${id}/messages`,data)).data.data;
+export const getMessageReceipts=async id=>(await axios.get(`/chat/messages/${id}/receipts`)).data.data;
+export const markRead=async id=>(await axios.post(`/chat/conversations/${id}/read`)).data;
+export const searchChatUsers=async q=>(await axios.get('/chat/users/search',{params:{q}})).data.data;
+export const getChatNotifications=async()=>(await axios.get('/chat/notifications')).data.data;
+
+export const getNotificationCenter=async()=>{const r=await axios.get('/chat/notifications');return {items:r.data.data||[],unread:Number(r.data.meta?.unread||0)}};
+export const markNotificationRead=async id=>(await axios.patch(`/chat/notifications/${id}/read`)).data;
+export const markAllNotificationsRead=async()=>(await axios.patch('/chat/notifications/read-all')).data;
+export const editMessage=async(id,body)=>(await axios.patch(`/chat/messages/${id}`,{body})).data;
+export const deleteMessage=async id=>(await axios.delete(`/chat/messages/${id}`)).data;
+export const getConversationMembers=async id=>(await axios.get(`/chat/conversations/${id}/members`)).data.data;
+export const addConversationMembers=async(id,member_ids)=>(await axios.post(`/chat/conversations/${id}/members`,{member_ids})).data;
+export const getAdminConversations=async(q='')=>(await axios.get('/chat/admin/conversations',{params:{q}})).data.data;export const adminDeleteConversation=async id=>(await axios.delete(`/chat/admin/conversations/${id}`)).data.data;export const deleteConversationForMe=async id=>(await axios.delete(`/chat/conversations/${id}`)).data;
+export const deleteEmptyDiscussion=async id=>(await axios.delete(`/chat/conversations/${id}/empty`)).data.data;
+export const exitGroup=async id=>(await axios.post(`/chat/conversations/${id}/exit`)).data;
+export const removeConversationMember=async(id,userId)=>(await axios.delete(`/chat/conversations/${id}/members/${userId}`)).data;
+export const setConversationMemberRole=async(id,userId,role)=>(await axios.patch(`/chat/conversations/${id}/members/${userId}/role`,{role})).data.data;

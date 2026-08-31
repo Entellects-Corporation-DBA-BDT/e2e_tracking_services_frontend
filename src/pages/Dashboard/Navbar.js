@@ -1,5 +1,5 @@
 import "../../styles/Dashboard/navbar.css";
-import { FaArrowLeft, FaBell, FaBriefcase, FaCalendarAlt, FaChevronDown, FaFileAlt, FaMedal, FaMoon, FaPrint, FaRedo, FaSearch, FaSignOutAlt, FaSun, FaUserTie } from 'react-icons/fa';
+import { FaArrowLeft, FaBriefcase, FaCalendarAlt, FaChevronDown, FaFileAlt, FaMedal, FaMoon, FaPrint, FaRedo, FaSearch, FaSignOutAlt, FaSun, FaUserTie } from 'react-icons/fa';
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -8,6 +8,7 @@ import { sidebarConfig } from "./SidebarConfig";
 import { useTheme } from "../../auth/ThemeContext";
 import { getCandidateData } from "../../api/candidateApi";
 import { getBenchSalesData, getRecruiterApplications } from "../../api/applicationApi";
+import HeaderCollaboration from "../../components/Collaboration/HeaderCollaboration";
 
 function Navbar() {
   const location = useLocation();
@@ -212,9 +213,9 @@ const selectResource = (resource) => {
           onClick={toggleTheme}>
           {darkMode ? <FaSun /> : <FaMoon />}
         </button>
-        <button type="button" className="e2e_navbar_notification" title="Notifications">
-          <FaBell />
-        </button>
+
+        <HeaderCollaboration location={location} navigate={navigate} title={currentPageTitle} />
+
 
         <div className="e2e_navbar_account" ref={profileRef}>
           <button type="button" className="e2e_navbar_profile" onClick={() => setProfileOpen((value) => !value)}

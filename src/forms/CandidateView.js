@@ -32,6 +32,7 @@ import {
 import { baseUrlImg } from "../Config/env";
 import "./CandidateView.css";
 import ProfilePerformance from "../components/ProfilePerformance";
+import EmbeddedDiscussion from "../components/Discussion/EmbeddedDiscussion";
 
 const MATCHING_STEPS = [
   "Initializing AI matching engine...",
@@ -251,9 +252,11 @@ const CandidateView = () => {
             <p><FaMapMarkerAlt /> {candidate.current_location || "Location not provided"}</p>
           </div>
         </div>
-        <span className={`candidate-view-status ${String(candidate.status || "").toLowerCase()}`}>
-          {candidate.status || "Status unavailable"}
-        </span>
+        <div className="candidate-view-header-actions">
+          <span className={`candidate-view-status ${String(candidate.status || "").toLowerCase()}`}>
+            {candidate.status || "Status unavailable"}
+          </span>
+        </div>
       </section>
 
       <section className="candidate-view-card">
@@ -429,6 +432,9 @@ const CandidateView = () => {
           </div>
         )}
       </section>
+
+
+      <EmbeddedDiscussion type="candidate" recordId={candidate.id || candidateId} title={`${candidate.name} Candidate Discussion`} url={`/dashboard/candidates/${candidate.id || candidateId}`} />
 
       {matching && (
         <div className="candidate-matching-overlay" role="dialog" aria-modal="true" aria-label="AI job matching in progress">

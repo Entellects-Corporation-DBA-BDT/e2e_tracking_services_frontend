@@ -1,0 +1,6 @@
+import {useState} from 'react';
+import {FaComments} from 'react-icons/fa';
+import {useLocation,useNavigate} from 'react-router-dom';
+import {createConversation} from '../../api/chatApi';
+import {usePermissions} from '../../auth/PermissionContext';
+export default function DiscussionLauncher({type,recordId,title,className=''}){const navigate=useNavigate(),location=useLocation(),{can}=usePermissions(),[loading,setLoading]=useState(false),[error,setError]=useState('');const open=async()=>{setLoading(true);setError('');try{const result=await createConversation({type:'contextual',name:`${title} Discussion`,member_ids:[],context:{type,id:String(recordId),title,url:location.pathname}});navigate(`/dashboard/chat?conversation=${result.id}`)}catch(e){setError(e?.response?.data?.message||'Discussion could not be opened.')}finally{setLoading(false)}};if(!can('chat','create'))return null;return <span className={`discussion-launcher ${className}`}><button type="button" onClick={open} disabled={loading}><FaComments/>{loading?'Opening...':'Discuss'}</button>{error&&<small role="alert">{error}</small>}</span>}

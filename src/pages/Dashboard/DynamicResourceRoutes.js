@@ -23,6 +23,9 @@ import AccessCatalog from "./AccessCatalog";
 import AttendanceManagement from "./AttendanceManagement";
 import RecruiterPerformance from "./RecruiterPerformance.";
 import W2Forms from "./W2Forms";
+import ChatWorkspace from "../../components/Chat/ChatWorkspace";
+import NotificationsPage from "../../components/Collaboration/NotificationsPage";
+import AdminChat from "../../components/Chat/AdminChat";
 
 const PAGE_COMPONENTS = {
   recruiting: <Recruiting />,
@@ -43,6 +46,9 @@ const PAGE_COMPONENTS = {
   resources: <AccessCatalog type="resources" />,
   "document-reminders": <DocumentReminders />,
   "w2-forms": <W2Forms />,
+  chat: <ChatWorkspace />,
+  "chat-notifications": <NotificationsPage />,
+  "chat-admin": <AdminChat />,
 };
 
 const DETAIL_COMPONENTS = {
@@ -80,4 +86,3 @@ export default function useDynamicResourceRoutes() {
       return routes;
     });
 }
-
