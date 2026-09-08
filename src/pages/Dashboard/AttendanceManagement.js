@@ -1,12 +1,14 @@
 import { useCallback, useEffect, useState } from "react";
-import { FaCalendarCheck, FaCheck, FaClock, FaPlus, FaTimes, FaTrash, FaUserCheck, FaUserTimes } from "react-icons/fa";
+import { useSearchParams } from "react-router-dom";
+import { FaCalendarCheck, FaCheck, FaClock, FaEdit, FaPlus, FaTimes, FaTrash, FaUserCheck, FaUserTimes } from "react-icons/fa";
 import {
   addEmployeeLeave, deleteHoliday, getEmployees, getHolidays, getLeaves,
-  getAttendanceIpPermissions, getMonthlyAttendance, getTodayAttendance, reviewLeave, saveHoliday, updateEmployeeWfhPermission,
+  getAttendanceIpPermissions, getMonthlyAttendance, getTodayAttendance, reviewLeave, saveHoliday, updateEmployeeWfhPermission, updateMonthlyAttendance,
 } from "../../api/employeeApi";
 import { usePermissions } from "../../auth/PermissionContext";
 import MyProfile from "./MyProfile";
 import ConfirmDialog from "../../components/ConfirmDialog";
+import PayslipManager from "../../components/PayslipManager";
 import "../../styles/Dashboard/attendanceManagement.css";
 
 const blankLeave = { employee_id:"", leave_type:"paid", start_date:"", end_date:"", duration:"full_day", reason:"" };
@@ -14,8 +16,10 @@ const blankHoliday = { holiday_date:"", name:"", description:"", is_optional:fal
 
 function AttendanceManagement() {
   const { can, user } = usePermissions();
+  const [assistantParams] = useSearchParams();
   const admin = can("attendance","edit");
   const superAdmin = Boolean(user?.super_admin);
+  const payslipAccess = can("payslips","view");
   const [tab,setTab]=useState("today");
   const localDate=new Date().toLocaleDateString("en-CA",{timeZone:"America/New_York"});
   const [selectedDate,setSelectedDate]=useState(localDate),[selectedMonth,setSelectedMonth]=useState(localDate.slice(0,7));
@@ -24,7 +28,9 @@ function AttendanceManagement() {
   const [monthly,setMonthly]=useState({data:[]}),[ipPermissions,setIpPermissions]=useState([]),[savingRestriction,setSavingRestriction]=useState(null),[restrictionSearch,setRestrictionSearch]=useState("");
   const [leave,setLeave]=useState(blankLeave),[holiday,setHoliday]=useState(blankHoliday);
   const [status,setStatus]=useState(""),[message,setMessage]=useState({text:"",error:false}),[loading,setLoading]=useState(true);
-  const [confirmation,setConfirmation]=useState(null);
+  const [confirmation,setConfirmation]=useState(null),[monthlyEdit,setMonthlyEdit]=useState(null),[monthlySaving,setMonthlySaving]=useState(false);
+  useEffect(()=>{const requested=assistantParams.get("assistant");if(["monthly","payslips","approvals","holidays"].includes(requested))setTab(requested)},[assistantParams]);
+  const showMessage=(text,error=false)=>setMessage({text,error});
 
   const load=useCallback(async()=>{
     setLoading(true);
@@ -41,7 +47,7 @@ function AttendanceManagement() {
   useEffect(()=>{if(admin)load();},[admin,load]);
   if(!admin)return <MyProfile/>;
 
-  const decide=async(id,next)=>{
+  const saveMonthlyEdit=async(event)=>{event.preventDefault();setMonthlySaving(true);try{const result=await updateMonthlyAttendance(monthlyEdit.id,{...monthlyEdit,month:selectedMonth});setMessage({text:result.message,error:false});setMonthlyEdit(null);await load()}catch(error){setMessage({text:error?.response?.data?.message||"Monthly attendance could not be updated.",error:true})}finally{setMonthlySaving(false)}};  const decide=async(id,next)=>{
     try{const result=await reviewLeave(id,{status:next});setMessage({text:result.message,error:false});load();}
     catch(error){setMessage({text:error?.response?.data?.message||"Leave could not be updated.",error:true});}
   };
@@ -58,7 +64,7 @@ function AttendanceManagement() {
 
   return <main className="attendance-management">
     <header className="attendance-management-hero"><span><FaCalendarCheck/></span><div><p>HR & ADMIN</p><h1>Attendance Management</h1><small>Approve leave, add employee leave, and maintain the company holiday calendar. All attendance times use US Eastern Time (ET).</small></div></header>
-    <nav>{[["today","Daily Attendance"],["monthly","Monthly Summary"],...(superAdmin?[["restriction","IP Restriction"]]:[]),["approvals","Leave Approvals"],["add-leave","Add Employee Leave"],["holidays","Holidays"]].map(([key,label])=><button key={key} className={tab===key?"active":""} onClick={()=>setTab(key)}>{label}</button>)}</nav>
+    <nav>{[["today","Daily Attendance"],["monthly","Monthly Summary"],...(payslipAccess?[["payslips","Payslips"]]:[]),...(superAdmin?[["restriction","IP Restriction"]]:[]),["approvals","Leave Approvals"],["add-leave","Add Employee Leave"],["holidays","Holidays"]].map(([key,label])=><button key={key} className={tab===key?"active":""} onClick={()=>setTab(key)}>{label}</button>)}</nav>
     {message.text&&<p className={`attendance-admin-message ${message.error?"error":""}`}>{message.text}</p>}
     {loading?<div className="attendance-loading"><span/> Loading attendance management...</div>:<>
       {tab==="today"&&<section className="attendance-admin-section">
@@ -74,8 +80,9 @@ function AttendanceManagement() {
       </section>}
       {tab==="monthly"&&<section className="attendance-admin-section">
         <div className="attendance-section-title"><div><h2>Monthly Attendance Summary</h2><p>Totals for every active employee through {monthly.end_date||"the selected month"}.</p></div><label className="attendance-date-filter">Month<input type="month" max={localDate.slice(0,7)} value={selectedMonth} onChange={e=>setSelectedMonth(e.target.value)}/></label></div>
-        <div className="attendance-admin-table"><table><thead><tr><th>Employee</th><th>Company Login</th><th>Role</th><th>Present Days</th><th>Half Days</th><th>Late Days</th><th>Total Hours</th></tr></thead><tbody>{monthly.data?.length?monthly.data.map(row=><tr key={row.id}><td><strong>{row.legal_name}</strong><small>{row.employee_id}</small></td><td><strong>{row.company_name}</strong><small>{row.username}</small></td><td>{row.role||"-"}</td><td>{row.present_days}</td><td>{row.half_days}</td><td>{row.late_days}</td><td><strong>{row.total_hours||0} h</strong></td></tr>):<tr><td colSpan="7">No employees found for this month.</td></tr>}</tbody></table></div>
+        <div className="attendance-admin-table monthly-policy-table"><table><thead><tr><th>Employee</th><th>Joining / Eligibility</th><th>Weekends</th><th>Holidays</th><th>Working</th><th>Present</th><th>Half</th><th>Worked</th><th>CL</th><th>PL</th><th>UPL</th><th>Payable</th><th>Hours</th><th>Edit</th></tr></thead><tbody>{monthly.data?.length?monthly.data.map(row=><tr key={row.id}><td><strong>{row.legal_name}</strong><small>{row.employee_id} · {row.role||"-"}</small></td><td><strong>{row.joining_date||"-"}</strong><small>{row.leave_eligible?"1 CL eligible":"Probation · no CL"}</small></td><td>{row.weekend_days}</td><td>{row.holiday_days}</td><td>{row.working_days}</td><td>{row.present_days}</td><td>{row.half_days}</td><td>{row.worked_days}</td><td>{row.cl_days} / {row.casual_leave_entitlement}</td><td>{row.pl_days}</td><td>{row.upl_days}</td><td><strong>{row.payable_days}</strong></td><td>{row.total_hours||0} h</td><td><button className="monthly-edit-button" onClick={()=>setMonthlyEdit({...row})}><FaEdit/></button></td></tr>):<tr><td colSpan="14">No employees found for this month.</td></tr>}</tbody></table></div>
       </section>}
+      {tab==="payslips"&&payslipAccess&&<PayslipManager month={selectedMonth} onMonthChange={setSelectedMonth} onMessage={showMessage}/>}
       {tab==="restriction"&&superAdmin&&<section className="attendance-admin-section attendance-restriction-card">
         <div className="attendance-section-title"><div><h2>Employee WFH Access</h2><p>Company IP restriction remains active. Grant an exception only to employees currently working from home.</p></div><input className="restriction-search" placeholder="Search employee..." value={restrictionSearch} onChange={e=>setRestrictionSearch(e.target.value)}/></div>
         <div className="attendance-admin-table"><table><thead><tr><th>Employee</th><th>Company Login</th><th>Role</th><th>Attendance Access</th><th>Action</th></tr></thead><tbody>{ipPermissions.filter(row=>`${row.legal_name} ${row.employee_code} ${row.company_name} ${row.username}`.toLowerCase().includes(restrictionSearch.toLowerCase())).map(row=><tr key={row.employee_id}><td><strong>{row.legal_name}</strong><small>{row.employee_code}</small></td><td><strong>{row.company_name}</strong><small>{row.username}</small></td><td>{row.role||"-"}</td><td><mark className={row.wfh_allowed?"approved":"rejected"}>{row.wfh_allowed?"WFH allowed":"Company network only"}</mark></td><td><button className={`wfh-toggle ${row.wfh_allowed?"remove":"grant"}`} disabled={savingRestriction===row.employee_id} onClick={async()=>{setSavingRestriction(row.employee_id);try{const result=await updateEmployeeWfhPermission(row.employee_id,!row.wfh_allowed);setIpPermissions(current=>current.map(item=>item.employee_id===row.employee_id?{...item,wfh_allowed:result.wfh_allowed}:item));setMessage({text:`${row.legal_name}: ${result.message}`,error:false});}catch(error){setMessage({text:error?.response?.data?.message||"WFH permission could not be updated.",error:true});}finally{setSavingRestriction(null);}}}>{savingRestriction===row.employee_id?"Saving...":row.wfh_allowed?"Remove WFH Access":"Grant WFH Access"}</button></td></tr>)}</tbody></table></div>
@@ -101,7 +108,7 @@ function AttendanceManagement() {
         <div className="attendance-holiday-list">{holidays.length?holidays.map(item=><article key={item.id}><time>{item.holiday_date}</time><div><strong>{item.name}</strong><small>{item.description||"Company holiday"}{Number(item.is_optional)===1?" - Optional":""}</small></div><button onClick={()=>setConfirmation({type:"holiday",row:item})}><FaTrash/></button></article>):<p>No holidays added for this year.</p>}</div>
       </section>}
     </>}
-    <ConfirmDialog open={Boolean(confirmation)}
+    {monthlyEdit&&<div className="payslip-overlay"><form className="monthly-adjustment-modal" onSubmit={saveMonthlyEdit}><header><div><h2>Edit Monthly Attendance</h2><p>{monthlyEdit.employee_id} · {monthlyEdit.legal_name} · {selectedMonth}</p></div><button type="button" onClick={()=>setMonthlyEdit(null)}><FaTimes/></button></header><div className="monthly-adjustment-grid">{[["holiday_days","Company Holidays"],["working_days","Working Days"],["present_days","Present Days"],["half_days","Half Days"],["worked_days","Worked Days"],["pl_days","Paid Leave"],["cl_days","Casual Leave"],["upl_days","Unpaid Leave"],["payable_days","Payable Days"],["net_paid_days","Net Paid Days"]].map(([key,label])=><label key={key}>{label}<input type="number" min="0" step=".5" value={monthlyEdit[key]??0} onChange={e=>setMonthlyEdit({...monthlyEdit,[key]:e.target.value})}/></label>)}</div><aside><strong>Automatic policy</strong><span>Saturday and Sunday are holidays. CL is unavailable for the first 3 months, then limited to 1 per month without carry-forward. Excess CL is included in UPL.</span></aside><footer><button type="button" onClick={()=>setMonthlyEdit(null)}>Cancel</button><button disabled={monthlySaving}>{monthlySaving?"Saving...":"Save Adjustments"}</button></footer></form></div>}    <ConfirmDialog open={Boolean(confirmation)}
       title={confirmation?.type==="holiday"?"Delete Holiday?":`${confirmation?.next==="approved"?"Approve":"Reject"} Leave Request?`}
       message={confirmation?.type==="holiday"
         ? `Delete ${confirmation?.row?.name} on ${confirmation?.row?.holiday_date}? Employees will no longer see it as a holiday.`

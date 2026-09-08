@@ -151,7 +151,7 @@ const selectResource = (resource) => {
           ? "Prime Vendor Details"
         : /^\/dashboard\/employee-status\/\d+$/.test(location.pathname)
           ? "Employee Identity Details"
-        : pageTitles[location.pathname] || "Dashboard";
+        : pageTitles[location.pathname] || resources.find((item) => item.route === location.pathname)?.display_name || "Dashboard";
 
   return (
     <div className={`e2e_navbar_container${candidateDetailPath || dashboardHome || myProfilePath ? ' has-section-navigation' : ''}`}>

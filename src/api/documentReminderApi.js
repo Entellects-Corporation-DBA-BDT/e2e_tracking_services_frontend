@@ -35,6 +35,15 @@ export const sendDocumentReminderNow = async (id) => {
   return response.data;
 };
 
+export const getDocumentReminderMailSettings = async () => {
+  const response = await axiosInstance.get("/document-reminders/mail-settings");
+  return response.data;
+};
+
+export const saveDocumentReminderMailSettings = async (data) => {
+  const response = await axiosInstance.post("/document-reminders/mail-settings", data);
+  return response.data;
+};
 export const disableDocumentReminder = async (id) => {
   const response = await axiosInstance.post(`/document-reminders/${id}/disable`);
   return response.data;

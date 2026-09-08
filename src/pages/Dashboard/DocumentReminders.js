@@ -1,15 +1,18 @@
 import { useCallback, useEffect, useState } from "react";
-import { FaBell, FaDownload, FaEdit, FaEye, FaFileAlt, FaPaperPlane, FaTimes } from "react-icons/fa";
+import { FaBell, FaCog, FaDownload, FaEdit, FaEye, FaFileAlt, FaPaperPlane, FaTimes } from "react-icons/fa";
 import { Link, useSearchParams } from 'react-router-dom';
 import { baseUrlImg } from "../../Config/env";
 import {
   disableDocumentReminder,
   exportDocumentReminders,
   getDocumentReminders,
+  getDocumentReminderMailSettings,
+  saveDocumentReminderMailSettings,
   sendDocumentReminderNow,
   updateDocumentReminder,
 } from "../../api/documentReminderApi";
 import Pagination from "./Pagination";
+import { usePermissions } from "../../auth/PermissionContext";
 import "../../styles/Dashboard/documentReminders.css";
 
 const emptyFilters = { candidate: "", document_type: "", expiry_from: "", expiry_to: "", status: "", days_left: "" };
@@ -24,6 +27,7 @@ const documentUrl = (value) => {
 
 function DocumentReminders() {
   const [searchParams] = useSearchParams();
+  const { isAdmin } = usePermissions();
   const [filters, setFilters] = useState(() => ({ ...emptyFilters, days_left: searchParams.get("days_left") || "" }));
   const [appliedFilters, setAppliedFilters] = useState(filters);
   const [rows, setRows] = useState([]);
@@ -35,6 +39,9 @@ function DocumentReminders() {
   const [previewRow, setPreviewRow] = useState(null);
   const [editRow, setEditRow] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [mailStatus, setMailStatus] = useState({ configured: false, data: null });
+  const [mailForm, setMailForm] = useState(null);
+  const [mailSaving, setMailSaving] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -50,6 +57,29 @@ function DocumentReminders() {
   }, [appliedFilters, page]);
 
   useEffect(() => { load(); }, [load]);
+  const loadMailStatus = useCallback(async () => {
+    try {
+      const response = await getDocumentReminderMailSettings();
+      setMailStatus({ configured: Boolean(response.configured), data: response.data || null });
+    } catch (error) {
+      setMessage({ type: "error", text: errorMessage(error, "Reminder mailbox status could not be loaded.") });
+    }
+  }, []);
+  useEffect(() => { loadMailStatus(); }, [loadMailStatus]);
+
+  const openMailSettings = () => {
+    const data = mailStatus.data || {};
+    setMailForm({ host: data.smtp_host || "smtp.ionos.com", port: data.smtp_port || 587, encryption: data.encryption || "tls", from_email: data.from_email || "h1b@bedatatech.com", from_name: data.from_name || "BeeData Technologies", to_email: data.to_email || "", password: "" });
+  };
+  const saveMailSettings = async (event) => {
+    event.preventDefault(); setMailSaving(true);
+    try {
+      const response = await saveDocumentReminderMailSettings(mailForm);
+      setMailStatus({ configured: true, data: response.data || null }); setMailForm(null);
+      setMessage({ type: "success", text: "Organization reminder mailbox authenticated and saved." });
+    } catch (error) { setMessage({ type: "error", text: errorMessage(error, "Reminder mailbox could not be authenticated.") }); }
+    finally { setMailSaving(false); }
+  };
 
   const runAction = async (action, successText) => {
     try {
@@ -108,7 +138,7 @@ function DocumentReminders() {
   return (
     <div className="document-reminders-page">
       <div className="document-reminders-heading">
-        <div><h1><FaBell /> Document Reminders</h1><p>Monitor H1B expirations, PERM filing windows, and I-140 priority dates.</p></div><button type="button" className="document-export-button" onClick={downloadExcel}><FaDownload /> Download Excel</button>
+        <div><h1><FaBell /> Document Reminders</h1><p>Monitor H1B expirations, PERM filing windows, and I-140 priority dates.</p></div><div className="document-heading-actions">{isAdmin && <button type="button" className={`document-mail-button ${mailStatus.configured ? "configured" : ""}`} onClick={openMailSettings}><FaCog /> {mailStatus.configured ? `Mail: ${mailStatus.data?.from_email}` : "Configure Reminder Mail"}</button>}<button type="button" className="document-export-button" onClick={downloadExcel}><FaDownload /> Download Excel</button></div>
       </div>
 
       {message && <div className={`document-reminders-alert ${message.type}`}>{message.text}<button onClick={() => setMessage(null)}><FaTimes /></button></div>}
@@ -149,6 +179,7 @@ function DocumentReminders() {
       {previewRow && <DocumentPreviewModal row={previewRow} onClose={() => setPreviewRow(null)} />}
       {jsonRow && <JsonModal row={jsonRow} onClose={() => setJsonRow(null)} />}
       {editRow && <EditModal row={editRow} setRow={setEditRow} onClose={() => setEditRow(null)} onSave={saveEdit} saving={saving} />}
+      {mailForm && <MailSettingsModal form={mailForm} setForm={setMailForm} configured={mailStatus.configured} saving={mailSaving} onClose={() => setMailForm(null)} onSave={saveMailSettings} />}
     </div>
   );
 }
@@ -172,4 +203,21 @@ function EditModal({ row, setRow, onClose, onSave, saving }) {
   return <div className="reminder-modal-backdrop"><form className="reminder-modal reminder-edit-modal" onSubmit={onSave}><div className="reminder-modal-header"><h2>Edit Reminder</h2><button type="button" onClick={onClose}><FaTimes /></button></div><label>Target Date<input required type="date" value={row.expiry_date || ""} onChange={(e) => setRow({ ...row, expiry_date: e.target.value })} /></label><label>Next Reminder<input type="date" value={row.next_reminder_date || ""} onChange={(e) => setRow({ ...row, next_reminder_date: e.target.value })} /></label><label>Status<select value={row.status} onChange={(e) => setRow({ ...row, status: e.target.value })}>{["Pending","Completed","Expired","Disabled"].map((status) => <option key={status}>{status}</option>)}</select></label><div className="reminder-modal-actions"><button type="button" className="secondary" onClick={onClose}>Cancel</button><button disabled={saving}>{saving ? "Saving..." : "Save Reminder"}</button></div></form></div>;
 }
 
+function MailSettingsModal({ form, setForm, configured, saving, onClose, onSave }) {
+  const change = (key) => (event) => setForm({ ...form, [key]: event.target.value });
+  return <div className="reminder-modal-backdrop" onMouseDown={onClose}><form className="reminder-modal reminder-mail-modal" onSubmit={onSave} onMouseDown={(event) => event.stopPropagation()}>
+    <div className="reminder-modal-header"><div><h2>Organization Reminder Mail</h2><p>Used by every manual and scheduled document reminder.</p></div><button type="button" onClick={onClose}><FaTimes /></button></div>
+    <div className="reminder-mail-grid">
+      <label>From Email<input type="email" required value={form.from_email} onChange={change("from_email")} placeholder="h1b@bedatatech.com" /></label>
+      <label>To Email<input type="email" required value={form.to_email} onChange={change("to_email")} placeholder="compliance@bedatatech.com" /></label>
+      <label>Sender Name<input required value={form.from_name} onChange={change("from_name")} /></label>
+      <label>SMTP Host<input required value={form.host} onChange={change("host")} /></label>
+      <label>SMTP Port<input type="number" min="1" max="65535" required value={form.port} onChange={change("port")} /></label>
+      <label>Security<select value={form.encryption} onChange={change("encryption")}><option value="tls">TLS</option><option value="ssl">SSL</option><option value="none">None</option></select></label>
+      <label className="mail-password">Webmail Password<input type="password" required={!configured} value={form.password} onChange={change("password")} placeholder={configured ? "Leave blank to keep current password" : "Required for first configuration"} autoComplete="new-password" /></label>
+    </div>
+    <p className="mail-security-note">The password is verified before saving and encrypted in the database. It is never displayed again.</p>
+    <div className="reminder-modal-actions"><button type="button" className="secondary" onClick={onClose}>Cancel</button><button disabled={saving}>{saving ? "Authenticating..." : "Authenticate & Save"}</button></div>
+  </form></div>;
+}
 export default DocumentReminders;

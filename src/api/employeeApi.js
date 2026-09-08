@@ -54,3 +54,17 @@ export const submitLeave = async (data) => (await axiosInstance.post("/attendanc
 export const addEmployeeLeave = async (data) => (await axiosInstance.post("/attendance/leaves/admin", data)).data;
 export const reviewLeave = async (id, data) => (await axiosInstance.put(`/attendance/leaves/${id}`, data)).data;
 export const editAttendance = async (id, data) => (await axiosInstance.put(`/attendance/records/${id}`, data)).data;
+export const getPayslipRoster = async (month) => (await axiosInstance.get("/attendance/payslips", { params: { month } })).data;
+export const getPayslipDraft = async (employeeId, month) => (await axiosInstance.get(`/attendance/payslips/draft/${employeeId}`, { params: { month } })).data;
+export const generatePayslip = async (data) => (await axiosInstance.post("/attendance/payslips", data)).data;
+export const sendPayslip = async (id) => (await axiosInstance.post(`/attendance/payslips/${id}/send`)).data;
+export const updatePayslip = async (id, data) => (await axiosInstance.put("/attendance/payslips/" + id, data)).data;
+export const getMailSender = async () => (await axiosInstance.get("/attendance/mail-sender")).data;
+export const saveMailSender = async (data) => (await axiosInstance.post("/attendance/mail-sender", data)).data;
+export const removeMailSender = async () => (await axiosInstance.delete("/attendance/mail-sender")).data;
+
+export const sendEmployeeOnboardingInvite = async (data) => (await axiosInstance.post('/attendance/onboarding-invites', data)).data;
+export const getEmployeeOnboardingInvite = async (token) => (await axiosInstance.get('/employee-onboarding/' + token)).data;
+export const submitEmployeeOnboarding = async (token,data) => (await axiosInstance.post('/employee-onboarding/' + token,data)).data;
+
+export const updateMonthlyAttendance = async (employeeId,data) => (await axiosInstance.put('/attendance/month/' + employeeId,data)).data;
