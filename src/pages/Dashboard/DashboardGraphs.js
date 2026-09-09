@@ -28,6 +28,10 @@ const COLORS = [
 ];
 
 const EMPTY_ANALYTICS = [];
+const CATEGORY_COLORS = {
+  recruiters: ["#6d4aff", "#8e72ff", "#a998ff", "#5133d6"],
+  benchsales: ["#0f9f8f", "#20b8a6", "#50cbbb", "#087f72"],
+};
 
 
 /* =========================
@@ -62,11 +66,18 @@ function DashboardGraphs({
   );
 
   const candidateData = useMemo(
-    () => analyticsData.map((item, index) => ({
+    () => analyticsData.map((item, index) => {
+      const itemCategory = item.category || "other";
+      const categoryIndex = analyticsData.slice(0, index).filter((entry) => entry.category === itemCategory).length;
+      const palette = CATEGORY_COLORS[itemCategory] || COLORS;
+      return {
         name: item.label,
         value: Number(item.value) || 0,
-        color: COLORS[index % COLORS.length],
-      })),
+        category: itemCategory,
+        categoryLabel: item.category_label || "Other",
+        color: palette[categoryIndex % palette.length],
+      };
+    }),
     [analyticsData]
   );
 
@@ -77,7 +88,7 @@ function DashboardGraphs({
           CANDIDATES OVERVIEW
       ========================= */}
       <div className="e2e_card">
-        <h3 className="e2e_card_title">Submissions Overview</h3>
+        <h3 className="e2e_card_title">Submissions by Employee</h3>
         <div className="e2e_chart_layout">
           <div className="e2e_chart_wrapper">
             <ResponsiveContainer width="100%" height={180}>
@@ -115,7 +126,7 @@ function DashboardGraphs({
                     className="e2e_dot"
                     style={{ background: item.color }}
                   ></span>
-                  <p>{item.name}</p>
+                  <p>{item.name}<small className={["e2e_employee_category", item.category].join(" ")}>{item.categoryLabel}</small></p>
                 </div>
                 <span>{item.value}</span>
               </div>
@@ -170,18 +181,15 @@ function DashboardGraphs({
               </div>
             </>
           )}
-          <div className="e2e_graph_filter_item">
-            <label>Category</label>
-            <select
-              className="e2e_graph_select"
-              value={category}
-              onChange={(e) => onCategoryChange(e.target.value)}
-            >
-              <option value="all">All Submissions</option>
-              <option value="recruiters">Recruiters</option>
-              <option value="benchsales">Bench Sales</option>
-            </select>
-          </div>
+          <fieldset className="e2e_category_switch">
+            <legend>Category</legend>
+            {[["all", "All"], ["recruiters", "Recruiting"], ["benchsales", "Bench Sales"]].map(([value, label]) => (
+              <label key={value} className={category === value ? "active" : ""}>
+                <input type="radio" name="dashboard-category" value={value} checked={category === value} onChange={(e) => onCategoryChange(e.target.value)} />
+                <span>{label}</span>
+              </label>
+            ))}
+          </fieldset>
           {selectedFilter === "custom" && (
             <button
               type="button"

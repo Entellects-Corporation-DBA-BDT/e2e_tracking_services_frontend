@@ -137,6 +137,7 @@ function Dashboard() {
   const [selectedEmployeeId, setSelectedEmployeeId] = useState(null);
   const [workforceRefresh, setWorkforceRefresh] = useState(0);
   const [workforcePeriod, setWorkforcePeriod] = useState("this_week");
+  const [workforceCategory, setWorkforceCategory] = useState("all");
   const activeRequest = useRef(0);
   const activeTableRequest = useRef(0);
 
@@ -206,7 +207,7 @@ function Dashboard() {
       setWorkforceLoading(true);
       setWorkforceError("");
       try {
-        const result = await getWorkforceAnalytics(selectedEmployeeId, workforcePeriod);
+        const result = await getWorkforceAnalytics(selectedEmployeeId, workforcePeriod, workforceCategory);
         if (!active) return;
         setWorkforceAnalytics(result || {});
         setSelectedEmployeeId(
@@ -224,7 +225,7 @@ function Dashboard() {
     };
     loadWorkforceAnalytics();
     return () => { active = false; };
-  }, [selectedEmployeeId, workforcePeriod, workforceRefresh, dashboardRefresh]);
+  }, [selectedEmployeeId, workforcePeriod, workforceCategory, workforceRefresh, dashboardRefresh]);
 
   useEffect(() => {
     const refreshDashboard = () => {
@@ -462,6 +463,7 @@ function Dashboard() {
                       <DashboardCards
                         summary={summary}
                         selectedCard={selectedCard}
+                        category={category}
                         onSelect={handleCardSelect}
                       />
                       <DashboardGraphs
@@ -485,9 +487,14 @@ function Dashboard() {
                           selectedEmployeeId || workforceAnalytics.selected_employee_id
                         }
                         period={workforcePeriod}
+                        category={workforceCategory}
                         onPeriodChange={(nextPeriod) => {
                           setSelectedEmployeeId(null);
                           setWorkforcePeriod(nextPeriod);
+                        }}
+                        onCategoryChange={(nextCategory) => {
+                          setSelectedEmployeeId(null);
+                          setWorkforceCategory(nextCategory);
                         }}
                         onEmployeeSelect={setSelectedEmployeeId}
                         onRetry={() => setWorkforceRefresh((value) => value + 1)}

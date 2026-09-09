@@ -38,10 +38,12 @@ export const getBenchSalesById = async (id) => {
 export const getBenchSalesData = async (
   page = 1,
   limit = 10,
-  search = ""
+  search = "",
+  filters = {}
 ) => {
   const response = await axiosInstance.get(
-    `/benchsales/list?page=${page}&limit=${limit}&search=${search}`
+    "/benchsales/list",
+    { params: { page, limit, search, ...filters } }
   );
 
   return response.data;
@@ -91,11 +93,12 @@ export const getDashboardActivities = async (limit = 30) => {
   return response.data?.data ?? [];
 };
 
-export const getWorkforceAnalytics = async (employeeId, period = "this_week") => {
+export const getWorkforceAnalytics = async (employeeId, period = "this_week", category = "all") => {
   const response = await axiosInstance.get("/dashboard/workforce-analytics", {
     params: {
       ...(employeeId ? { employee_id: employeeId } : {}),
       period,
+      category,
     },
   });
   return response.data?.data ?? response.data;
@@ -117,8 +120,8 @@ export const getProfilePerformance = async ({ candidateId, userId, page = 1, lim
   return response.data?.data ?? response.data;
 };
 
-export const getRecruiterApplications = async (page = 1, limit = 10, search = "") => {
-  const response = await axiosInstance.get("/recruiters/list", { params: { page, limit, search } });
+export const getRecruiterApplications = async (page = 1, limit = 10, search = "", filters = {}) => {
+  const response = await axiosInstance.get("/recruiters/list", { params: { page, limit, search, ...filters } });
   return response.data;
 };
 

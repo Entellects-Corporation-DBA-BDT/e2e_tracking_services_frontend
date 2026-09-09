@@ -7,6 +7,8 @@ import Pagination from "./Pagination";
 import FormView from "../../forms/FormView";
 import getUserDataFromCookies from "../../utils/getUserDataFromCookies";
 import { useNavigate } from "react-router-dom";
+import ApplicationListControls from "./ApplicationListControls";
+import { downloadApplicationExcel } from "../../utils/applicationListTools";
 
 const user = getUserDataFromCookies();
 const loginUserId = user?.user_id;
@@ -31,6 +33,9 @@ function BenchSales() {
   const [initialLoading, setInitialLoading] = useState(true);
   const [tableLoading, setTableLoading] = useState(false);
   const [selectedApplicationId, setSelectedApplicationId] = useState(null);
+  const [datePeriod, setDatePeriod] = useState("all");
+  const [dateFilters, setDateFilters] = useState({ start_date: "", end_date: "" });
+  const [exporting, setExporting] = useState(false);
 
   const fetchCandidates = async () => {
     try {
@@ -43,7 +48,8 @@ function BenchSales() {
       const response = await getBenchSalesData(
         currentPage,
         entries,
-        debouncedSearch
+        debouncedSearch,
+        dateFilters
       );
 
       setTableData(response.data || []);
@@ -86,8 +92,20 @@ function BenchSales() {
     currentPage,
     entries,
     debouncedSearch,
+    dateFilters,
   ]);
 
+  const exportReport = async () => {
+    setExporting(true);
+    try {
+      const response = await getBenchSalesData(1, 50000, debouncedSearch, dateFilters);
+      downloadApplicationExcel(response.data || [], "Bench Sales", dateFilters);
+    } catch (error) {
+      alert(error?.response?.data?.message || "Bench Sales Excel report could not be generated.");
+    } finally {
+      setExporting(false);
+    }
+  };
 
   if (initialLoading) {
     return <Loader  fullPage />;
@@ -118,40 +136,16 @@ function BenchSales() {
           </button>
         </div>
       </div>
-      <div className="e2e_recruiting_filters">
-        <div className="e2e_recruiting_filter_right">
-          <input
-            type="text"
-            placeholder="Search..."
-            value={searchTerm}
-            onChange={(e) => {
-              setSearchTerm(
-                e.target.value
-              );
-
-              setCurrentPage(1);
-            }}
-          />
-          
-        </div>
-
-        <select
-          value={entries}
-          className="e2e_pagination_number"
-          onChange={(e) => {
-            setEntries(
-              Number(e.target.value)
-            );
-            setCurrentPage(1);
-          }}
-        >
-          <option value={5}>5</option>
-          <option value={10}>10</option>
-          <option value={25}>25</option>
-          <option value={50}>50</option>
-          <option value={100}>100</option>
-        </select>
-      </div>
+      <ApplicationListControls
+        period={datePeriod}
+        dates={dateFilters}
+        onPeriodChange={(value) => { setDatePeriod(value); setCurrentPage(1); }}
+        onDatesChange={(value) => { setDateFilters(value); setCurrentPage(1); }}
+        search={searchTerm}
+        onSearchChange={(value) => { setSearchTerm(value); setCurrentPage(1); }}
+        onExport={exportReport}
+        exporting={exporting}
+      />
       <div className="e2e_benchsales_table_wrapper">
         <table className="e2e_benchsales_table">
           <thead className="e2e_benchsales_thead">
@@ -269,17 +263,10 @@ function BenchSales() {
           </tbody>
         </table>
       </div>
-      <Pagination
-        currentPage={
-          currentPage
-        }
-        totalPages={
-          totalPages
-        }
-        onPageChange={
-          setCurrentPage
-        }
-      />
+      <div className="application-list-footer">
+        <label className="application-bottom-rows"><select aria-label="Rows per page" value={entries} onChange={(event) => { setEntries(Number(event.target.value)); setCurrentPage(1); }}>{[5, 10, 25, 50, 100].map((value) => <option key={value} value={value}>{value}</option>)}</select></label>
+        <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+      </div>
       {
         showPopup && (
           <NewBenchSalesForm

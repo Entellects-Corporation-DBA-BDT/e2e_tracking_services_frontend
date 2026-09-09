@@ -18,6 +18,7 @@ const formatMetricTitle = (key) => key
 function DashboardCards({
   summary = {},
   selectedCard = "submissions",
+  category = "all",
   onSelect = () => {},
 }) {
   const { can } = usePermissions();
@@ -55,6 +56,8 @@ function DashboardCards({
       ...card,
       count: summary[card.key] ?? 0,
       growth: summary[`${card.key}_growth`] ?? "",
+      recruitingCount: summary.category_breakdown?.recruiters?.[card.key],
+      benchSalesCount: summary.category_breakdown?.benchsales?.[card.key],
     }));
   }, [summary, can]);
 
@@ -92,9 +95,15 @@ function DashboardCards({
           </div>
 
           <div className="e2e_card_bottom">
-
+            <div className="e2e_card_category_counts">
+              {(category === "all" || category === "recruiters") && (
+                <span className="recruiting"><i />Recruiting <b>{Number(item.recruitingCount ?? (category === "recruiters" ? item.count : 0)) || 0}</b></span>
+              )}
+              {(category === "all" || category === "benchsales") && (
+                <span className="benchsales"><i />Bench Sales <b>{Number(item.benchSalesCount ?? (category === "benchsales" ? item.count : 0)) || 0}</b></span>
+              )}
+            </div>
             {item.growth !== "" && <span>{item.growth}</span>}
-
           </div>
 
         </button>

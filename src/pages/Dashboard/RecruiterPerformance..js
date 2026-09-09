@@ -63,6 +63,7 @@ export default function RecruiterPerformance({ onClose, module = "bench" }) {
   const [metric, setMetric] = useState("submissions");
   const [applicationPage, setApplicationPage] = useState(1);
   const [applicationLimit, setApplicationLimit] = useState(10);
+  const [detailMetric, setDetailMetric] = useState("submissions");
 
   useEffect(() => {
     let active = true;
@@ -87,6 +88,7 @@ export default function RecruiterPerformance({ onClose, module = "bench" }) {
       candidate_id: selectedCandidate || undefined,
       application_page: applicationPage,
       application_limit: applicationLimit,
+      detail_metric: detailMetric,
     }).then((response) => {
       if (active && response.success) setData(response.data || {});
     }).catch((requestError) => {
@@ -95,7 +97,7 @@ export default function RecruiterPerformance({ onClose, module = "bench" }) {
       if (active) setLoading(false);
     });
     return () => { active = false; };
-  }, [filters, selectedEmployee, selectedCandidate, applicationPage, applicationLimit, module]);
+  }, [filters, selectedEmployee, selectedCandidate, applicationPage, applicationLimit, detailMetric, module]);
 
   const employees = Array.isArray(data.employees) ? data.employees : [];
   const candidates = Array.isArray(data.candidates) ? data.candidates : [];
@@ -153,6 +155,23 @@ export default function RecruiterPerformance({ onClose, module = "bench" }) {
     setSelectedCandidate(selected ? String(selected.id) : "");
   };
 
+  const openMetricDetails = (nextMetric) => {
+    if (nextMetric === "candidates") {
+      setViewBy("candidates");
+      setMetric("submissions");
+      setDetailMetric("submissions");
+    } else if (nextMetric === "employees") {
+      setViewBy("users");
+      setMetric("submissions");
+      setDetailMetric("submissions");
+    } else {
+      setMetric(nextMetric);
+      setDetailMetric(nextMetric);
+    }
+    setApplicationPage(1);
+    window.setTimeout(() => document.querySelector(".performance-details")?.scrollIntoView({ behavior: "smooth", block: "start" }), 0);
+  };
+
   const isRecruiter = module === "recruiter";
   const closePage = onClose || (() => navigate(isRecruiter ? "/dashboard/recruiting" : "/dashboard/bench-sales"));
   const explorerData = (viewBy === "users" ? employees : candidates).map((item, index) => ({
@@ -201,11 +220,11 @@ export default function RecruiterPerformance({ onClose, module = "bench" }) {
       {error && <div className="performance-error">{error}</div>}
       {loading ? <div className="performance-loading"><span />Loading performance charts...</div> : <>
         <div className="performance-summary">
-          <Summary label="Submissions" value={summary.total_submissions} />
-          <Summary label="Candidates" value={summary.unique_candidates} />
-          <Summary label="Interviews" value={summary.interviews} tone="amber" />
-          <Summary label="Placements" value={summary.placements} tone="green" />
-          <Summary label="Employees" value={summary.active_employees} tone="blue" />
+          <Summary label="Submissions" value={summary.total_submissions} active={detailMetric === "submissions"} onClick={() => openMetricDetails("submissions")} />
+          <Summary label="Candidates" value={summary.unique_candidates} onClick={() => openMetricDetails("candidates")} />
+          <Summary label="Interviews" value={summary.interviews} tone="amber" active={detailMetric === "interviews"} onClick={() => openMetricDetails("interviews")} />
+          <Summary label="Placements" value={summary.placements} tone="green" active={detailMetric === "placements"} onClick={() => openMetricDetails("placements")} />
+          <Summary label="Employees" value={summary.active_employees} tone="blue" onClick={() => openMetricDetails("employees")} />
         </div>
 
         <section className="performance-explorer">
@@ -323,10 +342,10 @@ export default function RecruiterPerformance({ onClose, module = "bench" }) {
         </div>
 
         <article className="performance-details">
-          <div className="chart-card-heading"><div><h3><FaUser /> Submission Details</h3><p>{applicationPagination.total} matching records · click a person or View for details</p></div><label className="performance-page-size">Show <select value={applicationLimit} onChange={(event) => { setApplicationLimit(Number(event.target.value)); setApplicationPage(1); }}>{[10, 20, 50].map((value) => <option key={value} value={value}>{value}</option>)}</select></label></div>
+          <div className="chart-card-heading"><div><h3><FaUser /> {detailMetric === "interviews" ? "Interview" : detailMetric === "placements" ? "Placement" : "Submission"} Details</h3><p>{applicationPagination.total} matching records · click a person or View for details</p></div><label className="performance-page-size">Show <select value={applicationLimit} onChange={(event) => { setApplicationLimit(Number(event.target.value)); setApplicationPage(1); }}>{[10, 20, 50].map((value) => <option key={value} value={value}>{value}</option>)}</select></label></div>
           <div className="performance-table-wrap">
             <table><thead><tr><th>Date</th><th>Candidate</th><th>Employee</th><th>Technology</th><th>Client / Vendor</th><th>Status</th><th>Rate</th><th /></tr></thead>
-              <tbody>{applications.length ? applications.map((item) => <tr key={item.id}>
+              <tbody>{applications.length ? applications.map((item) => <tr key={[item.id, item.detail_event_id || "submission"].join("-")}>
                 <td>{dateLabel(item.activity_date || item.date_created)}</td><td>{item.candidate_id ? <button className="performance-record-link" onClick={() => navigate("/dashboard/candidates/" + item.candidate_id + "#reports")}>{item.candidate_name || "-"}</button> : <strong>{item.candidate_name || "-"}</strong>}</td><td><button className="performance-record-link" onClick={() => navigate("/dashboard/employee-status/" + item.employee_id + "#profile-performance")}>{item.employee_name || "-"}</button></td><td>{item.role || "-"}</td><td>{item.client || item.vendor || "-"}</td><td><span className={`performance-status process-${item.process_id}`}>{item.status}</span></td><td>{item.rate ? `$${item.rate}` : "-"}</td><td><a href={`/dashboard/${isRecruiter ? "recruiting" : "bench-sales"}/${item.id}`}>View</a></td>
               </tr>) : <tr><td colSpan="8"><Empty /></td></tr>}</tbody>
             </table>
@@ -338,6 +357,13 @@ export default function RecruiterPerformance({ onClose, module = "bench" }) {
   );
 }
 
-const Summary = ({ label, value, tone = "" }) => <article className={tone}><span>{label}</span><strong>{number(value)}</strong></article>;
+const Summary = ({ label, value, tone = "", active = false, onClick }) => (
+  <article className={[tone, active ? "active" : ""].filter(Boolean).join(" ")} role="button" tabIndex="0" onClick={onClick} onKeyDown={(event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      onClick?.();
+    }
+  }}><span>{label}</span><strong>{number(value)}</strong><small>View details</small></article>
+);
 const ChartCard = ({ title, subtitle, wide = false, children }) => <article className={`performance-chart-card${wide ? " wide" : ""}`}><div className="chart-card-heading"><div><h3>{title}</h3><p>{subtitle}</p></div></div>{children}</article>;
 const Empty = () => <div className="performance-empty">No matching performance data.</div>;

@@ -512,3 +512,14 @@
 @media (max-width: 700px) {
   .e2e_recruiting_summary { grid-template-columns: 1fr; }
 }
+/* Recruiting process badges match the Bench Sales table. */
+.e2e_recruiting_td_process{width:170px;min-width:170px;box-sizing:border-box;text-align:center!important}
+.e2e_recruiting_process_content{display:flex;width:100%;min-height:52px;align-items:center;justify-content:center;flex-direction:column;gap:5px}
+.e2e_recruiting_process_badge{display:inline-flex;width:142px;min-height:32px;box-sizing:border-box;align-items:center;justify-content:center;gap:6px;padding:6px 10px;border:1px solid transparent;border-radius:999px;font-size:11px;font-weight:800;line-height:1.2;white-space:nowrap}
+.e2e_recruiting_process_submitted{color:#1d4ed8;background:#eff6ff;border-color:#bfdbfe}
+.e2e_recruiting_process_interview{color:#a16207;background:#fefce8;border-color:#fde68a}
+.e2e_recruiting_process_placed{color:#15803d;background:#dcfce7;border-color:#86efac;box-shadow:0 2px 8px rgba(22,163,74,.14)}
+.e2e_recruiting_process_unknown{color:#64748b;background:#f1f5f9;border-color:#e2e8f0}
+.e2e_recruiting_process_note{display:block;height:12px;margin:0;color:transparent;font-size:9px;font-weight:750;line-height:12px;white-space:nowrap;visibility:hidden}
+.e2e_recruiting_process_note.visible{color:#15803d;visibility:visible}
+@media(max-width:768px){.e2e_recruiting_td_process{width:160px;min-width:160px}.e2e_recruiting_process_badge{width:134px}}

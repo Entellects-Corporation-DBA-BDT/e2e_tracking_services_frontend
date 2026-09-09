@@ -59,7 +59,9 @@ function WorkforceSubmissionAnalytics({
   error = "",
   selectedEmployeeId,
   period,
+  category = "all",
   onPeriodChange,
+  onCategoryChange,
   onEmployeeSelect,
   onRetry,
   onSubmissionOpen,
@@ -118,6 +120,15 @@ function WorkforceSubmissionAnalytics({
           <p>Only employees with activity in the selected comparison are shown. Click an employee to inspect their candidates.</p>
         </div>
         <div className="workforce-chart-controls">
+          <fieldset className="workforce-category-switch">
+            <legend>Team</legend>
+            {[["all", "All"], ["recruiters", "Recruiting"], ["benchsales", "Bench Sales"]].map(([value, label]) => (
+              <label key={value} className={category === value ? "active" : ""}>
+                <input type="radio" name="workforce-category" value={value} checked={category === value} onChange={(event) => onCategoryChange(event.target.value)} />
+                <span>{label}</span>
+              </label>
+            ))}
+          </fieldset>
           <label><span>Compare</span><select value={period} onChange={(event) => onPeriodChange(event.target.value)}><option value="today">Today vs Yesterday</option><option value="this_week">This Week vs Last Week</option><option value="this_month">This Month vs Last Month</option></select></label>
           <label><span>Metric</span><select value={metric} onChange={(event) => setMetric(event.target.value)}><option value="submissions">Submissions</option><option value="interviews">Interviews</option><option value="placements">Placements</option></select></label>
         </div>

@@ -1,0 +1,15 @@
+.application-list-controls{display:flex;align-items:flex-end;gap:10px;flex-wrap:nowrap;margin:10px 0 14px;padding:12px;border:1px solid #e7eaf0;border-radius:12px;background:#fff;box-shadow:0 3px 12px rgba(16,24,40,.04)}
+.application-list-controls label{display:flex;min-width:0;flex-direction:column;gap:5px;color:#667085;font-size:10px;font-weight:800}
+.application-period-control,.application-search-control{flex:0 0 180px}
+.application-list-controls select,.application-list-controls input{width:100%;height:38px;min-width:0;padding:0 11px;border:1px solid #d0d5dd;border-radius:8px;background:#fff;color:#344054;outline:none}
+.application-list-controls select:focus,.application-list-controls input:focus{border-color:#7659f5;box-shadow:0 0 0 3px rgba(91,53,245,.1)}
+.application-custom-dates{display:flex;flex:0 1 310px;gap:8px}.application-custom-dates label{flex:1}
+.application-export-button{flex:0 0 auto;height:38px;margin-left:auto;padding:0 17px;border:0;border-radius:9px;background:linear-gradient(135deg,#16825d,#0d6f50);color:#fff;font-size:11px;font-weight:800;white-space:nowrap;cursor:pointer;box-shadow:0 4px 10px rgba(22,130,93,.2)}
+.application-export-button:hover{background:linear-gradient(135deg,#106b4c,#095a40)}.application-export-button:disabled{opacity:.55;cursor:not-allowed}
+@media(max-width:1050px){.application-list-controls{flex-wrap:wrap}.application-export-button{margin-left:auto}}
+.application-list-footer{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;margin-top:14px}
+.application-list-footer .e2e_pagination_container{margin-top:0;margin-left:auto}
+.application-bottom-rows{display:flex;align-items:center;gap:7px;color:#667085;font-size:11px;font-weight:800}
+.application-bottom-rows select{height:36px;padding:0 28px 0 10px;border:1px solid #d0d5dd;border-radius:8px;background:#fff;color:#344054;outline:none}
+.application-bottom-rows select:focus{border-color:#7659f5;box-shadow:0 0 0 3px rgba(91,53,245,.1)}
+@media(max-width:680px){.application-list-controls,.application-custom-dates{align-items:stretch;flex-direction:column}.application-period-control,.application-search-control,.application-custom-dates{flex:auto;width:100%}.application-export-button{width:100%;margin-left:0}.application-list-footer{align-items:center;flex-direction:column}.application-list-footer .e2e_pagination_container{margin-left:0}.application-bottom-rows{align-self:flex-start}}

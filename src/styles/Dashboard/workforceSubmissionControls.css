@@ -43,3 +43,9 @@
     min-width: 0;
   }
 }
+
+.workforce-category-switch{display:flex;align-items:center;gap:3px;margin:0;padding:3px;border:1px solid #ddd6fe;border-radius:10px;background:#f8f7ff}
+.workforce-category-switch legend,.workforce-category-switch input{position:absolute;width:1px;height:1px;overflow:hidden;opacity:0}
+.workforce-category-switch label{display:block}
+.workforce-category-switch span{display:block;padding:8px 10px;border-radius:7px;color:#667085;cursor:pointer;white-space:nowrap}
+.workforce-category-switch label.active span{background:#5b35f5;color:#fff;box-shadow:0 3px 8px rgba(91,53,245,.25)}

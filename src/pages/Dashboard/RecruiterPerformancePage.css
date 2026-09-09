@@ -257,3 +257,7 @@
 .performance-page-size select{border:1px solid #d0d5dd;border-radius:7px;padding:6px}
 .performance-record-link{border:0;padding:0;background:transparent;color:#4f46e5;font:inherit;font-weight:700;cursor:pointer}
 .performance-record-link:hover{text-decoration:underline}
+.performance-summary article[role="button"]{cursor:pointer;transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease}
+.performance-summary article[role="button"]:hover,.performance-summary article[role="button"]:focus-visible{transform:translateY(-3px);box-shadow:0 8px 20px rgba(52,64,84,.12);outline:none}
+.performance-summary article[role="button"].active{border-color:#5b35f5;box-shadow:0 0 0 2px rgba(91,53,245,.12)}
+.performance-summary article small{display:block;margin-top:5px;color:#667085;font-size:9px;font-weight:700}
