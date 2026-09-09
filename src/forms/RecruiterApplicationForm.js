@@ -15,7 +15,10 @@ const today = new Intl.DateTimeFormat("en-CA", {
 const emptyFiles = { resume_file: null, r2r_file: null, driving_file: null, visa_file: null, msc_file: null };
 
 function RecruiterApplicationForm({ onClose, applicationId, isEdit = false, refreshData }) {
-  const [formData, setFormData] = useState({ date_created: today, candidate_id: "", candidate_name: "", poc: "", feedback: "", remarks: "" });
+  const [formData, setFormData] = useState({
+    date_created: today, candidate_id: "", candidate_name: "", client: "", role: "",
+    poc: "", feedback: "", remarks: "",
+  });
   const [files, setFiles] = useState(emptyFiles);
   const [candidates, setCandidates] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -35,6 +38,8 @@ function RecruiterApplicationForm({ onClose, applicationId, isEdit = false, refr
           date_created: item.date_created || today,
           candidate_id: item.candidate_id || "",
           candidate_name: item.candidate_name || "",
+          client: item.client || "",
+          role: item.role || "",
           poc: item.poc || "",
           feedback: item.feedback || "",
           remarks: item.remarks || "",
@@ -45,10 +50,16 @@ function RecruiterApplicationForm({ onClose, applicationId, isEdit = false, refr
     return () => { active = false; };
   }, [applicationId, isEdit]);
 
-  const handleCandidate = (event) => {
-    const id = event.target.value;
-    const selected = candidates.find((candidate) => String(candidate.id) === id);
-    setFormData((current) => ({ ...current, candidate_id: id, candidate_name: selected?.name || "" }));
+  const handleCandidateName = (event) => {
+    const name = event.target.value;
+    const selected = candidates.find(
+      (candidate) => candidate.name.trim().toLowerCase() === name.trim().toLowerCase()
+    );
+    setFormData((current) => ({
+      ...current,
+      candidate_id: selected ? String(selected.id) : "",
+      candidate_name: name,
+    }));
   };
 
   const submit = async (event) => {
@@ -76,7 +87,9 @@ function RecruiterApplicationForm({ onClose, applicationId, isEdit = false, refr
     <div className="benchHeader"><div><h2>{isEdit ? "Edit Recruiter Application" : "New Recruiter Application"}</h2><p>Recruiting Candidate Submission</p></div></div>
     <div className="formGrid">
       <div className="inputGroup"><label>Submission Date</label><div className="inputWrapper"><FiCalendar /><input required type="date" value={formData.date_created} onChange={(e) => setFormData({ ...formData, date_created: e.target.value })} /></div></div>
-      <div className="inputGroup"><label>Candidate Details</label><div className="inputWrapper"><FiUser /><select required value={formData.candidate_id} onChange={handleCandidate}><option value="">Select Candidate</option>{candidates.map((candidate) => <option key={candidate.id} value={candidate.id}>{candidate.name}</option>)}</select></div></div>
+      <div className="inputGroup"><label>Candidate Details</label><div className="inputWrapper"><FiUser /><input required list="recruiter-candidate-options" value={formData.candidate_name} onChange={handleCandidateName} placeholder="Select or enter candidate name" /><datalist id="recruiter-candidate-options">{candidates.map((candidate) => <option key={candidate.id} value={candidate.name}>{candidate.email || candidate.skills || `Candidate #${candidate.id}`}</option>)}</datalist></div><small>Select an existing candidate or type a new candidate name.</small></div>
+      <div className="inputGroup"><label>Client Name</label><input type="text" value={formData.client} onChange={(e) => setFormData({ ...formData, client: e.target.value })} placeholder="Enter client name" /></div>
+      <div className="inputGroup"><label>Role / Position</label><input type="text" value={formData.role} onChange={(e) => setFormData({ ...formData, role: e.target.value })} placeholder="Enter role or position" /></div>
       <div className="inputGroup"><label>POC Name</label><input type="text" value={formData.poc} onChange={(e) => setFormData({ ...formData, poc: e.target.value })} placeholder="Enter POC name" /></div>
       <div className="inputGroup"><label>Feedback</label><input type="text" value={formData.feedback} onChange={(e) => setFormData({ ...formData, feedback: e.target.value })} placeholder="Enter feedback" /></div>
       <div className="inputGroup fullWidth"><label>Remarks</label><textarea rows="4" value={formData.remarks} onChange={(e) => setFormData({ ...formData, remarks: e.target.value })} placeholder="Additional remarks..." /></div>

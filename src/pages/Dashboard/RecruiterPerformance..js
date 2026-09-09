@@ -18,7 +18,7 @@ import { FaCalendarAlt, FaChartPie, FaSearch, FaTimes, FaUser } from "react-icon
 import { useNavigate } from "react-router-dom";
 import "./RecruiterPerformance.css";
 import "./RecruiterPerformancePage.css";
-import { getPerformanceDashboard } from "../../api/applicationApi";
+import { getPerformanceDashboard, getRecruiterPerformanceDashboard } from "../../api/applicationApi";
 import { getCandidateData } from "../../api/candidateApi";
 
 const today = new Intl.DateTimeFormat("en-CA", {
@@ -47,7 +47,7 @@ const presetDates = (period) => {
   return { start_date: start.toISOString().slice(0, 10), end_date: today };
 };
 
-export default function RecruiterPerformance({ onClose }) {
+export default function RecruiterPerformance({ onClose, module = "bench" }) {
   const navigate = useNavigate();
   const [draft, setDraft] = useState({ start_date: monthStart, end_date: today, search: "" });
   const [filters, setFilters] = useState(draft);
@@ -78,7 +78,10 @@ export default function RecruiterPerformance({ onClose }) {
     let active = true;
     setLoading(true);
     setError("");
-    getPerformanceDashboard({
+    const loadPerformance = module === "recruiter"
+      ? getRecruiterPerformanceDashboard
+      : getPerformanceDashboard;
+    loadPerformance({
       ...filters,
       employee_id: selectedEmployee || undefined,
       candidate_id: selectedCandidate || undefined,
@@ -92,7 +95,7 @@ export default function RecruiterPerformance({ onClose }) {
       if (active) setLoading(false);
     });
     return () => { active = false; };
-  }, [filters, selectedEmployee, selectedCandidate, applicationPage, applicationLimit]);
+  }, [filters, selectedEmployee, selectedCandidate, applicationPage, applicationLimit, module]);
 
   const employees = Array.isArray(data.employees) ? data.employees : [];
   const candidates = Array.isArray(data.candidates) ? data.candidates : [];
@@ -150,7 +153,8 @@ export default function RecruiterPerformance({ onClose }) {
     setSelectedCandidate(selected ? String(selected.id) : "");
   };
 
-  const closePage = onClose || (() => navigate("/dashboard/bench-sales"));
+  const isRecruiter = module === "recruiter";
+  const closePage = onClose || (() => navigate(isRecruiter ? "/dashboard/recruiting" : "/dashboard/bench-sales"));
   const explorerData = (viewBy === "users" ? employees : candidates).map((item, index) => ({
     ...item,
     chartLabel: viewBy === "users" ? item.employee_name : item.candidate_name,
@@ -178,8 +182,8 @@ export default function RecruiterPerformance({ onClose }) {
   return (
     <div className="performance-dashboard">
       <header className="performance-header">
-        <div><span>BENCH SALES ANALYTICS</span><h2>Performance Dashboard</h2><p>Employee and candidate submission outcomes from live application data.</p></div>
-        <button type="button" onClick={closePage} aria-label="Back to Bench Sales"><FaTimes /></button>
+        <div><span>{isRecruiter ? "RECRUITING ANALYTICS" : "BENCH SALES ANALYTICS"}</span><h2>Performance Dashboard</h2><p>Employee and candidate submission outcomes from live application data.</p></div>
+        <button type="button" onClick={closePage} aria-label={isRecruiter ? "Back to Recruiting" : "Back to Bench Sales"}><FaTimes /></button>
       </header>
 
       <form className="performance-filters" onSubmit={applyFilters}>
@@ -323,7 +327,7 @@ export default function RecruiterPerformance({ onClose }) {
           <div className="performance-table-wrap">
             <table><thead><tr><th>Date</th><th>Candidate</th><th>Employee</th><th>Technology</th><th>Client / Vendor</th><th>Status</th><th>Rate</th><th /></tr></thead>
               <tbody>{applications.length ? applications.map((item) => <tr key={item.id}>
-                <td>{dateLabel(item.activity_date || item.date_created)}</td><td>{item.candidate_id ? <button className="performance-record-link" onClick={() => navigate("/dashboard/candidates/" + item.candidate_id + "#reports")}>{item.candidate_name || "-"}</button> : <strong>{item.candidate_name || "-"}</strong>}</td><td><button className="performance-record-link" onClick={() => navigate("/dashboard/employee-status/" + item.employee_id + "#profile-performance")}>{item.employee_name || "-"}</button></td><td>{item.role || "-"}</td><td>{item.client || item.vendor || "-"}</td><td><span className={`performance-status process-${item.process_id}`}>{item.status}</span></td><td>{item.rate ? `$${item.rate}` : "-"}</td><td><a href={`/dashboard/bench-sales/${item.id}`}>View</a></td>
+                <td>{dateLabel(item.activity_date || item.date_created)}</td><td>{item.candidate_id ? <button className="performance-record-link" onClick={() => navigate("/dashboard/candidates/" + item.candidate_id + "#reports")}>{item.candidate_name || "-"}</button> : <strong>{item.candidate_name || "-"}</strong>}</td><td><button className="performance-record-link" onClick={() => navigate("/dashboard/employee-status/" + item.employee_id + "#profile-performance")}>{item.employee_name || "-"}</button></td><td>{item.role || "-"}</td><td>{item.client || item.vendor || "-"}</td><td><span className={`performance-status process-${item.process_id}`}>{item.status}</span></td><td>{item.rate ? `$${item.rate}` : "-"}</td><td><a href={`/dashboard/${isRecruiter ? "recruiting" : "bench-sales"}/${item.id}`}>View</a></td>
               </tr>) : <tr><td colSpan="8"><Empty /></td></tr>}</tbody>
             </table>
           </div>

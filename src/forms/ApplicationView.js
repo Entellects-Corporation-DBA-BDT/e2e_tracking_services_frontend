@@ -88,7 +88,7 @@ const ApplicationView = ({
       setUpdating(true);
       setProcessError("");
       const updateProcess = module === "recruiter" ? updateRecruiterApplicationProcess : updateApplicationProcess;
-      const details = nextProcess === 2 ? interviewForm : { feedback: placementFeedback };
+      const details = nextProcess === 2 ? interviewForm : nextProcess === 3 ? { feedback: placementFeedback } : {};
       const res = await updateProcess(
         application.id,
         nextProcess,
@@ -129,7 +129,12 @@ const ApplicationView = ({
   const nextRound = interviewRounds.reduce((highest, event) => Math.max(highest, Number(event.round_number) || 0), 0) + 1;
   const timelineEvents = [
     { id: "submitted", event_type: "submitted", title: "Application Submitted", created_at: application.date_created, feedback: "Candidate profile submitted for this opportunity." },
-    ...processHistory.map((event) => ({ ...event, title: event.event_type === "interview" ? `Interview Round ${event.round_number || 1} Scheduled` : "Candidate Placed" })),
+    ...processHistory.map((event) => ({
+      ...event,
+      title: event.event_type === "interview"
+        ? `Interview Round ${event.round_number || 1} Scheduled`
+        : event.event_type === "placed" ? "Candidate Placed" : "Status Returned to Submission",
+    })),
   ];
   const formatTimelineDate = (value) => {
     if (!value) return "";
@@ -162,19 +167,21 @@ const ApplicationView = ({
             {application.process_id === 3 && "Placed"}
           </div>
           <div className="application-process-actions">
-            {application.process_id !== 3 && (
-              <button className="process-btn interview-action" disabled={updating} onClick={() => {
-                setNextProcess(2); setProcessError("");
-                setInterviewForm({ interview_date: "", interview_start_time: "", interview_end_time: "", feedback: "" });
-                setShowConfirm(true);
-              }}>Schedule Interview Round {nextRound}</button>
+            {application.process_id !== 1 && (
+              <button className="process-btn" disabled={updating} onClick={() => {
+                setNextProcess(1); setProcessError(""); setShowConfirm(true);
+              }}>Move to Submitted</button>
             )}
-            {application.process_id === 2 && (
+            <button className="process-btn interview-action" disabled={updating} onClick={() => {
+              setNextProcess(2); setProcessError("");
+              setInterviewForm({ interview_date: "", interview_start_time: "", interview_end_time: "", feedback: "" });
+              setShowConfirm(true);
+            }}>Schedule Interview Round {nextRound}</button>
+            {application.process_id !== 3 && (
               <button className="process-btn placement-action" disabled={updating} onClick={() => {
                 setNextProcess(3); setPlacementFeedback(""); setProcessError(""); setShowConfirm(true);
               }}>Mark as Placed</button>
             )}
-            {application.process_id === 3 && <button className="process-btn completed" disabled><FaCheckCircle /> Candidate Placed</button>}
           </div>
         </div>
       </div>
@@ -311,12 +318,14 @@ const ApplicationView = ({
             <h2 id="process-confirm-title">
               {nextProcess === 2
                 ? `Schedule Interview Round ${nextRound}?`
-                : "Mark Candidate as Placed?"}
+                : nextProcess === 3 ? "Mark Candidate as Placed?" : "Move Candidate to Submitted?"}
             </h2>
             <p>
               {nextProcess === 2
                 ? `Add round ${nextRound} to ${application.candidate_name}'s interview journey. Earlier rounds and feedback will remain visible.`
-                : `Are you sure you want to mark "${application.candidate_name}" as Placed?`}
+                : nextProcess === 3
+                  ? `Are you sure you want to mark "${application.candidate_name}" as Placed?`
+                  : `Move "${application.candidate_name}" back to Submitted? Existing interview and placement history will remain unchanged.`}
             </p>
             {nextProcess === 2 && (
               <div className="interview-schedule-form">
@@ -372,7 +381,7 @@ const ApplicationView = ({
                   ? "Updating..."
                   : nextProcess === 2
                     ? `Schedule Round ${nextRound}`
-                    : "Mark as Placed"}
+                    : nextProcess === 3 ? "Mark as Placed" : "Move to Submitted"}
               </button>
             </div>
           </div>

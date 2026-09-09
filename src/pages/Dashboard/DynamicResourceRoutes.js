@@ -52,7 +52,10 @@ const PAGE_COMPONENTS = {
 };
 
 const DETAIL_COMPONENTS = {
-  recruiting: [{ suffix: ":applicationId", element: <ApplicationPageView module="recruiter" /> }],
+  recruiting: [
+    { suffix: "performance", element: <RecruiterPerformance module="recruiter" /> },
+    { suffix: ":applicationId", element: <ApplicationPageView module="recruiter" /> },
+  ],
   "bench-sales": [
     { suffix: "performance", element: <RecruiterPerformance /> },
     { suffix: ":applicationId", element: <ApplicationPageView module="bench" /> },

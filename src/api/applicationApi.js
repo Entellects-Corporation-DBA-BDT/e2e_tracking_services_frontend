@@ -220,6 +220,14 @@ export const getPerformanceDashboard = async (params = {}) => {
   return response.data;
 };
 
+export const getRecruiterPerformanceDashboard = async (params = {}) => {
+  const response = await axiosInstance.get(
+    "/recruiters/dashboard/performance",
+    { params }
+  );
+  return response.data;
+};
+
 export const updateApplicationProcess = async (id, processId, details = {}) => {
   const response = await axiosInstance.put(
     `/benchsales/process/${id}`,
