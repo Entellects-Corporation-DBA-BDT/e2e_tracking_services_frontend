@@ -8,6 +8,7 @@ import { getRecruiterApplications, getRecruiterPerformanceDashboard } from "../.
 import { useNavigate } from "react-router-dom";
 import ApplicationListControls from "./ApplicationListControls";
 import { downloadApplicationExcel } from "../../utils/applicationListTools";
+import { formatEasternDate } from "../../utils/easternTime";
 
 const user = getUserDataFromCookies();
 const loginUserId = user?.user_id;
@@ -75,7 +76,7 @@ function Recruiting() {
   };
 
   const open = (form, id = null) => { setSelectedApplicationId(id); setOpenForm(form); };
-  const displayDate = (date) => date ? new Date(`${date}`).toLocaleDateString("en-US", { timeZone: "America/New_York" }) : "-";
+  const displayDate = (date) => formatEasternDate(date);
 
   if (initialLoading) return <Loader fullPage />;
 

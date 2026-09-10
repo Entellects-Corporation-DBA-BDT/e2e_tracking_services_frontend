@@ -7,10 +7,9 @@ import {
   updateRecruiterApplication,
 } from "../api/applicationApi";
 import "./BenchSales.css";
+import { easternDateInputValue, easternToday } from "../utils/easternTime";
 
-const today = new Intl.DateTimeFormat("en-CA", {
-  timeZone: "America/New_York", year: "numeric", month: "2-digit", day: "2-digit",
-}).format(new Date());
+const today = easternToday();
 
 const emptyFiles = { resume_file: null, r2r_file: null, driving_file: null, visa_file: null, msc_file: null };
 
@@ -35,7 +34,7 @@ function RecruiterApplicationForm({ onClose, applicationId, isEdit = false, refr
       if (applicationResponse?.success) {
         const item = applicationResponse.data;
         setFormData({
-          date_created: item.date_created || today,
+          date_created: easternDateInputValue(item.date_created, today),
           candidate_id: item.candidate_id || "",
           candidate_name: item.candidate_name || "",
           client: item.client || "",
@@ -86,7 +85,7 @@ function RecruiterApplicationForm({ onClose, applicationId, isEdit = false, refr
   return <form className="benchModal" onSubmit={submit}>
     <div className="benchHeader"><div><h2>{isEdit ? "Edit Recruiter Application" : "New Recruiter Application"}</h2><p>Recruiting Candidate Submission</p></div></div>
     <div className="formGrid">
-      <div className="inputGroup"><label>Submission Date</label><div className="inputWrapper"><FiCalendar /><input required type="date" value={formData.date_created} onChange={(e) => setFormData({ ...formData, date_created: e.target.value })} /></div></div>
+      <div className="inputGroup"><label>Submission Date <small>(Eastern Time)</small></label><div className="inputWrapper"><FiCalendar /><input required type="date" value={formData.date_created} onChange={(e) => setFormData({ ...formData, date_created: e.target.value })} /></div></div>
       <div className="inputGroup"><label>Candidate Details</label><div className="inputWrapper"><FiUser /><input required list="recruiter-candidate-options" value={formData.candidate_name} onChange={handleCandidateName} placeholder="Select or enter candidate name" /><datalist id="recruiter-candidate-options">{candidates.map((candidate) => <option key={candidate.id} value={candidate.name}>{candidate.email || candidate.skills || `Candidate #${candidate.id}`}</option>)}</datalist></div><small>Select an existing candidate or type a new candidate name.</small></div>
       <div className="inputGroup"><label>Client Name</label><input type="text" value={formData.client} onChange={(e) => setFormData({ ...formData, client: e.target.value })} placeholder="Enter client name" /></div>
       <div className="inputGroup"><label>Role / Position</label><input type="text" value={formData.role} onChange={(e) => setFormData({ ...formData, role: e.target.value })} placeholder="Enter role or position" /></div>

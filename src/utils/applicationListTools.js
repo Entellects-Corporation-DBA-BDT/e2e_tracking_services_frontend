@@ -1,3 +1,5 @@
+import { formatEasternDate } from "./easternTime";
+
 const PROCESS_LABELS = { 1: "Submitted", 2: "Interview Scheduled", 3: "Placed" };
 
 const easternDate = (date = new Date()) => {
@@ -30,7 +32,7 @@ const fileName = (path) => path ? String(path).split(/[\\/]/).pop() : "";
 
 export const downloadApplicationExcel = (rows, moduleLabel, filters = {}) => {
   const recruitingColumns = [
-    ["Submission Date", 115, (row) => row.date_created],
+    ["Submission Date (ET)", 115, (row) => formatEasternDate(row.date_created)],
     ["Recruiter Name", 135, (row) => row.employee_name],
     ["Candidate Name", 155, (row) => row.candidate_name],
     ["Client", 145, (row) => row.client],

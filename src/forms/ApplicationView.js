@@ -21,6 +21,7 @@ import { baseUrlImg } from "../Config/env";
 import "./ApplicationView.css";
 import "./InterviewSchedule.css";
 import EmbeddedDiscussion from "../components/Discussion/EmbeddedDiscussion";
+import { formatEasternDate, formatEasternDateTime, formatEasternInterviewSlot } from "../utils/easternTime";
 
 const ApplicationView = ({
   applicationId,
@@ -136,11 +137,7 @@ const ApplicationView = ({
         : event.event_type === "placed" ? "Candidate Placed" : "Status Returned to Submission",
     })),
   ];
-  const formatTimelineDate = (value) => {
-    if (!value) return "";
-    const parsed = new Date(String(value).replace(" ", "T"));
-    return Number.isNaN(parsed.getTime()) ? value : parsed.toLocaleString([], { dateStyle: "medium", timeStyle: "short" });
-  };
+  const formatTimelineDate = (value) => formatEasternDateTime(value);
 
   return (
     <div className={`application-view${standalone ? " application-view-standalone" : ""}`}>
@@ -195,7 +192,7 @@ const ApplicationView = ({
             <FaCalendarAlt />
             <div>
               <label>Submission Date</label>
-              <span>{application.date_created}</span>
+              <span>{formatEasternDate(application.date_created)} <small>ET</small></span>
             </div>
           </div>
           <div className="info-item">
@@ -274,7 +271,7 @@ const ApplicationView = ({
               <div className="application-timeline-marker">{event.event_type === "interview" ? <FaCalendarAlt /> : <FaCheckCircle />}</div>
               <div className="application-timeline-content">
                 <div className="application-timeline-title"><h4>{event.title}</h4><time><FaClock /> {formatTimelineDate(event.created_at)}</time></div>
-                {event.interview_slot && <div className="application-timeline-slot"><FaCalendarAlt /> {event.interview_slot}</div>}
+                {event.interview_slot && <div className="application-timeline-slot"><FaCalendarAlt /> {formatEasternInterviewSlot(event.interview_slot)}</div>}
                 {event.feedback && <div className="application-timeline-feedback"><FaCommentDots /><div><small>Feedback / Notes</small><p>{event.feedback}</p></div></div>}
                 {event.created_by_name && <div className="application-timeline-author">Updated by {event.created_by_name}</div>}
               </div>
