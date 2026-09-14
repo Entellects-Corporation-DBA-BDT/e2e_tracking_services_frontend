@@ -7,6 +7,7 @@ import Pagination from "./Pagination";
 import FormView from "../../forms/FormView";
 import getUserDataFromCookies from "../../utils/getUserDataFromCookies";
 import { useNavigate } from "react-router-dom";
+import { FaArrowRight } from "react-icons/fa";
 import ApplicationListControls from "./ApplicationListControls";
 import { downloadApplicationExcel } from "../../utils/applicationListTools";
 
@@ -116,12 +117,7 @@ function BenchSales() {
     <div className="e2e_recruiting_page">
       <div className="e2e_recruiting_top">
         <div className="e2e_recruiting_left">
-          <h2>
-            BenchSales Application List
-            <button className="performence-button" onClick={() => {
-                          navigate("/dashboard/bench-sales/performance");
-                        }}>Performance</button>
-          </h2>
+          <h2>BenchSales Application List <button type="button" className="performance-arrow-button" onClick={() => navigate("/dashboard/bench-sales/performance")} aria-label="Open Bench Sales performance" title="Bench Sales performance"><FaArrowRight /></button></h2>
           <div className="e2e_recruiting_heading_line"></div>
         </div>
 

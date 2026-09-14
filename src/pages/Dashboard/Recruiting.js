@@ -4,8 +4,9 @@ import Loader from "./Loader";
 import Pagination from "./Pagination";
 import FormView from "../../forms/FormView";
 import getUserDataFromCookies from "../../utils/getUserDataFromCookies";
-import { getRecruiterApplications, getRecruiterPerformanceDashboard } from "../../api/applicationApi";
+import { getRecruiterApplications } from "../../api/applicationApi";
 import { useNavigate } from "react-router-dom";
+import { FaArrowRight } from "react-icons/fa";
 import ApplicationListControls from "./ApplicationListControls";
 import { downloadApplicationExcel } from "../../utils/applicationListTools";
 import { formatEasternDate } from "../../utils/easternTime";
@@ -32,7 +33,6 @@ function Recruiting() {
   const [initialLoading, setInitialLoading] = useState(true);
   const [tableLoading, setTableLoading] = useState(false);
   const [error, setError] = useState("");
-  const [summary, setSummary] = useState({ submissions: 0, interviews: 0, placements: 0 });
   const [datePeriod, setDatePeriod] = useState("all");
   const [dateFilters, setDateFilters] = useState({ start_date: "", end_date: "" });
   const [exporting, setExporting] = useState(false);
@@ -41,13 +41,9 @@ function Recruiting() {
     try {
       setError("");
       initialLoading ? setInitialLoading(true) : setTableLoading(true);
-      const [response, summaryData] = await Promise.all([
-        getRecruiterApplications(currentPage, entries, debouncedSearch, dateFilters),
-        getRecruiterPerformanceDashboard({ application_page: 1, application_limit: 5, ...dateFilters }).catch(() => null),
-      ]);
+      const response = await getRecruiterApplications(currentPage, entries, debouncedSearch, dateFilters);
       setTableData(response.data || []);
       setTotalPages(response.total_pages || 1);
-      setSummary(summaryData?.data?.summary || { submissions: 0, interviews: 0, placements: 0 });
     } catch (requestError) {
       setError(requestError?.response?.data?.message || "Recruiter applications could not be loaded.");
     } finally {
@@ -82,16 +78,11 @@ function Recruiting() {
 
   return <div className="e2e_recruiting_page">
     <div className="e2e_recruiting_top">
-      <div className="e2e_recruiting_left"><h2>Recruiter Application List <button className="performence-button" onClick={() => navigate("/dashboard/recruiting/performance")}>Performance</button></h2><div className="e2e_recruiting_heading_line" /></div>
+      <div className="e2e_recruiting_left"><h2>Recruiter Application List <button type="button" className="performance-arrow-button" onClick={() => navigate("/dashboard/recruiting/performance")} aria-label="Open recruiter performance" title="Recruiter performance"><FaArrowRight /></button></h2><div className="e2e_recruiting_heading_line" /></div>
       <div className="e2e_recruiting_right"><button className="e2e_recruiting_add_btn" onClick={() => open("recruiter")}>+ Add New</button></div>
     </div>
 
     {error && <p role="alert" style={{ color: "#b91c1c", fontWeight: 700 }}>{error}</p>}
-    <div className="e2e_recruiting_summary">
-      <article><span>Submissions</span><strong>{Number(summary.total_submissions) || 0}</strong></article>
-      <article><span>Interviews</span><strong>{Number(summary.interviews) || 0}</strong></article>
-      <article><span>Placements</span><strong>{Number(summary.placements) || 0}</strong></article>
-    </div>
     <ApplicationListControls
       period={datePeriod}
       dates={dateFilters}

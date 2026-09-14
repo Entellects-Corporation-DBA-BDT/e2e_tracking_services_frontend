@@ -1,0 +1,5 @@
+import {NavLink,useLocation} from "react-router-dom";
+import {useMemo} from "react";
+import {usePermissions} from "../../auth/PermissionContext";
+import {groupResources} from "./ResourceGroups";
+export default function RelatedResourceNav(){const{resources}=usePermissions(),location=useLocation();const group=useMemo(()=>groupResources(resources).find(item=>item.id!=="overview"&&item.items.some(resource=>location.pathname===resource.route||location.pathname.startsWith(`${resource.route}/`))),[resources,location.pathname]);if(!group||group.items.length<2)return null;return <section className="e2e_related_resources" aria-label={`${group.label} related resources`}><header><small>Workspace</small><strong>{group.label}</strong></header><nav>{group.items.map(item=><NavLink key={item.id} to={item.route} end={item.route==="/dashboard"}>{item.display_name}</NavLink>)}</nav></section>}

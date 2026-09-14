@@ -10,6 +10,7 @@ import {
 import Sidebar from "./Sidebar";
 import Navbar from "./Navbar";
 import ApplicationAssistant from "../../components/Assistant/ApplicationAssistant";
+import RelatedResourceNav from "./RelatedResourceNav";
 
 import DashboardCards from "./DashboardCards";
 import DashboardGraphs from "./DashboardGraphs";
@@ -442,6 +443,8 @@ function Dashboard() {
         <ApplicationAssistant />
 
         <div className="e2e_dashboard_scroll_content">
+
+          <RelatedResourceNav />
 
           <Routes>
             {/* Dashboard Home */}
