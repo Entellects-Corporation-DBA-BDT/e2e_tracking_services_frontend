@@ -20,6 +20,7 @@ import EmployeeView from "./EmployeeView";
 import CandidateView from "../../forms/CandidateView";
 import JobView from "../../forms/JobView";
 import AccessCatalog from "./AccessCatalog";
+import AttendanceConfigurations from "../../components/AttendanceConfigurations";
 import AttendanceManagement from "./AttendanceManagement";
 import RecruiterPerformance from "./RecruiterPerformance.";
 import W2Forms from "./W2Forms";
@@ -70,8 +71,8 @@ const DETAIL_COMPONENTS = {
 const relativePath = (route) => route.replace(/^\/dashboard\/?/, "").replace(/^\/|\/$/g, "");
 
 export default function useDynamicResourceRoutes() {
-  const { resources } = usePermissions();
-  return resources
+  const { resources, can, user } = usePermissions();
+  const routes = resources
     .filter((resource) => resource.resource_type === "PAGE"
       && resource.permissions?.view
       && resource.route
@@ -88,4 +89,8 @@ export default function useDynamicResourceRoutes() {
       }
       return routes;
     });
+  if (can("employees","create") || can("payslips","share") || (can("attendance","edit") && (user?.super_admin || Number(user?.position_id)===1))) {
+    routes.push(<Route key="attendance-mail-configurations" path="attendance/configurations" element={<main className="attendance-management"><AttendanceConfigurations/></main>}/>);
+  }
+  return routes;
 }

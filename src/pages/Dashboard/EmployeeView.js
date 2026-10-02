@@ -2,6 +2,8 @@ import { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { FaArrowLeft, FaBriefcase, FaIdBadge, FaRedo, FaTrashAlt, FaUser, FaUserTag } from "react-icons/fa";
 import { getEmployeeById, removeCompanyName } from "../../api/employeeApi";
+import EmployeeCollectionFields from "../../components/EmployeeCollectionFields";
+import { normalizeCollection } from "../../utils/employeeCollection";
 import AssignCompanyNameModal from "../../components/AssignCompanyNameModal";
 import AttendancePanel from "../../components/AttendancePanel";
 import "../../styles/Dashboard/recordView.css";
@@ -82,6 +84,10 @@ function EmployeeView() {
         </dl>
       </section>
 
+      <section className="e2e_record_card">
+        <div className="e2e_record_card_title"><FaIdBadge/><div><h2>Candidate Information & Documents</h2><p>Family, experience, education, certifications, references and declaration.</p></div></div>
+        <EmployeeCollectionFields value={normalizeCollection(employee.collection)} readOnly employeeId={employee.id} candidateName={employee.legal_name} candidatePhone={employee.contact_info}/>
+      </section>
       <span id='profile-performance' className='profile-section-anchor' aria-hidden='true' />
       {employee.user_id && hasSubmissionPerformance(employee.role) && (
         <div className='profile-section-target'>

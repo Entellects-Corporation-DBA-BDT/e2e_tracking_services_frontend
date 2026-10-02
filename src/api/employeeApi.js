@@ -36,7 +36,7 @@ export const setEmployeeAttendanceDate = async (employeeId, date, present = true
   return response.data;
 }; 
 export const createEmployee = async (data) => (await axiosInstance.post("/employees", data)).data;
-export const updateEmployee = async (id, data) => (await axiosInstance.put(`/employees/${id}`, data)).data;
+export const updateEmployee = async (id, data) => (await axiosInstance.request({method: data instanceof FormData ? "post" : "put", url: `/employees/${id}`, data})).data;
 export const deleteEmployee = async (id) => (await axiosInstance.delete(`/employees/${id}`)).data;
 export const getMyEmployeeProfile = async () => (await axiosInstance.get("/employees/me")).data;
 export const getPositions = async () => (await axiosInstance.get("/position/list", { params: { page: 1, limit: 100 } })).data;
@@ -65,6 +65,20 @@ export const removeMailSender = async () => (await axiosInstance.delete("/attend
 
 export const sendEmployeeOnboardingInvite = async (data) => (await axiosInstance.post('/attendance/onboarding-invites', data)).data;
 export const getEmployeeOnboardingInvite = async (token) => (await axiosInstance.get('/employee-onboarding/' + token)).data;
-export const submitEmployeeOnboarding = async (token,data) => (await axiosInstance.post('/employee-onboarding/' + token,data)).data;
+export const submitEmployeeOnboarding = async (token,data,onUploadProgress) => (await axiosInstance.post('/employee-onboarding/' + token,data,{onUploadProgress})).data;
 
 export const updateMonthlyAttendance = async (employeeId,data) => (await axiosInstance.put('/attendance/month/' + employeeId,data)).data;
+
+export const downloadEmployeeDocument = async (employeeId, documentId, name) => {
+  const response = await axiosInstance.get('/employees/' + employeeId + '/documents/' + documentId, {responseType:'blob'});
+  const url = URL.createObjectURL(response.data);
+  const link = document.createElement('a');
+  link.href = url; link.download = name || 'document'; document.body.appendChild(link); link.click(); link.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+};
+export const getEmployeeUploadLimits = async () => (await axiosInstance.get('/employees/upload-limits')).data;
+
+export const getEmployeeOnboardingRoles = async () => (await axiosInstance.get('/attendance/onboarding-roles')).data;
+
+export const getLeaveMailSettings = async () => (await axiosInstance.get('/attendance/leave-mail-settings')).data;
+export const saveLeaveMailSettings = async data => (await axiosInstance.post('/attendance/leave-mail-settings',data)).data;

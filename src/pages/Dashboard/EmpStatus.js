@@ -6,6 +6,7 @@ import "../../styles/Dashboard/empstatus.css";
 import Loader from "./Loader";
 import Pagination from "./Pagination";
 import AssignCompanyNameModal from "../../components/AssignCompanyNameModal";
+import EmployeeOnboardingInvite from "../../components/EmployeeOnboardingInvite";
 import EmployeeFormModal from "../../components/EmployeeFormModal";
 import { deleteEmployee } from "../../api/employeeApi";
 import { ProtectedComponent } from "../../auth/PermissionContext";
@@ -61,6 +62,7 @@ function EmployeeStatusReport() {
   return (
     <div className="e2e_empstatus_page">
       <div className="e2e_empstatus_top"><div><h2>Employee Identity Management</h2><p>Keep legal employee records separate from application-facing Company Names.</p><div className="e2e_empstatus_heading_line" /></div><ProtectedComponent resource="employees" action="create"><button className="e2e_employee_add" onClick={()=>{setEditing(null);setFormOpen(true)}}>+ Add Employee</button></ProtectedComponent></div>
+      <ProtectedComponent resource="employees" action="create"><EmployeeOnboardingInvite/></ProtectedComponent>
       <div className="e2e_empstatus_filters">
         <label className="e2e_empstatus_search_wrap"><FaSearch /><input type="search" placeholder="Search legal name, Company Name or Employee ID..." value={search} onChange={(event) => { setSearch(event.target.value); setPage(1); }} /></label>
         <label className="e2e_empstatus_entries">Show <select value={entries} onChange={(event) => { setEntries(Number(event.target.value)); setPage(1); }}>{[10,25,50,100].map((size) => <option key={size}>{size}</option>)}</select></label>

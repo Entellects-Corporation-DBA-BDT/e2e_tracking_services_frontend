@@ -8,6 +8,7 @@ import {
 import { usePermissions } from "../../auth/PermissionContext";
 import MyProfile from "./MyProfile";
 import ConfirmDialog from "../../components/ConfirmDialog";
+import AttendanceConfigurations from "../../components/AttendanceConfigurations";
 import PayslipManager from "../../components/PayslipManager";
 import "../../styles/Dashboard/attendanceManagement.css";
 
@@ -18,7 +19,8 @@ function AttendanceManagement() {
   const { can, user } = usePermissions();
   const [assistantParams] = useSearchParams();
   const admin = can("attendance","edit");
-  const superAdmin = Boolean(user?.super_admin);
+  const superAdmin = Boolean(user?.super_admin || Number(user?.position_id) === 1);
+  const configurationAccess = can("employees","create") || can("payslips","share") || superAdmin;
   const payslipAccess = can("payslips","view");
   const [tab,setTab]=useState("today");
   const localDate=new Date().toLocaleDateString("en-CA",{timeZone:"America/New_York"});
@@ -29,7 +31,7 @@ function AttendanceManagement() {
   const [leave,setLeave]=useState(blankLeave),[holiday,setHoliday]=useState(blankHoliday);
   const [status,setStatus]=useState(""),[message,setMessage]=useState({text:"",error:false}),[loading,setLoading]=useState(true);
   const [confirmation,setConfirmation]=useState(null),[monthlyEdit,setMonthlyEdit]=useState(null),[monthlySaving,setMonthlySaving]=useState(false);
-  useEffect(()=>{const requested=assistantParams.get("assistant");if(["monthly","payslips","approvals","holidays"].includes(requested))setTab(requested)},[assistantParams]);
+  useEffect(()=>{const requested=assistantParams.get("assistant");if(["monthly","payslips","approvals","holidays","configurations"].includes(requested))setTab(requested)},[assistantParams]);
   const showMessage=(text,error=false)=>setMessage({text,error});
 
   const load=useCallback(async()=>{
@@ -45,6 +47,7 @@ function AttendanceManagement() {
     finally{setLoading(false);}
   },[status,selectedDate,selectedMonth,superAdmin]);
   useEffect(()=>{if(admin)load();},[admin,load]);
+  if(!admin && tab==="configurations" && configurationAccess)return <main className="attendance-management"><AttendanceConfigurations/></main>;
   if(!admin)return <MyProfile/>;
 
   const saveMonthlyEdit=async(event)=>{event.preventDefault();setMonthlySaving(true);try{const result=await updateMonthlyAttendance(monthlyEdit.id,{...monthlyEdit,month:selectedMonth});setMessage({text:result.message,error:false});setMonthlyEdit(null);await load()}catch(error){setMessage({text:error?.response?.data?.message||"Monthly attendance could not be updated.",error:true})}finally{setMonthlySaving(false)}};  const decide=async(id,next)=>{
@@ -64,9 +67,9 @@ function AttendanceManagement() {
 
   return <main className="attendance-management">
     <header className="attendance-management-hero"><span><FaCalendarCheck/></span><div><p>HR & ADMIN</p><h1>Attendance Management</h1><small>Approve leave, add employee leave, and maintain the company holiday calendar. All attendance times use US Eastern Time (ET).</small></div></header>
-    <nav>{[["today","Daily Attendance"],["monthly","Monthly Summary"],...(payslipAccess?[["payslips","Payslips"]]:[]),...(superAdmin?[["restriction","IP Restriction"]]:[]),["approvals","Leave Approvals"],["add-leave","Add Employee Leave"],["holidays","Holidays"]].map(([key,label])=><button key={key} className={tab===key?"active":""} onClick={()=>setTab(key)}>{label}</button>)}</nav>
+    <nav>{[["today","Daily Attendance"],["monthly","Monthly Summary"],...(payslipAccess?[["payslips","Payslips"]]:[]),...(configurationAccess?[["configurations","Configurations"]]:[]),...(superAdmin?[["restriction","IP Restriction"]]:[]),["approvals","Leave Approvals"],["add-leave","Add Employee Leave"],["holidays","Holidays"]].map(([key,label])=><button key={key} className={tab===key?"active":""} onClick={()=>setTab(key)}>{label}</button>)}</nav>
     {message.text&&<p className={`attendance-admin-message ${message.error?"error":""}`}>{message.text}</p>}
-    {loading?<div className="attendance-loading"><span/> Loading attendance management...</div>:<>
+    {tab==="configurations"&&configurationAccess?<AttendanceConfigurations/>:loading?<div className="attendance-loading"><span/> Loading attendance management...</div>:<>
       {tab==="today"&&<section className="attendance-admin-section">
         <div className="attendance-section-title"><div><h2>Daily Attendance</h2><p>Select any date to review every active employee.</p></div><label className="attendance-date-filter">Date<input type="date" max={localDate} value={selectedDate} onChange={e=>setSelectedDate(e.target.value)}/></label></div>
         <div className="attendance-today-cards">
