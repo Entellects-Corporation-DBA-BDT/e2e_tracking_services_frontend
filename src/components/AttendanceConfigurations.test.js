@@ -2,10 +2,11 @@ import {fireEvent,render,screen,within,waitFor} from "@testing-library/react";
 import AttendanceConfigurations from "./AttendanceConfigurations";
 import {getMailSender,saveMailSender,getLeaveMailSettings,saveLeaveMailSettings} from "../api/employeeApi";
 const mockNavigate=jest.fn();
+const mockUser={email:"hr@example.com",position_id:1};
 jest.mock("react-router-dom",()=>({useNavigate:()=>mockNavigate}),{virtual:true});
-jest.mock("../auth/PermissionContext",()=>({usePermissions:()=>({can:()=>true,user:{email:"hr@example.com",position_id:1}})}));
+jest.mock("../auth/PermissionContext",()=>({usePermissions:()=>({can:()=>true,user:mockUser})}));
 jest.mock("../api/employeeApi",()=>({getMailSender:jest.fn(),saveMailSender:jest.fn(),removeMailSender:jest.fn(),getLeaveMailSettings:jest.fn(),saveLeaveMailSettings:jest.fn()}));
-beforeEach(()=>{jest.clearAllMocks();getMailSender.mockResolvedValue({success:true,configured:false});getLeaveMailSettings.mockResolvedValue({success:true,configured:false})});
+beforeEach(()=>{jest.clearAllMocks();mockUser.position_id=1;getMailSender.mockResolvedValue({success:true,configured:false});getLeaveMailSettings.mockResolvedValue({success:true,configured:false})});
 const sender=()=>within(screen.getByRole("article",{name:"Your Sender Mailbox"}));
 const leave=()=>within(screen.getByRole("article",{name:"Leave Approval Mailbox"}));
 test("verifies one sender for pre-offers and payslips and clears the password form",async()=>{
@@ -24,4 +25,11 @@ test("saves the organization leave sender and HR recipient separately",async()=>
 });
 test("retries a failed sender status load and links back to Employees",async()=>{
  getMailSender.mockRejectedValueOnce(new Error("offline"));render(<AttendanceConfigurations/>);fireEvent.click(await sender().findByRole("button",{name:"Retry Loading"}));await sender().findByRole("button",{name:"Configure Mailbox"});expect(getMailSender).toHaveBeenCalledTimes(2);fireEvent.click(screen.getByRole("button",{name:"Go to Employees"}));await waitFor(()=>expect(mockNavigate).toHaveBeenCalledWith("/dashboard/employee-status"));
+});
+
+
+test("HR can configure a mailbox different from their login email",async()=>{
+ mockUser.position_id=2;saveMailSender.mockResolvedValue({success:true,configured:true,message:"Verified alternate sender",data:{smtp_username:"recruitment@example.com",smtp_host:"smtp.ionos.com",smtp_port:587,encryption:"tls"}});
+ render(<AttendanceConfigurations/>);fireEvent.click(await sender().findByRole("button",{name:"Configure Mailbox"}));fireEvent.change(sender().getByLabelText(/^Sender Email/),{target:{value:"recruitment@example.com"}});fireEvent.change(sender().getByLabelText("Webmail / App Password"),{target:{value:"test-secret"}});fireEvent.click(sender().getByRole("button",{name:"Verify & Save"}));
+ await sender().findByText("Verified alternate sender");expect(saveMailSender).toHaveBeenCalledWith(expect.objectContaining({email:"recruitment@example.com",password:"test-secret"}));expect(screen.queryByRole("article",{name:"Leave Approval Mailbox"})).not.toBeInTheDocument();
 });
