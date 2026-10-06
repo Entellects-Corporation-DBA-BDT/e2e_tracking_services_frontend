@@ -1,0 +1,6 @@
+2026/10/05-21:59:43.923 29c4 Reusing MANIFEST C:\Users\ADMIN\Desktop\e2e_tracking_services_frontend\.server-audit\reference-theme\browser\Default\EdgeCoupons/coupons_data.db/MANIFEST-000001
+2026/10/05-21:59:43.924 29c4 Recovering log #4
+2026/10/05-21:59:43.925 29c4 Reusing old log C:\Users\ADMIN\Desktop\e2e_tracking_services_frontend\.server-audit\reference-theme\browser\Default\EdgeCoupons/coupons_data.db/000004.log 
+2026/10/05-21:59:47.665 3128 Level-0 table #8: started
+2026/10/05-21:59:47.765 3128 Level-0 table #8: 683444 bytes OK
+2026/10/05-21:59:47.772 3128 Delete type=0 #4

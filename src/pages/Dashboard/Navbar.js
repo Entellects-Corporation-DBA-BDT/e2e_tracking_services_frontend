@@ -1,5 +1,5 @@
 import "../../styles/Dashboard/navbar.css";
-import { FaArrowLeft, FaBriefcase, FaCalendarAlt, FaChevronDown, FaFileAlt, FaMedal, FaMoon, FaPrint, FaRedo, FaSearch, FaSignOutAlt, FaSun, FaUserTie } from 'react-icons/fa';
+import { FaBars, FaArrowLeft, FaBriefcase, FaCalendarAlt, FaChevronDown, FaFileAlt, FaMedal, FaMoon, FaPrint, FaRedo, FaSearch, FaSignOutAlt, FaSun, FaUserTie } from 'react-icons/fa';
 import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -13,6 +13,8 @@ import HeaderCollaboration from "../../components/Collaboration/HeaderCollaborat
 function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
+  const [profileSidebarOpen,setProfileSidebarOpen]=useState(true);
+  useEffect(()=>{setProfileSidebarOpen(true);document.body.classList.remove("reference-sidebar-hidden")},[location.pathname]);
   const searchRef = useRef(null);
   const { resources: allResources, user, logout, isAdmin } = usePermissions();
   const [searchTerm, setSearchTerm] = useState("");
@@ -155,7 +157,8 @@ const selectResource = (resource) => {
 
   return (
     <div className={`e2e_navbar_container${candidateDetailPath || dashboardHome || myProfilePath ? ' has-section-navigation' : ''}`}>
-      <div>
+      <div className="reference-header-brand"><button type="button" className="reference-menu-toggle" aria-label="Toggle sidebar" aria-expanded={profileSidebarOpen} onClick={()=>{setProfileSidebarOpen(value=>!value);document.body.classList.toggle("reference-sidebar-hidden",profileSidebarOpen)}}><FaBars/></button><img src="/logo.png" alt="E2E Tracking Services"/><div><strong>E2E TRACKING</strong><small>SERVICES</small></div></div>
+      <div className="e2e_navbar_page_title">
         <h2 className="e2e_navbar_title">
           {currentPageTitle}
         </h2>

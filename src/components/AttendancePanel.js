@@ -8,7 +8,7 @@ import ConfirmDialog from "./ConfirmDialog";
 
 const dateValue = (date) => date.toISOString().slice(0, 10);
 
-function AttendancePanel({ employeeId, employeeCode, isOwn = false, canManage = false }) {
+function AttendancePanel({ employeeId, employeeCode, isOwn = false, canManage = false, showClock=true, showLeave=true }) {
   const now = new Date();
   const [startDate, setStartDate] = useState(dateValue(new Date(now.getFullYear(), now.getMonth() - 5, 1)));
   const [endDate, setEndDate] = useState(dateValue(now));
@@ -54,7 +54,7 @@ function AttendancePanel({ employeeId, employeeCode, isOwn = false, canManage = 
   return <section className="attendance-panel">
     <div className="attendance-heading"><div><h2>Attendance Insights</h2><p>Working hours, punctuality, and daily attendance history.</p></div><div><label>From<input type="date" value={startDate} onChange={(e)=>setStartDate(e.target.value)} /></label><label>To<input type="date" value={endDate} onChange={(e)=>setEndDate(e.target.value)} /></label></div></div>
     {error ? <div className="e2e_empstatus_error">{error}<button onClick={load}>Try again</button></div> : loading ? <div className="attendance-loading"><span /> Loading attendance...</div> : <>
-      <AttendanceActions employeeCode={employeeCode} isOwn={isOwn} canManage={canManage} onChanged={load} />
+      <AttendanceActions showLeave={showLeave} showClock={showClock} employeeCode={employeeCode} isOwn={isOwn} canManage={canManage} onChanged={load} />
       <div className="attendance-cards">{cards.map(([label,value,icon])=><div key={label}><span>{icon}</span><p>{label}</p><strong>{value}</strong></div>)}</div>
       <div className="attendance-chart"><h3>Daily Working Hours</h3>{payload.trend.length ? <ResponsiveContainer width="100%" height={270}><LineChart data={payload.trend} margin={{top:12,right:12,left:0,bottom:8}}><CartesianGrid strokeDasharray="3 3" vertical={false}/><XAxis dataKey="date" tick={{fontSize:11}} minTickGap={28}/><YAxis tick={{fontSize:11}} domain={[0, "auto"]} unit="h"/><Tooltip formatter={(value)=>[`${value} hours`,"Working Hours"]}/><Line connectNulls type="monotone" dataKey="hours" stroke="#7c3aed" strokeWidth={3} dot={{r:3,fill:"#fff",strokeWidth:2}} activeDot={{r:6}}/></LineChart></ResponsiveContainer> : <div className="attendance-empty">No attendance records in this date range.</div>}</div>
       <AttendanceCalendar employeeId={employeeId} records={payload.calendar || payload.data}

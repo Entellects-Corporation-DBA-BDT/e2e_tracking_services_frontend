@@ -6,7 +6,7 @@ export const getEmployees = async (params = {}) => {
 };
 
 export const getEmployeeById = async (id) => {
-  const response = await axiosInstance.get(`/employees/${id}`);
+  const response = await axiosInstance.get(`/employees/${id}`, {timeout:15000});
   return response.data;
 };
 
@@ -36,10 +36,10 @@ export const setEmployeeAttendanceDate = async (employeeId, date, present = true
   return response.data;
 }; 
 export const createEmployee = async (data) => (await axiosInstance.post("/employees", data)).data;
-export const updateEmployee = async (id, data) => (await axiosInstance.request({method: data instanceof FormData ? "post" : "put", url: `/employees/${id}`, data})).data;
+export const updateEmployee = async (id, data) => (await axiosInstance.request({method: data instanceof FormData ? "post" : "put", url: `/employees/${id}`, data, timeout:120000})).data;
 export const deleteEmployee = async (id) => (await axiosInstance.delete(`/employees/${id}`)).data;
 export const getMyEmployeeProfile = async () => (await axiosInstance.get("/employees/me")).data;
-export const getPositions = async () => (await axiosInstance.get("/position/list", { params: { page: 1, limit: 100 } })).data;
+export const getPositions = async () => (await axiosInstance.get("/position/list", { params: { page: 1, limit: 100 }, timeout:15000 })).data;
 export const getTodayAttendance = async (date, self = false) => (await axiosInstance.get("/attendance/today", { params: { ...(date ? { date } : {}), ...(self ? { self: 1 } : {}) } })).data;
 export const getMonthlyAttendance = async (month) => (await axiosInstance.get("/attendance/month", { params: { month } })).data;
 export const getAttendanceIpPermissions = async () => (await axiosInstance.get("/attendance/ip-settings")).data;
@@ -82,3 +82,12 @@ export const getEmployeeOnboardingRoles = async () => (await axiosInstance.get('
 
 export const getLeaveMailSettings = async () => (await axiosInstance.get('/attendance/leave-mail-settings')).data;
 export const saveLeaveMailSettings = async data => (await axiosInstance.post('/attendance/leave-mail-settings',data)).data;
+
+export const updateMyEmployeeProfile = async data => (await axiosInstance.post('/employees/me',data,{timeout:120000})).data;
+export const downloadEmployeeOnboardingDocument = async (token,documentId,name) => {
+ const response=await axiosInstance.get(`/employee-onboarding/${token}/documents/${documentId}`,{responseType:'blob'});
+ const url=URL.createObjectURL(response.data);const link=document.createElement('a');link.href=url;link.download=name||'document';document.body.appendChild(link);link.click();link.remove();window.setTimeout(()=>URL.revokeObjectURL(url),1000);
+};
+
+export const getEmployeePhoto = async id => (await axiosInstance.get(`/employees/${id}/photo`, {responseType:"blob",timeout:15000})).data;
+export const uploadEmployeePhoto = async (id,file) => {const data=new FormData();data.append("photo",file);return (await axiosInstance.post(`/employees/${id}/photo`,data,{timeout:30000})).data;};

@@ -33,3 +33,4 @@ test("HR can configure a mailbox different from their login email",async()=>{
  render(<AttendanceConfigurations/>);fireEvent.click(await sender().findByRole("button",{name:"Configure Mailbox"}));fireEvent.change(sender().getByLabelText(/^Sender Email/),{target:{value:"recruitment@example.com"}});fireEvent.change(sender().getByLabelText("Webmail / App Password"),{target:{value:"test-secret"}});fireEvent.click(sender().getByRole("button",{name:"Verify & Save"}));
  await sender().findByText("Verified alternate sender");expect(saveMailSender).toHaveBeenCalledWith(expect.objectContaining({email:"recruitment@example.com",password:"test-secret"}));expect(screen.queryByRole("article",{name:"Leave Approval Mailbox"})).not.toBeInTheDocument();
 });
+  

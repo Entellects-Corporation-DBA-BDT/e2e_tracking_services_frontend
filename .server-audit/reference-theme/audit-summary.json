@@ -1,0 +1,51 @@
+{
+  "routes": [
+    "/dashboard/employee-status/7",
+    "/dashboard/employee-status",
+    "/dashboard/jobs",
+    "/dashboard/clients",
+    "/dashboard/recruiting",
+    "/dashboard/attendance",
+    "/dashboard/users",
+    "/dashboard/candidates",
+    "/dashboard/training",
+    "/dashboard/permissions",
+    "/dashboard/resources",
+    "/dashboard/bench-sales",
+    "/about",
+    "/contact",
+    "/",
+    "/dashboard/hotlist",
+    "/dashboard/vendors",
+    "/dashboard/candidate-onboarding",
+    "/dashboard/document-reminders",
+    "/dashboard/w2-forms",
+    "/dashboard/chat",
+    "/dashboard/notifications",
+    "/dashboard/chat-admin",
+    "/dashboard/positions",
+    "/dashboard",
+    "/register",
+    "/w2-form"
+  ],
+  "routeCount": 27,
+  "checks": 60,
+  "failures": [],
+  "interactions": [
+    {
+      "interaction": "inline-education",
+      "educationEditor": true,
+      "unrelatedPersonalFields": false,
+      "dialog": false
+    },
+    {
+      "interaction": "attendance-toggle",
+      "attendanceExpanded": true,
+      "hideAvailable": true
+    },
+    {
+      "interaction": "configuration-tab",
+      "rendered": true
+    }
+  ]
+}

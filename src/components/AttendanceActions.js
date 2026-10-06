@@ -9,7 +9,7 @@ import ConfirmDialog from "./ConfirmDialog";
 const emptyLeave = { leave_type: "paid", start_date: "", end_date: "", duration: "full_day", reason: "" };
 const emptyHoliday = { holiday_date: "", name: "", description: "", is_optional: false };
 
-function AttendanceActions({ employeeCode, isOwn, canManage, onChanged }) {
+function AttendanceActions({ employeeCode, isOwn, canManage, onChanged, showClock=true, showLeave=true, showHolidays=true, leaveTitle }) {
   const [today, setToday] = useState(null);
   const [leaves, setLeaves] = useState([]);
   const [holidays, setHolidays] = useState([]);
@@ -23,17 +23,17 @@ function AttendanceActions({ employeeCode, isOwn, canManage, onChanged }) {
 
   const load = useCallback(async () => {
     try {
-      const requests = [getHolidays(new Date().getFullYear()), getLeaves()];
-      if (isOwn) requests.unshift(getTodayAttendance(undefined, true));
-      const results = await Promise.all(requests);
-      let offset = 0;
-      if (isOwn) { setToday(results[0]); offset = 1; }
-      setHolidays(results[offset]?.data || []);
-      setLeaves(results[offset + 1]?.data || []);
+      const [holidayResult,leaveResult,todayResult]=await Promise.all([
+        showHolidays?getHolidays(new Date().getFullYear()):Promise.resolve(null),
+        showLeave?getLeaves():Promise.resolve(null),
+        isOwn&&showClock?getTodayAttendance(undefined,true):Promise.resolve(null),
+      ]);
+      setHolidays(holidayResult?.data||[]);setLeaves(leaveResult?.data||[]);setToday(todayResult);
+
     } catch (error) {
       setMessage({ text: error?.response?.data?.message || "Attendance controls could not be loaded.", error: true });
     }
-  }, [isOwn]);
+  }, [isOwn,showClock,showLeave,showHolidays]);
   useEffect(() => { load(); }, [load]);
 
   const clock = async () => {
@@ -48,12 +48,12 @@ function AttendanceActions({ employeeCode, isOwn, canManage, onChanged }) {
   };
   const requestLeave = async (event) => {
     event.preventDefault(); setBusy(true);
-    try { const result = await submitLeave(leave); setMessage({ text: result.message, error: false }); setLeave(emptyLeave); await load(); }
+    try { const result = await submitLeave(leave); setMessage({ text: result.message, error: false }); setLeave(emptyLeave); await load(); onChanged?.(); }
     catch (error) { setMessage({ text: error?.response?.data?.message || "Leave request failed.", error: true }); }
     finally { setBusy(false); }
   };
   const decideLeave = async (id, status) => {
-    try { const result = await reviewLeave(id, { status }); setMessage({ text: result.message, error: false }); await load(); }
+    try { const result = await reviewLeave(id, { status }); setMessage({ text: result.message, error: false }); await load(); onChanged?.(); }
     catch (error) { setMessage({ text: error?.response?.data?.message || "Leave could not be updated.", error: true }); }
   };
   const addHoliday = async (event) => {
@@ -65,7 +65,7 @@ function AttendanceActions({ employeeCode, isOwn, canManage, onChanged }) {
   const record = today?.record;
   const nextAction = !record ? "in" : record.time_out === "00:00:00" ? "out" : "";
   return <div className="attendance-workflows">
-    {isOwn && <section className="attendance-clock-card">
+    {isOwn && showClock && <section className="attendance-clock-card">
       <div><span><FaClock /></span><div><h3>Today in Eastern Time</h3><p>{today?.work_date || "Loading..."} Â· 9:30 AMâ€“6:30 PM America/New_York</p></div></div>
       <div className="clock-status"><strong>{record ? record.work_status.replace("_", " ") : "Not timed in"}</strong>
         <small>{record ? `${record.time_in} â€” ${record.time_out === "00:00:00" ? "Working" : record.time_out}` : today?.network?.allowed ? "Confirm your employee ID to begin" : `Company network required Â· Current IP: ${today?.network?.ip || "unknown"}`}</small></div>
@@ -78,8 +78,8 @@ function AttendanceActions({ employeeCode, isOwn, canManage, onChanged }) {
       <p>Enter your employee ID exactly as shown on your profile.</p><label>Employee ID<input autoFocus value={confirmationId} onChange={e=>setConfirmationId(e.target.value.toUpperCase())} placeholder="BDT-I-007" /></label>
       <footer><button onClick={()=>setConfirming("")}>Cancel</button><button disabled={busy || !confirmationId.trim()} onClick={clock}>Confirm {employeeCode}</button></footer></section></div>}
 
-    <section className="attendance-leave-card">
-      <header><div><FaPlaneDeparture /><h3>{canManage ? "Leave Management" : "My Leave"}</h3></div><p>Request, approve, reject, and track time away.</p></header>
+    {showLeave&&<section className="attendance-leave-card">
+      <header><div><FaPlaneDeparture /><h3>{leaveTitle||(canManage ? "Leave Management" : "My Leave")}</h3></div><p>Request, approve, reject, and track time away.</p></header>
       {isOwn && <form onSubmit={requestLeave} className="leave-form">
         <select value={leave.leave_type} onChange={e=>setLeave({...leave,leave_type:e.target.value})}>{["paid","sick","casual","unpaid","bereavement","other"].map(x=><option key={x}>{x}</option>)}</select>
         <input required type="date" value={leave.start_date} onChange={e=>setLeave({...leave,start_date:e.target.value,end_date:leave.end_date||e.target.value})}/>
@@ -90,9 +90,9 @@ function AttendanceActions({ employeeCode, isOwn, canManage, onChanged }) {
       </form>}
       <div className="leave-list">{leaves.length ? leaves.map(item=><article key={item.id}><div><strong>{item.employee_name || "My leave"} Â· {item.leave_type}</strong><span>{item.start_date} to {item.end_date} Â· {item.duration.replace("_"," ")}</span><small>{item.reason}</small></div><mark className={item.status}>{item.status}</mark>
         {canManage && item.status==="pending" && <footer><button onClick={()=>decideLeave(item.id,"approved")}><FaCheck /></button><button onClick={()=>decideLeave(item.id,"rejected")}><FaTimes /></button></footer>}</article>) : <p>No leave requests found.</p>}</div>
-    </section>
+    </section>}
 
-    {canManage && <section className="attendance-holiday-card"><header><div><FaCalendarPlus /><h3>Company Holidays</h3></div><p>Eastern Time office calendar.</p></header>
+    {canManage && showHolidays && <section className="attendance-holiday-card"><header><div><FaCalendarPlus /><h3>Company Holidays</h3></div><p>Eastern Time office calendar.</p></header>
       <form onSubmit={addHoliday}><input required type="date" value={holiday.holiday_date} onChange={e=>setHoliday({...holiday,holiday_date:e.target.value})}/><input required placeholder="Holiday name" value={holiday.name} onChange={e=>setHoliday({...holiday,name:e.target.value})}/><button>Save Holiday</button></form>
       <div>{holidays.map(item=><span key={item.id}><b>{item.holiday_date}</b> {item.name}<button aria-label="Delete holiday" onClick={()=>setDeletingHoliday(item)}><FaTrash /></button></span>)}</div>
     </section>}

@@ -1,0 +1,28 @@
+{"logTime": "1005/162709", "correlationVector":"tVcU0IZei5AchTKCeXlED1","action":"Normal GetUpdate request", "result":"", "context":cV=tVcU0IZei5AchTKCeXlED1
+Refresh requested types: Extensions, Extension settings, Device Info, User Consents, Send Tab To Self, Web Apps, Encryption Keys}
+{"logTime": "1005/162709", "correlationVector":"tVcU0IZei5AchTKCeXlED1.1","action":"SyncServerConnectionManagerRequest", "result":"SYNC_SERVER_OK", "context":{"environment":"Prod_southindia_prod-s01-004-apac-southindia", "migrationStage":"NotStarted", "server":"akswtt10700005f"}}
+{"logTime": "1005/162709", "correlationVector":"tVcU0IZei5AchTKCeXlED1.2","action":"ProcessGetUpdates", "result":"Done", "context":{"dataType":"Device Info", "deleted":"0", "process_failed_to_decrypt":"0", "process_pending_decryption":"0", "process_success":"1", "total":"1"}}
+{"logTime": "1005/162709", "correlationVector":"tVcU0IZei5AchTKCeXlED1.3","action":"GetUpdates Response", "result":"Success", "context":Received 1 update(s). cV=tVcU0IZei5AchTKCeXlED1.0;server=akswtt10700005f;cloudType=Consumer;environment=Prod_southindia_prod-s01-004-apac-southindia;migrationStage=NotStarted}
+{"logTime": "1005/162729", "correlationVector":"","action":"Microsoft.Sync.State.UserActionableError.30Sec", "result":"Error:7"}
+{"logTime": "1005/162729", "correlationVector":"","action":"Microsoft.Sync.State.Existing.UserActionableError.30Sec", "result":"Error:7"}
+{"logTime": "1005/162759", "correlationVector":"","action":"Microsoft.Sync.State.UserActionableError.1Min", "result":"Error:7"}
+{"logTime": "1005/162759", "correlationVector":"","action":"Microsoft.Sync.State.Existing.UserActionableError.1Min", "result":"Error:7"}
+{"logTime": "1005/162943", "correlationVector":"eqnKbrVwO3Snxhkxb1rSRS","action":"Normal GetUpdate request", "result":"", "context":cV=eqnKbrVwO3Snxhkxb1rSRS
+Refresh requested types: Extensions, Extension settings, Device Info, User Consents, Send Tab To Self, Web Apps, Encryption Keys}
+{"logTime": "1005/162943", "correlationVector":"eqnKbrVwO3Snxhkxb1rSRS.1","action":"SyncServerConnectionManagerRequest", "result":"SYNC_SERVER_OK", "context":{"environment":"Prod_southindia_prod-s01-004-apac-southindia", "migrationStage":"NotStarted", "server":"akswtt107000059"}}
+{"logTime": "1005/162943", "correlationVector":"eqnKbrVwO3Snxhkxb1rSRS.2","action":"GetUpdates Response", "result":"Success", "context":Received 0 update(s). cV=eqnKbrVwO3Snxhkxb1rSRS.0;server=akswtt107000059;cloudType=Consumer;environment=Prod_southindia_prod-s01-004-apac-southindia;migrationStage=NotStarted}
+{"logTime": "1005/162955", "correlationVector":"1vKCgKt/sceR6Cgxh0dFCa","action":"Commit Request", "result":"", "context":Item count: 1
+Contributing types: Extensions}
+{"logTime": "1005/162955", "correlationVector":"1vKCgKt/sceR6Cgxh0dFCa.1","action":"SyncServerConnectionManagerRequest", "result":"SYNC_SERVER_OK", "context":{"environment":"Prod_southindia_prod-s01-004-apac-southindia", "migrationStage":"NotStarted", "server":"akswtt10700005a"}}
+{"logTime": "1005/162955", "correlationVector":"1vKCgKt/sceR6Cgxh0dFCa.2","action":"Commit Response", "result":"Success", "context":Result: Success. cV=1vKCgKt/sceR6Cgxh0dFCa.0;server=akswtt10700005a;cloudType=Consumer;environment=Prod_southindia_prod-s01-004-apac-southindia;migrationStage=NotStarted}
+{"logTime": "1005/163051", "correlationVector":"YLD+FyKgAQmSyLDuTUevVj","action":"Normal GetUpdate request", "result":"", "context":cV=YLD+FyKgAQmSyLDuTUevVj
+Refresh requested types: Extensions, Extension settings, Device Info, User Consents, Send Tab To Self, Web Apps, Encryption Keys}
+{"logTime": "1005/163051", "correlationVector":"YLD+FyKgAQmSyLDuTUevVj.1","action":"SyncServerConnectionManagerRequest", "result":"SYNC_SERVER_OK", "context":{"environment":"Prod_southindia_prod-s01-004-apac-southindia", "migrationStage":"NotStarted", "server":"akswtt1070000c4"}}
+{"logTime": "1005/163051", "correlationVector":"YLD+FyKgAQmSyLDuTUevVj.2","action":"ProcessGetUpdates", "result":"Done", "context":{"dataType":"Extensions", "deleted":"0", "process_failed_to_decrypt":"0", "process_pending_decryption":"0", "process_success":"1", "total":"1"}}
+{"logTime": "1005/163051", "correlationVector":"YLD+FyKgAQmSyLDuTUevVj.3","action":"GetUpdates Response", "result":"Success", "context":Received 1 update(s). cV=YLD+FyKgAQmSyLDuTUevVj.0;server=akswtt1070000c4;cloudType=Consumer;environment=Prod_southindia_prod-s01-004-apac-southindia;migrationStage=NotStarted}
+{"logTime": "1005/163111", "correlationVector":"","action":"Microsoft.Sync.State.UserActionableError.30Sec", "result":"Error:7"}
+{"logTime": "1005/163111", "correlationVector":"","action":"Microsoft.Sync.State.Existing.UserActionableError.30Sec", "result":"Error:7"}
+{"logTime": "1005/163141", "correlationVector":"","action":"Microsoft.Sync.State.UserActionableError.1Min", "result":"Error:7"}
+{"logTime": "1005/163141", "correlationVector":"","action":"Microsoft.Sync.State.Existing.UserActionableError.1Min", "result":"Error:7"}
+{"logTime": "1005/163241", "correlationVector":"","action":"Microsoft.Sync.State.UserActionableError.2Min", "result":"Error:7"}
+{"logTime": "1005/163241", "correlationVector":"","action":"Microsoft.Sync.State.Existing.UserActionableError.2Min", "result":"Error:7"}

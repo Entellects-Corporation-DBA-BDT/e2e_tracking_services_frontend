@@ -1,0 +1,404 @@
+[
+  {
+    "route": "/dashboard/employee-status/7",
+    "width": 1440,
+    "title": "E2E TRACKING",
+    "body": "E2E TRACKING\n\nSERVICES\n\nFind a resource\nOverview\nDashboard\nTalent Acquisition\nRecruiting\nJobs\nCandidates\nSales & Relationships\nBench sales\nClients\nOnboarding & ",
+    "overflow": false,
+    "navSize": {
+      "width": 225,
+      "scroll": 225
+    },
+    "sidebar": "rgb(13, 28, 51)",
+    "active": "linear-gradient(110deg, rgb(8, 123, 255), rgb(120, 69, 255))",
+    "errors": []
+  },
+  {
+    "route": "/dashboard/employee-status/7",
+    "width": 390,
+    "title": "E2E TRACKING",
+    "body": "Dashboard\nRecruiting\nJobs\nCandidates\nBench sales\nClients\nTraining\nEmployees\nProfile\nAttendance\nUsers\nPermissions\nResources\nEmployee Identity Details\n\nWelcome to",
+    "overflow": false,
+    "navSize": {
+      "width": 362,
+      "scroll": 6625
+    },
+    "sidebar": "rgb(13, 28, 51)",
+    "active": "linear-gradient(110deg, rgb(8, 123, 255), rgb(120, 69, 255))",
+    "errors": []
+  },
+  {
+    "route": "/dashboard/employee-status",
+    "width": 1440,
+    "title": "E2E TRACKING",
+    "body": "E2E TRACKING\n\nSERVICES\n\nFind a resource\nOverview\nDashboard\nTalent Acquisition\nRecruiting\nJobs\nCandidates\nSales & Relationships\nBench sales\nClients\nOnboarding & ",
+    "overflow": false,
+    "navSize": {
+      "width": 225,
+      "scroll": 225
+    },
+    "sidebar": "rgb(13, 28, 51)",
+    "active": "linear-gradient(110deg, rgb(8, 123, 255), rgb(120, 69, 255))",
+    "errors": []
+  },
+  {
+    "route": "/dashboard/employee-status",
+    "width": 390,
+    "title": "E2E TRACKING",
+    "body": "Dashboard\nRecruiting\nJobs\nCandidates\nBench sales\nClients\nTraining\nEmployees\nProfile\nAttendance\nUsers\nPermissions\nResources\nEmployee Status Report\n\nWelcome to E2",
+    "overflow": false,
+    "navSize": {
+      "width": 362,
+      "scroll": 6625
+    },
+    "sidebar": "rgb(13, 28, 51)",
+    "active": "linear-gradient(110deg, rgb(8, 123, 255), rgb(120, 69, 255))",
+    "errors": []
+  },
+  {
+    "route": "/dashboard/jobs",
+    "width": 1440,
+    "title": "E2E TRACKING",
+    "body": "E2E TRACKING\n\nSERVICES\n\nFind a resource\nOverview\nDashboard\nTalent Acquisition\nRecruiting\nJobs\nCandidates\nSales & Relationships\nBench sales\nClients\nOnboarding & ",
+    "overflow": false,
+    "navSize": {
+      "width": 225,
+      "scroll": 225
+    },
+    "sidebar": "rgb(13, 28, 51)",
+    "active": "linear-gradient(110deg, rgb(8, 123, 255), rgb(120, 69, 255))",
+    "errors": []
+  },
+  {
+    "route": "/dashboard/jobs",
+    "width": 390,
+    "title": "E2E TRACKING",
+    "body": "Dashboard\nRecruiting\nJobs\nCandidates\nBench sales\nClients\nTraining\nEmployees\nProfile\nAttendance\nUsers\nPermissions\nResources\nJobs\n\nWelcome to E2E Tracking Service",
+    "overflow": false,
+    "navSize": {
+      "width": 362,
+      "scroll": 6625
+    },
+    "sidebar": "rgb(13, 28, 51)",
+    "active": "linear-gradient(110deg, rgb(8, 123, 255), rgb(120, 69, 255))",
+    "errors": []
+  },
+  {
+    "route": "/dashboard/clients",
+    "width": 1440,
+    "title": "E2E TRACKING",
+    "body": "E2E TRACKING\n\nSERVICES\n\nFind a resource\nOverview\nDashboard\nTalent Acquisition\nRecruiting\nJobs\nCandidates\nSales & Relationships\nBench sales\nClients\nOnboarding & ",
+    "overflow": false,
+    "navSize": {
+      "width": 225,
+      "scroll": 225
+    },
+    "sidebar": "rgb(13, 28, 51)",
+    "active": "linear-gradient(110deg, rgb(8, 123, 255), rgb(120, 69, 255))",
+    "errors": []
+  },
+  {
+    "route": "/dashboard/clients",
+    "width": 390,
+    "title": "E2E TRACKING",
+    "body": "Dashboard\nRecruiting\nJobs\nCandidates\nBench sales\nClients\nTraining\nEmployees\nProfile\nAttendance\nUsers\nPermissions\nResources\nClients\n\nWelcome to E2E Tracking Serv",
+    "overflow": false,
+    "navSize": {
+      "width": 362,
+      "scroll": 6625
+    },
+    "sidebar": "rgb(13, 28, 51)",
+    "active": "linear-gradient(110deg, rgb(8, 123, 255), rgb(120, 69, 255))",
+    "errors": []
+  },
+  {
+    "route": "/dashboard/recruiting",
+    "width": 1440,
+    "title": "E2E TRACKING",
+    "body": "E2E TRACKING\n\nSERVICES\n\nFind a resource\nOverview\nDashboard\nTalent Acquisition\nRecruiting\nJobs\nCandidates\nSales & Relationships\nBench sales\nClients\nOnboarding & ",
+    "overflow": false,
+    "navSize": {
+      "width": 225,
+      "scroll": 225
+    },
+    "sidebar": "rgb(13, 28, 51)",
+    "active": "linear-gradient(110deg, rgb(8, 123, 255), rgb(120, 69, 255))",
+    "errors": []
+  },
+  {
+    "route": "/dashboard/recruiting",
+    "width": 390,
+    "title": "E2E TRACKING",
+    "body": "Dashboard\nRecruiting\nJobs\nCandidates\nBench sales\nClients\nTraining\nEmployees\nProfile\nAttendance\nUsers\nPermissions\nResources\nRecruiting\n\nWelcome to E2E Tracking S",
+    "overflow": false,
+    "navSize": {
+      "width": 362,
+      "scroll": 6625
+    },
+    "sidebar": "rgb(13, 28, 51)",
+    "active": "linear-gradient(110deg, rgb(8, 123, 255), rgb(120, 69, 255))",
+    "errors": []
+  },
+  {
+    "route": "/dashboard/attendance",
+    "width": 1440,
+    "title": "E2E TRACKING",
+    "body": "E2E TRACKING\n\nSERVICES\n\nFind a resource\nOverview\nDashboard\nTalent Acquisition\nRecruiting\nJobs\nCandidates\nSales & Relationships\nBench sales\nClients\nOnboarding & ",
+    "overflow": false,
+    "navSize": {
+      "width": 225,
+      "scroll": 225
+    },
+    "sidebar": "rgb(13, 28, 51)",
+    "active": "linear-gradient(110deg, rgb(8, 123, 255), rgb(120, 69, 255))",
+    "errors": []
+  },
+  {
+    "route": "/dashboard/attendance",
+    "width": 390,
+    "title": "E2E TRACKING",
+    "body": "Dashboard\nRecruiting\nJobs\nCandidates\nBench sales\nClients\nTraining\nEmployees\nProfile\nAttendance\nUsers\nPermissions\nResources\nAttendance\n\nWelcome to E2E Tracking S",
+    "overflow": false,
+    "navSize": {
+      "width": 362,
+      "scroll": 6625
+    },
+    "sidebar": "rgb(13, 28, 51)",
+    "active": "linear-gradient(110deg, rgb(8, 123, 255), rgb(120, 69, 255))",
+    "errors": []
+  },
+  {
+    "route": "/dashboard/users",
+    "width": 1440,
+    "title": "E2E TRACKING",
+    "body": "E2E TRACKING\n\nSERVICES\n\nFind a resource\nOverview\nDashboard\nTalent Acquisition\nRecruiting\nJobs\nCandidates\nSales & Relationships\nBench sales\nClients\nOnboarding & ",
+    "overflow": false,
+    "navSize": {
+      "width": 225,
+      "scroll": 225
+    },
+    "sidebar": "rgb(13, 28, 51)",
+    "active": "linear-gradient(110deg, rgb(8, 123, 255), rgb(120, 69, 255))",
+    "errors": []
+  },
+  {
+    "route": "/dashboard/users",
+    "width": 390,
+    "title": "E2E TRACKING",
+    "body": "Dashboard\nRecruiting\nJobs\nCandidates\nBench sales\nClients\nTraining\nEmployees\nProfile\nAttendance\nUsers\nPermissions\nResources\nUser Management\n\nWelcome to E2E Track",
+    "overflow": false,
+    "navSize": {
+      "width": 362,
+      "scroll": 6625
+    },
+    "sidebar": "rgb(13, 28, 51)",
+    "active": "linear-gradient(110deg, rgb(8, 123, 255), rgb(120, 69, 255))",
+    "errors": []
+  },
+  {
+    "route": "/dashboard/candidates",
+    "width": 1440,
+    "title": "E2E TRACKING",
+    "body": "E2E TRACKING\n\nSERVICES\n\nFind a resource\nOverview\nDashboard\nTalent Acquisition\nRecruiting\nJobs\nCandidates\nSales & Relationships\nBench sales\nClients\nOnboarding & ",
+    "overflow": false,
+    "navSize": {
+      "width": 225,
+      "scroll": 225
+    },
+    "sidebar": "rgb(13, 28, 51)",
+    "active": "linear-gradient(110deg, rgb(8, 123, 255), rgb(120, 69, 255))",
+    "errors": []
+  },
+  {
+    "route": "/dashboard/candidates",
+    "width": 390,
+    "title": "E2E TRACKING",
+    "body": "Dashboard\nRecruiting\nJobs\nCandidates\nBench sales\nClients\nTraining\nEmployees\nProfile\nAttendance\nUsers\nPermissions\nResources\nCandidates\n\nWelcome to E2E Tracking S",
+    "overflow": false,
+    "navSize": {
+      "width": 362,
+      "scroll": 6625
+    },
+    "sidebar": "rgb(13, 28, 51)",
+    "active": "linear-gradient(110deg, rgb(8, 123, 255), rgb(120, 69, 255))",
+    "errors": []
+  },
+  {
+    "route": "/dashboard/training",
+    "width": 1440,
+    "title": "E2E TRACKING",
+    "body": "E2E TRACKING\n\nSERVICES\n\nFind a resource\nOverview\nDashboard\nTalent Acquisition\nRecruiting\nJobs\nCandidates\nSales & Relationships\nBench sales\nClients\nOnboarding & ",
+    "overflow": false,
+    "navSize": {
+      "width": 225,
+      "scroll": 225
+    },
+    "sidebar": "rgb(13, 28, 51)",
+    "active": "linear-gradient(110deg, rgb(8, 123, 255), rgb(120, 69, 255))",
+    "errors": []
+  },
+  {
+    "route": "/dashboard/training",
+    "width": 390,
+    "title": "E2E TRACKING",
+    "body": "Dashboard\nRecruiting\nJobs\nCandidates\nBench sales\nClients\nTraining\nEmployees\nProfile\nAttendance\nUsers\nPermissions\nResources\nTraining\n\nWelcome to E2E Tracking Ser",
+    "overflow": false,
+    "navSize": {
+      "width": 362,
+      "scroll": 6625
+    },
+    "sidebar": "rgb(13, 28, 51)",
+    "active": "linear-gradient(110deg, rgb(8, 123, 255), rgb(120, 69, 255))",
+    "errors": []
+  },
+  {
+    "route": "/dashboard/permissions",
+    "width": 1440,
+    "title": "E2E TRACKING",
+    "body": "E2E TRACKING\n\nSERVICES\n\nFind a resource\nOverview\nDashboard\nTalent Acquisition\nRecruiting\nJobs\nCandidates\nSales & Relationships\nBench sales\nClients\nOnboarding & ",
+    "overflow": false,
+    "navSize": {
+      "width": 225,
+      "scroll": 225
+    },
+    "sidebar": "rgb(13, 28, 51)",
+    "active": "linear-gradient(110deg, rgb(8, 123, 255), rgb(120, 69, 255))",
+    "errors": []
+  },
+  {
+    "route": "/dashboard/permissions",
+    "width": 390,
+    "title": "E2E TRACKING",
+    "body": "Dashboard\nRecruiting\nJobs\nCandidates\nBench sales\nClients\nTraining\nEmployees\nProfile\nAttendance\nUsers\nPermissions\nResources\nPermission Matrix\n\nWelcome to E2E Tra",
+    "overflow": false,
+    "navSize": {
+      "width": 362,
+      "scroll": 6625
+    },
+    "sidebar": "rgb(13, 28, 51)",
+    "active": "linear-gradient(110deg, rgb(8, 123, 255), rgb(120, 69, 255))",
+    "errors": []
+  },
+  {
+    "route": "/dashboard/resources",
+    "width": 1440,
+    "title": "E2E TRACKING",
+    "body": "E2E TRACKING\n\nSERVICES\n\nFind a resource\nOverview\nDashboard\nTalent Acquisition\nRecruiting\nJobs\nCandidates\nSales & Relationships\nBench sales\nClients\nOnboarding & ",
+    "overflow": false,
+    "navSize": {
+      "width": 225,
+      "scroll": 225
+    },
+    "sidebar": "rgb(13, 28, 51)",
+    "active": "linear-gradient(110deg, rgb(8, 123, 255), rgb(120, 69, 255))",
+    "errors": []
+  },
+  {
+    "route": "/dashboard/resources",
+    "width": 390,
+    "title": "E2E TRACKING",
+    "body": "Dashboard\nRecruiting\nJobs\nCandidates\nBench sales\nClients\nTraining\nEmployees\nProfile\nAttendance\nUsers\nPermissions\nResources\nResources\n\nWelcome to E2E Tracking Se",
+    "overflow": false,
+    "navSize": {
+      "width": 362,
+      "scroll": 6625
+    },
+    "sidebar": "rgb(13, 28, 51)",
+    "active": "linear-gradient(110deg, rgb(8, 123, 255), rgb(120, 69, 255))",
+    "errors": []
+  },
+  {
+    "route": "/dashboard/bench-sales",
+    "width": 1440,
+    "title": "E2E TRACKING",
+    "body": "E2E TRACKING\n\nSERVICES\n\nFind a resource\nOverview\nDashboard\nTalent Acquisition\nRecruiting\nJobs\nCandidates\nSales & Relationships\nBench sales\nClients\nOnboarding & ",
+    "overflow": false,
+    "navSize": {
+      "width": 225,
+      "scroll": 225
+    },
+    "sidebar": "rgb(13, 28, 51)",
+    "active": "linear-gradient(110deg, rgb(8, 123, 255), rgb(120, 69, 255))",
+    "errors": []
+  },
+  {
+    "route": "/dashboard/bench-sales",
+    "width": 390,
+    "title": "E2E TRACKING",
+    "body": "Dashboard\nRecruiting\nJobs\nCandidates\nBench sales\nClients\nTraining\nEmployees\nProfile\nAttendance\nUsers\nPermissions\nResources\nBench Sales\n\nWelcome to E2E Tracking ",
+    "overflow": false,
+    "navSize": {
+      "width": 362,
+      "scroll": 6625
+    },
+    "sidebar": "rgb(13, 28, 51)",
+    "active": "linear-gradient(110deg, rgb(8, 123, 255), rgb(120, 69, 255))",
+    "errors": []
+  },
+  {
+    "route": "/about",
+    "width": 1440,
+    "title": "Empowering Recruitment & Workforce Management",
+    "body": "ABOUT E2E TRACKING SERVICES\nEmpowering Recruitment & Workforce Management\n\nE2E Tracking Services helps organizations manage recruiting, submissions, vendors, cl",
+    "overflow": false,
+    "navSize": null,
+    "sidebar": null,
+    "active": null,
+    "errors": []
+  },
+  {
+    "route": "/about",
+    "width": 390,
+    "title": "Empowering Recruitment & Workforce Management",
+    "body": "ABOUT E2E TRACKING SERVICES\nEmpowering Recruitment & Workforce Management\n\nE2E Tracking Services helps organizations manage recruiting, submissions, vendors, cl",
+    "overflow": false,
+    "navSize": null,
+    "sidebar": null,
+    "active": null,
+    "errors": []
+  },
+  {
+    "route": "/contact",
+    "width": 1440,
+    "title": "Contact Us",
+    "body": "Contact Us\n\nWe are here to answer your questions and help your business grow.\n\nPhone\n\n+1-847-960-4204\n\nEmail\n\nhr_ind@beedatatech.com\n\nLocation\n\nMadhurawada, Vis",
+    "overflow": false,
+    "navSize": null,
+    "sidebar": null,
+    "active": null,
+    "errors": []
+  },
+  {
+    "route": "/contact",
+    "width": 390,
+    "title": "Contact Us",
+    "body": "Contact Us\n\nWe are here to answer your questions and help your business grow.\n\nPhone\n\n+1-847-960-4204\n\nEmail\n\nhr_ind@beedatatech.com\n\nLocation\n\nMadhurawada, Vis",
+    "overflow": false,
+    "navSize": null,
+    "sidebar": null,
+    "active": null,
+    "errors": []
+  },
+  {
+    "route": "/",
+    "width": 1440,
+    "title": "One Platform forComplete RecruitmentManagement",
+    "body": "E2E TRACKING\nSERVICES\nOne Platform for\nComplete Recruitment\nManagement\n\nStreamline your hiring process, track submissions, manage interviews and close placement",
+    "overflow": false,
+    "navSize": null,
+    "sidebar": null,
+    "active": null,
+    "errors": []
+  },
+  {
+    "route": "/",
+    "width": 390,
+    "title": "One Platform forComplete RecruitmentManagement",
+    "body": "E2E TRACKING\nSERVICES\nOne Platform for\nComplete Recruitment\nManagement\n\nStreamline your hiring process, track submissions, manage interviews and close placement",
+    "overflow": false,
+    "navSize": null,
+    "sidebar": null,
+    "active": null,
+    "errors": []
+  }
+]

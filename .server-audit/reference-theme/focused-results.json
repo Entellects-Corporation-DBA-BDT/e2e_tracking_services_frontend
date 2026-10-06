@@ -1,0 +1,1106 @@
+[
+  {
+    "route": "/dashboard/employee-status/7",
+    "width": 1440,
+    "title": "E2E TRACKING",
+    "body": "E2E TRACKING\n\nSERVICES\n\nFind a resource\nOverview\nDashboard\nTalent Acquisition\nRecruiting\nJobs\nCandidates\nSales & Relationships\nBench sales\nClients\nHot list\nPrim",
+    "overflow": false,
+    "navMenus": [
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      }
+    ],
+    "navSize": {
+      "width": 225,
+      "scroll": 225
+    },
+    "sidebar": "rgb(13, 28, 51)",
+    "active": "linear-gradient(110deg, rgb(8, 123, 255), rgb(120, 69, 255))",
+    "errors": []
+  },
+  {
+    "route": "/dashboard/employee-status/7",
+    "width": 390,
+    "title": "E2E TRACKING",
+    "body": "Dashboard\nRecruiting\nJobs\nCandidates\nBench sales\nClients\nHot list\nPrime vendors\nTraining\nCandidate onboarding\nDocument reminders\nW2 forms\nEmployees\nProfile\nAtte",
+    "overflow": false,
+    "navMenus": [
+      {
+        "w": 96,
+        "min": "0px"
+      },
+      {
+        "w": 298,
+        "min": "0px"
+      },
+      {
+        "w": 399,
+        "min": "0px"
+      },
+      {
+        "w": 399,
+        "min": "0px"
+      },
+      {
+        "w": 298,
+        "min": "0px"
+      },
+      {
+        "w": 197,
+        "min": "0px"
+      },
+      {
+        "w": 500,
+        "min": "0px"
+      }
+    ],
+    "navSize": {
+      "width": 362,
+      "scroll": 2217
+    },
+    "sidebar": "rgb(13, 28, 51)",
+    "active": "linear-gradient(110deg, rgb(8, 123, 255), rgb(120, 69, 255))",
+    "errors": []
+  },
+  {
+    "route": "/dashboard/clients",
+    "width": 1440,
+    "title": "E2E TRACKING",
+    "body": "E2E TRACKING\n\nSERVICES\n\nFind a resource\nOverview\nDashboard\nTalent Acquisition\nRecruiting\nJobs\nCandidates\nSales & Relationships\nBench sales\nClients\nHot list\nPrim",
+    "overflow": false,
+    "navMenus": [
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      }
+    ],
+    "navSize": {
+      "width": 225,
+      "scroll": 225
+    },
+    "sidebar": "rgb(13, 28, 51)",
+    "active": "linear-gradient(110deg, rgb(8, 123, 255), rgb(120, 69, 255))",
+    "errors": []
+  },
+  {
+    "route": "/dashboard/clients",
+    "width": 390,
+    "title": "E2E TRACKING",
+    "body": "Dashboard\nRecruiting\nJobs\nCandidates\nBench sales\nClients\nHot list\nPrime vendors\nTraining\nCandidate onboarding\nDocument reminders\nW2 forms\nEmployees\nProfile\nAtte",
+    "overflow": false,
+    "navMenus": [
+      {
+        "w": 96,
+        "min": "0px"
+      },
+      {
+        "w": 298,
+        "min": "0px"
+      },
+      {
+        "w": 399,
+        "min": "0px"
+      },
+      {
+        "w": 399,
+        "min": "0px"
+      },
+      {
+        "w": 298,
+        "min": "0px"
+      },
+      {
+        "w": 197,
+        "min": "0px"
+      },
+      {
+        "w": 500,
+        "min": "0px"
+      }
+    ],
+    "navSize": {
+      "width": 362,
+      "scroll": 2217
+    },
+    "sidebar": "rgb(13, 28, 51)",
+    "active": "linear-gradient(110deg, rgb(8, 123, 255), rgb(120, 69, 255))",
+    "errors": []
+  },
+  {
+    "route": "/dashboard/hotlist",
+    "width": 1440,
+    "title": "E2E TRACKING",
+    "body": "E2E TRACKING\n\nSERVICES\n\nFind a resource\nOverview\nDashboard\nTalent Acquisition\nRecruiting\nJobs\nCandidates\nSales & Relationships\nBench sales\nClients\nHot list\nPrim",
+    "overflow": false,
+    "navMenus": [
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      }
+    ],
+    "navSize": {
+      "width": 225,
+      "scroll": 225
+    },
+    "sidebar": "rgb(13, 28, 51)",
+    "active": "linear-gradient(110deg, rgb(8, 123, 255), rgb(120, 69, 255))",
+    "errors": []
+  },
+  {
+    "route": "/dashboard/hotlist",
+    "width": 390,
+    "title": "E2E TRACKING",
+    "body": "Dashboard\nRecruiting\nJobs\nCandidates\nBench sales\nClients\nHot list\nPrime vendors\nTraining\nCandidate onboarding\nDocument reminders\nW2 forms\nEmployees\nProfile\nAtte",
+    "overflow": false,
+    "navMenus": [
+      {
+        "w": 96,
+        "min": "0px"
+      },
+      {
+        "w": 298,
+        "min": "0px"
+      },
+      {
+        "w": 399,
+        "min": "0px"
+      },
+      {
+        "w": 399,
+        "min": "0px"
+      },
+      {
+        "w": 298,
+        "min": "0px"
+      },
+      {
+        "w": 197,
+        "min": "0px"
+      },
+      {
+        "w": 500,
+        "min": "0px"
+      }
+    ],
+    "navSize": {
+      "width": 362,
+      "scroll": 2217
+    },
+    "sidebar": "rgb(13, 28, 51)",
+    "active": "linear-gradient(110deg, rgb(8, 123, 255), rgb(120, 69, 255))",
+    "errors": []
+  },
+  {
+    "route": "/dashboard/vendors",
+    "width": 1440,
+    "title": "E2E TRACKING",
+    "body": "E2E TRACKING\n\nSERVICES\n\nFind a resource\nOverview\nDashboard\nTalent Acquisition\nRecruiting\nJobs\nCandidates\nSales & Relationships\nBench sales\nClients\nHot list\nPrim",
+    "overflow": false,
+    "navMenus": [
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      }
+    ],
+    "navSize": {
+      "width": 225,
+      "scroll": 225
+    },
+    "sidebar": "rgb(13, 28, 51)",
+    "active": "linear-gradient(110deg, rgb(8, 123, 255), rgb(120, 69, 255))",
+    "errors": []
+  },
+  {
+    "route": "/dashboard/vendors",
+    "width": 390,
+    "title": "E2E TRACKING",
+    "body": "Dashboard\nRecruiting\nJobs\nCandidates\nBench sales\nClients\nHot list\nPrime vendors\nTraining\nCandidate onboarding\nDocument reminders\nW2 forms\nEmployees\nProfile\nAtte",
+    "overflow": false,
+    "navMenus": [
+      {
+        "w": 96,
+        "min": "0px"
+      },
+      {
+        "w": 298,
+        "min": "0px"
+      },
+      {
+        "w": 399,
+        "min": "0px"
+      },
+      {
+        "w": 399,
+        "min": "0px"
+      },
+      {
+        "w": 298,
+        "min": "0px"
+      },
+      {
+        "w": 197,
+        "min": "0px"
+      },
+      {
+        "w": 500,
+        "min": "0px"
+      }
+    ],
+    "navSize": {
+      "width": 362,
+      "scroll": 2217
+    },
+    "sidebar": "rgb(13, 28, 51)",
+    "active": "linear-gradient(110deg, rgb(8, 123, 255), rgb(120, 69, 255))",
+    "errors": []
+  },
+  {
+    "route": "/dashboard/candidate-onboarding",
+    "width": 1440,
+    "title": "E2E TRACKING",
+    "body": "E2E TRACKING\n\nSERVICES\n\nFind a resource\nOverview\nDashboard\nTalent Acquisition\nRecruiting\nJobs\nCandidates\nSales & Relationships\nBench sales\nClients\nHot list\nPrim",
+    "overflow": false,
+    "navMenus": [
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      }
+    ],
+    "navSize": {
+      "width": 225,
+      "scroll": 225
+    },
+    "sidebar": "rgb(13, 28, 51)",
+    "active": "linear-gradient(110deg, rgb(8, 123, 255), rgb(120, 69, 255))",
+    "errors": []
+  },
+  {
+    "route": "/dashboard/candidate-onboarding",
+    "width": 390,
+    "title": "E2E TRACKING",
+    "body": "Dashboard\nRecruiting\nJobs\nCandidates\nBench sales\nClients\nHot list\nPrime vendors\nTraining\nCandidate onboarding\nDocument reminders\nW2 forms\nEmployees\nProfile\nAtte",
+    "overflow": false,
+    "navMenus": [
+      {
+        "w": 96,
+        "min": "0px"
+      },
+      {
+        "w": 298,
+        "min": "0px"
+      },
+      {
+        "w": 399,
+        "min": "0px"
+      },
+      {
+        "w": 399,
+        "min": "0px"
+      },
+      {
+        "w": 298,
+        "min": "0px"
+      },
+      {
+        "w": 197,
+        "min": "0px"
+      },
+      {
+        "w": 500,
+        "min": "0px"
+      }
+    ],
+    "navSize": {
+      "width": 362,
+      "scroll": 2217
+    },
+    "sidebar": "rgb(13, 28, 51)",
+    "active": "linear-gradient(110deg, rgb(8, 123, 255), rgb(120, 69, 255))",
+    "errors": []
+  },
+  {
+    "route": "/dashboard/document-reminders",
+    "width": 1440,
+    "title": "E2E TRACKING",
+    "body": "E2E TRACKING\n\nSERVICES\n\nFind a resource\nOverview\nDashboard\nTalent Acquisition\nRecruiting\nJobs\nCandidates\nSales & Relationships\nBench sales\nClients\nHot list\nPrim",
+    "overflow": false,
+    "navMenus": [
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      }
+    ],
+    "navSize": {
+      "width": 225,
+      "scroll": 225
+    },
+    "sidebar": "rgb(13, 28, 51)",
+    "active": "linear-gradient(110deg, rgb(8, 123, 255), rgb(120, 69, 255))",
+    "errors": []
+  },
+  {
+    "route": "/dashboard/document-reminders",
+    "width": 390,
+    "title": "E2E TRACKING",
+    "body": "Dashboard\nRecruiting\nJobs\nCandidates\nBench sales\nClients\nHot list\nPrime vendors\nTraining\nCandidate onboarding\nDocument reminders\nW2 forms\nEmployees\nProfile\nAtte",
+    "overflow": false,
+    "navMenus": [
+      {
+        "w": 96,
+        "min": "0px"
+      },
+      {
+        "w": 298,
+        "min": "0px"
+      },
+      {
+        "w": 399,
+        "min": "0px"
+      },
+      {
+        "w": 399,
+        "min": "0px"
+      },
+      {
+        "w": 298,
+        "min": "0px"
+      },
+      {
+        "w": 197,
+        "min": "0px"
+      },
+      {
+        "w": 500,
+        "min": "0px"
+      }
+    ],
+    "navSize": {
+      "width": 362,
+      "scroll": 2217
+    },
+    "sidebar": "rgb(13, 28, 51)",
+    "active": "linear-gradient(110deg, rgb(8, 123, 255), rgb(120, 69, 255))",
+    "errors": []
+  },
+  {
+    "route": "/dashboard/w2-forms",
+    "width": 1440,
+    "title": "E2E TRACKING",
+    "body": "E2E TRACKING\n\nSERVICES\n\nFind a resource\nOverview\nDashboard\nTalent Acquisition\nRecruiting\nJobs\nCandidates\nSales & Relationships\nBench sales\nClients\nHot list\nPrim",
+    "overflow": false,
+    "navMenus": [
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      }
+    ],
+    "navSize": {
+      "width": 225,
+      "scroll": 225
+    },
+    "sidebar": "rgb(13, 28, 51)",
+    "active": "linear-gradient(110deg, rgb(8, 123, 255), rgb(120, 69, 255))",
+    "errors": []
+  },
+  {
+    "route": "/dashboard/w2-forms",
+    "width": 390,
+    "title": "E2E TRACKING",
+    "body": "Dashboard\nRecruiting\nJobs\nCandidates\nBench sales\nClients\nHot list\nPrime vendors\nTraining\nCandidate onboarding\nDocument reminders\nW2 forms\nEmployees\nProfile\nAtte",
+    "overflow": false,
+    "navMenus": [
+      {
+        "w": 96,
+        "min": "0px"
+      },
+      {
+        "w": 298,
+        "min": "0px"
+      },
+      {
+        "w": 399,
+        "min": "0px"
+      },
+      {
+        "w": 399,
+        "min": "0px"
+      },
+      {
+        "w": 298,
+        "min": "0px"
+      },
+      {
+        "w": 197,
+        "min": "0px"
+      },
+      {
+        "w": 500,
+        "min": "0px"
+      }
+    ],
+    "navSize": {
+      "width": 362,
+      "scroll": 2217
+    },
+    "sidebar": "rgb(13, 28, 51)",
+    "active": "linear-gradient(110deg, rgb(8, 123, 255), rgb(120, 69, 255))",
+    "errors": []
+  },
+  {
+    "route": "/dashboard/chat",
+    "width": 1440,
+    "title": "E2E TRACKING",
+    "body": "E2E TRACKING\n\nSERVICES\n\nFind a resource\nOverview\nDashboard\nTalent Acquisition\nRecruiting\nJobs\nCandidates\nSales & Relationships\nBench sales\nClients\nHot list\nPrim",
+    "overflow": false,
+    "navMenus": [
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      }
+    ],
+    "navSize": {
+      "width": 225,
+      "scroll": 225
+    },
+    "sidebar": "rgb(13, 28, 51)",
+    "active": "linear-gradient(110deg, rgb(8, 123, 255), rgb(120, 69, 255))",
+    "errors": []
+  },
+  {
+    "route": "/dashboard/chat",
+    "width": 390,
+    "title": "E2E TRACKING",
+    "body": "Dashboard\nRecruiting\nJobs\nCandidates\nBench sales\nClients\nHot list\nPrime vendors\nTraining\nCandidate onboarding\nDocument reminders\nW2 forms\nEmployees\nProfile\nAtte",
+    "overflow": false,
+    "navMenus": [
+      {
+        "w": 96,
+        "min": "0px"
+      },
+      {
+        "w": 298,
+        "min": "0px"
+      },
+      {
+        "w": 399,
+        "min": "0px"
+      },
+      {
+        "w": 399,
+        "min": "0px"
+      },
+      {
+        "w": 298,
+        "min": "0px"
+      },
+      {
+        "w": 197,
+        "min": "0px"
+      },
+      {
+        "w": 500,
+        "min": "0px"
+      }
+    ],
+    "navSize": {
+      "width": 362,
+      "scroll": 2217
+    },
+    "sidebar": "rgb(13, 28, 51)",
+    "active": "linear-gradient(110deg, rgb(8, 123, 255), rgb(120, 69, 255))",
+    "errors": []
+  },
+  {
+    "route": "/dashboard/notifications",
+    "width": 1440,
+    "title": "E2E TRACKING",
+    "body": "E2E TRACKING\n\nSERVICES\n\nFind a resource\nOverview\nDashboard\nTalent Acquisition\nRecruiting\nJobs\nCandidates\nSales & Relationships\nBench sales\nClients\nHot list\nPrim",
+    "overflow": false,
+    "navMenus": [
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      }
+    ],
+    "navSize": {
+      "width": 225,
+      "scroll": 225
+    },
+    "sidebar": "rgb(13, 28, 51)",
+    "active": "linear-gradient(110deg, rgb(8, 123, 255), rgb(120, 69, 255))",
+    "errors": []
+  },
+  {
+    "route": "/dashboard/notifications",
+    "width": 390,
+    "title": "E2E TRACKING",
+    "body": "Dashboard\nRecruiting\nJobs\nCandidates\nBench sales\nClients\nHot list\nPrime vendors\nTraining\nCandidate onboarding\nDocument reminders\nW2 forms\nEmployees\nProfile\nAtte",
+    "overflow": false,
+    "navMenus": [
+      {
+        "w": 96,
+        "min": "0px"
+      },
+      {
+        "w": 298,
+        "min": "0px"
+      },
+      {
+        "w": 399,
+        "min": "0px"
+      },
+      {
+        "w": 399,
+        "min": "0px"
+      },
+      {
+        "w": 298,
+        "min": "0px"
+      },
+      {
+        "w": 197,
+        "min": "0px"
+      },
+      {
+        "w": 500,
+        "min": "0px"
+      }
+    ],
+    "navSize": {
+      "width": 362,
+      "scroll": 2217
+    },
+    "sidebar": "rgb(13, 28, 51)",
+    "active": "linear-gradient(110deg, rgb(8, 123, 255), rgb(120, 69, 255))",
+    "errors": []
+  },
+  {
+    "route": "/dashboard/chat-admin",
+    "width": 1440,
+    "title": "E2E TRACKING",
+    "body": "E2E TRACKING\n\nSERVICES\n\nFind a resource\nOverview\nDashboard\nTalent Acquisition\nRecruiting\nJobs\nCandidates\nSales & Relationships\nBench sales\nClients\nHot list\nPrim",
+    "overflow": false,
+    "navMenus": [
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      }
+    ],
+    "navSize": {
+      "width": 225,
+      "scroll": 225
+    },
+    "sidebar": "rgb(13, 28, 51)",
+    "active": "linear-gradient(110deg, rgb(8, 123, 255), rgb(120, 69, 255))",
+    "errors": []
+  },
+  {
+    "route": "/dashboard/chat-admin",
+    "width": 390,
+    "title": "E2E TRACKING",
+    "body": "Dashboard\nRecruiting\nJobs\nCandidates\nBench sales\nClients\nHot list\nPrime vendors\nTraining\nCandidate onboarding\nDocument reminders\nW2 forms\nEmployees\nProfile\nAtte",
+    "overflow": false,
+    "navMenus": [
+      {
+        "w": 96,
+        "min": "0px"
+      },
+      {
+        "w": 298,
+        "min": "0px"
+      },
+      {
+        "w": 399,
+        "min": "0px"
+      },
+      {
+        "w": 399,
+        "min": "0px"
+      },
+      {
+        "w": 298,
+        "min": "0px"
+      },
+      {
+        "w": 197,
+        "min": "0px"
+      },
+      {
+        "w": 500,
+        "min": "0px"
+      }
+    ],
+    "navSize": {
+      "width": 362,
+      "scroll": 2217
+    },
+    "sidebar": "rgb(13, 28, 51)",
+    "active": "linear-gradient(110deg, rgb(8, 123, 255), rgb(120, 69, 255))",
+    "errors": []
+  },
+  {
+    "route": "/dashboard/positions",
+    "width": 1440,
+    "title": "E2E TRACKING",
+    "body": "E2E TRACKING\n\nSERVICES\n\nFind a resource\nOverview\nDashboard\nTalent Acquisition\nRecruiting\nJobs\nCandidates\nSales & Relationships\nBench sales\nClients\nHot list\nPrim",
+    "overflow": false,
+    "navMenus": [
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      }
+    ],
+    "navSize": {
+      "width": 225,
+      "scroll": 225
+    },
+    "sidebar": "rgb(13, 28, 51)",
+    "active": "linear-gradient(110deg, rgb(8, 123, 255), rgb(120, 69, 255))",
+    "errors": []
+  },
+  {
+    "route": "/dashboard/positions",
+    "width": 390,
+    "title": "E2E TRACKING",
+    "body": "Dashboard\nRecruiting\nJobs\nCandidates\nBench sales\nClients\nHot list\nPrime vendors\nTraining\nCandidate onboarding\nDocument reminders\nW2 forms\nEmployees\nProfile\nAtte",
+    "overflow": false,
+    "navMenus": [
+      {
+        "w": 96,
+        "min": "0px"
+      },
+      {
+        "w": 298,
+        "min": "0px"
+      },
+      {
+        "w": 399,
+        "min": "0px"
+      },
+      {
+        "w": 399,
+        "min": "0px"
+      },
+      {
+        "w": 298,
+        "min": "0px"
+      },
+      {
+        "w": 197,
+        "min": "0px"
+      },
+      {
+        "w": 500,
+        "min": "0px"
+      }
+    ],
+    "navSize": {
+      "width": 362,
+      "scroll": 2217
+    },
+    "sidebar": "rgb(13, 28, 51)",
+    "active": "linear-gradient(110deg, rgb(8, 123, 255), rgb(120, 69, 255))",
+    "errors": []
+  },
+  {
+    "route": "/dashboard",
+    "width": 1440,
+    "title": "E2E TRACKING",
+    "body": "E2E TRACKING\n\nSERVICES\n\nFind a resource\nOverview\nDashboard\nTalent Acquisition\nRecruiting\nJobs\nCandidates\nSales & Relationships\nBench sales\nClients\nHot list\nPrim",
+    "overflow": false,
+    "navMenus": [
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      },
+      {
+        "w": 208,
+        "min": "auto"
+      }
+    ],
+    "navSize": {
+      "width": 225,
+      "scroll": 225
+    },
+    "sidebar": "rgb(13, 28, 51)",
+    "active": "linear-gradient(110deg, rgb(8, 123, 255), rgb(120, 69, 255))",
+    "errors": []
+  },
+  {
+    "route": "/dashboard",
+    "width": 390,
+    "title": "E2E TRACKING",
+    "body": "Dashboard\nRecruiting\nJobs\nCandidates\nBench sales\nClients\nHot list\nPrime vendors\nTraining\nCandidate onboarding\nDocument reminders\nW2 forms\nEmployees\nProfile\nAtte",
+    "overflow": false,
+    "navMenus": [
+      {
+        "w": 96,
+        "min": "0px"
+      },
+      {
+        "w": 298,
+        "min": "0px"
+      },
+      {
+        "w": 399,
+        "min": "0px"
+      },
+      {
+        "w": 399,
+        "min": "0px"
+      },
+      {
+        "w": 298,
+        "min": "0px"
+      },
+      {
+        "w": 197,
+        "min": "0px"
+      },
+      {
+        "w": 500,
+        "min": "0px"
+      }
+    ],
+    "navSize": {
+      "width": 362,
+      "scroll": 2217
+    },
+    "sidebar": "rgb(13, 28, 51)",
+    "active": "linear-gradient(110deg, rgb(8, 123, 255), rgb(120, 69, 255))",
+    "errors": []
+  },
+  {
+    "route": "/register",
+    "width": 1440,
+    "title": "Create Account",
+    "body": "Create Account\n\nJoin E2E Tracking Services\n\nFull Name\nEmail\nPassword\nConfirm Password\nCreate Account\nAlready have an account?Login",
+    "overflow": false,
+    "navMenus": [],
+    "navSize": null,
+    "sidebar": null,
+    "active": null,
+    "errors": []
+  },
+  {
+    "route": "/register",
+    "width": 390,
+    "title": "Create Account",
+    "body": "Create Account\n\nJoin E2E Tracking Services\n\nFull Name\nEmail\nPassword\nConfirm Password\nCreate Account\nAlready have an account?Login",
+    "overflow": false,
+    "navMenus": [],
+    "navSize": null,
+    "sidebar": null,
+    "active": null,
+    "errors": []
+  },
+  {
+    "route": "/w2-form",
+    "width": 1440,
+    "title": "Secure Data Information Form",
+    "body": "Secure Data Information Form\n\nComplete and submit your Wage and Tax Statement information.\n\nEMPLOYMENT DOCUMENT\nData Form\n\nProject, consultant, end-client and i",
+    "overflow": false,
+    "navMenus": [],
+    "navSize": null,
+    "sidebar": null,
+    "active": null,
+    "errors": []
+  },
+  {
+    "route": "/w2-form",
+    "width": 390,
+    "title": "Secure Data Information Form",
+    "body": "Secure Data Information Form\n\nComplete and submit your Wage and Tax Statement information.\n\nEMPLOYMENT DOCUMENT\nData Form\n\nProject, consultant, end-client and i",
+    "overflow": false,
+    "navMenus": [],
+    "navSize": null,
+    "sidebar": null,
+    "active": null,
+    "errors": []
+  }
+]
