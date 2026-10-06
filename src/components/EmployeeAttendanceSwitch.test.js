@@ -18,3 +18,7 @@ test("preserves logged-out state when the server rejects attendance",async()=>{
 test("compact banner preserves network protection and opens the report",async()=>{
  getTodayAttendance.mockResolvedValue({work_date:"2026-10-06",network:{allowed:false,ip:"203.0.113.10"},record:{time_in:"09:12:00",time_out:"00:00:00"}});const view=jest.fn();render(<EmployeeAttendanceSwitch compact employeeCode="BDT-I-133" onViewAttendance={view}/>);await screen.findByText(/Company network required. Current IP/);expect(screen.getByRole("switch")).toBeDisabled();fireEvent.click(screen.getByRole("button",{name:/View Attendance/}));expect(view).toHaveBeenCalledTimes(1);expect(clockAttendance).not.toHaveBeenCalled();
 });
+
+ test("attendance login requires an assigned employee ID",async()=>{
+ render(<EmployeeAttendanceSwitch employeeCode={null} compact/>);await screen.findByText(/HR must assign your employee ID/);await waitFor(()=>expect(getTodayAttendance).toHaveBeenCalled());expect(screen.getByRole("switch")).toBeDisabled();fireEvent.click(screen.getByRole("switch"));expect(clockAttendance).not.toHaveBeenCalled();
+ });

@@ -28,7 +28,7 @@ export const removeCompanyName = async (employeeId) => {
 };
 
 export const getEmployeeAttendance = async (employeeId, params = {}) => {
-  const response = await axiosInstance.get(`/employees/${employeeId}/attendance`, { params });
+  const response = await axiosInstance.get(`/employees/${employeeId}/attendance`, { params, timeout:15000 });
   return response.data;
 };
 export const setEmployeeAttendanceDate = async (employeeId, date, present = true) => {
@@ -38,14 +38,17 @@ export const setEmployeeAttendanceDate = async (employeeId, date, present = true
 export const createEmployee = async (data) => (await axiosInstance.post("/employees", data)).data;
 export const updateEmployee = async (id, data) => (await axiosInstance.request({method: data instanceof FormData ? "post" : "put", url: `/employees/${id}`, data, timeout:120000})).data;
 export const deleteEmployee = async (id) => (await axiosInstance.delete(`/employees/${id}`)).data;
-export const getMyEmployeeProfile = async () => (await axiosInstance.get("/employees/me")).data;
+export const getMyEmployeeProfile = async () => (await axiosInstance.get("/employees/me",{timeout:15000})).data;
 export const getPositions = async () => (await axiosInstance.get("/position/list", { params: { page: 1, limit: 100 }, timeout:15000 })).data;
-export const getTodayAttendance = async (date, self = false) => (await axiosInstance.get("/attendance/today", { params: { ...(date ? { date } : {}), ...(self ? { self: 1 } : {}) } })).data;
+export const getTodayAttendance = async (date, self = false) => (await axiosInstance.get("/attendance/today", { timeout:15000, params: { ...(date ? { date } : {}), ...(self ? { self: 1 } : {}) } })).data;
 export const getMonthlyAttendance = async (month) => (await axiosInstance.get("/attendance/month", { params: { month } })).data;
 export const getAttendanceIpPermissions = async () => (await axiosInstance.get("/attendance/ip-settings")).data;
 export const updateEmployeeWfhPermission = async (employeeId, wfhAllowed) => (await axiosInstance.put(`/attendance/ip-settings/${employeeId}`, { wfh_allowed: wfhAllowed })).data;
-export const clockAttendance = async (action, employeeId) =>
-  (await axiosInstance.post(`/attendance/time-${action}`, { employee_id: employeeId })).data;
+export const clockAttendance = async (action, employeeId) => {
+  const data=(await axiosInstance.post(`/attendance/time-${action}`, { employee_id: employeeId })).data;
+  if(data.success!==false&&typeof window!=="undefined")window.dispatchEvent(new Event("e2e-attendance-changed"));
+  return data;
+};
 export const getHolidays = async (year) => (await axiosInstance.get("/attendance/holidays", { params: { year } })).data;
 export const saveHoliday = async (data) => (await axiosInstance.post("/attendance/holidays", data)).data;
 export const deleteHoliday = async (id) => (await axiosInstance.delete(`/attendance/holidays/${id}`)).data;

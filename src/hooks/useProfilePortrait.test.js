@@ -1,0 +1,8 @@
+import {renderHook,waitFor,act} from "@testing-library/react";
+import useProfilePortrait from "./useProfilePortrait";
+import {getMyEmployeeProfile,getEmployeePhoto} from "../api/employeeApi";
+jest.mock("../api/employeeApi",()=>({getMyEmployeeProfile:jest.fn(),getEmployeePhoto:jest.fn()}));
+beforeEach(()=>{URL.createObjectURL=jest.fn(()=>"blob:portrait");URL.revokeObjectURL=jest.fn()});
+test("loads the signed-in employee portrait and refreshes after a photo change",async()=>{getMyEmployeeProfile.mockResolvedValue({data:{id:7,photo:"stored.photo.enc"}});getEmployeePhoto.mockResolvedValue(new Blob(["image"]));const {result,unmount}=renderHook(()=>useProfilePortrait(12,true));await waitFor(()=>expect(result.current[0]).toBe("blob:portrait"));expect(getEmployeePhoto).toHaveBeenCalledWith(7);act(()=>window.dispatchEvent(new CustomEvent("e2e-profile-photo-changed",{detail:{employeeId:7}})));await waitFor(()=>expect(getEmployeePhoto).toHaveBeenCalledTimes(2));act(()=>window.dispatchEvent(new CustomEvent("e2e-profile-photo-changed",{detail:{employeeId:99}})));expect(getEmployeePhoto).toHaveBeenCalledTimes(2);unmount();expect(URL.revokeObjectURL).toHaveBeenCalled()});
+test("uses initials fallback when no portrait is saved",async()=>{getMyEmployeeProfile.mockResolvedValue({data:{id:7,photo:""}});const {result}=renderHook(()=>useProfilePortrait(12,true));await waitFor(()=>expect(getMyEmployeeProfile).toHaveBeenCalled());expect(result.current[0]).toBe("");expect(getEmployeePhoto).not.toHaveBeenCalled()});
+test("does not request a profile without permission",()=>{renderHook(()=>useProfilePortrait(12,false));expect(getMyEmployeeProfile).not.toHaveBeenCalled()});

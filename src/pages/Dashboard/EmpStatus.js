@@ -69,16 +69,17 @@ function EmployeeStatusReport() {
       </div>
       {error && <div className="e2e_empstatus_error" role="alert">{error}<button type="button" onClick={loadEmployees}>Try again</button></div>}
       <div className="e2e_empstatus_table_wrapper">
-        <table className="e2e_empstatus_table"><thead><tr><th>Employee ID</th><th>Legal Employee Name</th><th>Company Name</th><th>Role</th><th>Assignment</th><th>Action</th></tr></thead>
-          <tbody>{loading ? <tr><td colSpan="6" className="e2e_empstatus_empty">Loading employees...</td></tr> : employees.length ? employees.map((employee) => (
+        <table className="e2e_empstatus_table"><thead><tr><th>Employee ID</th><th>Legal Employee Name</th><th>Company Name</th><th>Role</th><th>Profile Completion %</th><th>Assignment</th><th>Action</th></tr></thead>
+          <tbody>{loading ? <tr><td colSpan="7" className="e2e_empstatus_empty">Loading employees...</td></tr> : employees.length ? employees.map((employee) => (
             <tr key={employee.id}>
               <td><strong>{employee.employee_id}</strong></td><td>{employee.legal_name}</td>
               <td>{employee.company_name ? <span className="e2e_company_identity"><FaUserTag /> {employee.company_name}</span> : <span className="e2e_not_assigned">Not Assigned</span>}</td>
               <td>{employee.role || "â€”"}</td>
+              <td><div className="employee-list-completion"><strong>{Number.isFinite(Number(employee.profile_completion))&&employee.profile_completion!=null?`${Math.max(0,Math.min(100,Number(employee.profile_completion)))}%`:"Unavailable"}</strong><div role="progressbar" aria-label={`Profile completion for ${employee.legal_name}`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={Number(employee.profile_completion)||0}><span style={{width:`${Math.max(0,Math.min(100,Number(employee.profile_completion)||0))}%`}}/></div></div></td>
               <td><span className={employee.user_id ? "e2e_assignment_badge assigned" : "e2e_assignment_badge unassigned"}>{employee.user_id ? "Assigned" : "Not Assigned"}</span></td>
               <td><div className="e2e_empstatus_actions"><button type="button" className="e2e_empstatus_view_btn" onClick={() => navigate(`/dashboard/employee-status/${employee.id}`)}>View</button><button type="button" className="editBtn" onClick={()=>{setEditing(employee);setFormOpen(true)}}>Edit</button><button type="button" className="deleteBtn" onClick={()=>setDeleting(employee)}>Remove</button>{!employee.user_id && <button type="button" className="e2e_empstatus_assign_btn" onClick={() => setAssigning(employee)}>Assign</button>}</div></td>
             </tr>
-          )) : <tr><td colSpan="6" className="e2e_empstatus_empty">No employees found.</td></tr>}</tbody>
+          )) : <tr><td colSpan="7" className="e2e_empstatus_empty">No employees found.</td></tr>}</tbody>
         </table>
       </div>
       <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />

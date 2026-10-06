@@ -92,3 +92,87 @@ html.e2e-dark .e2e_dashboard_scroll_content table td{color:var(--app-text)}
 html.e2e-dark .e2e_dashboard_scroll_content :is(.profile-information-card,.employee-attendance-switch,.profile-attendance-insights,.attendance-configurations) :is(p,small):not(.profile-required-warning):not(.collection-error):not([role="alert"]){color:var(--app-muted)}
 html.e2e-dark .e2e_navbar_notification{color:var(--app-muted)}
 html.e2e-dark :is(.e2e_about_container,.e2e_contact_container) :is(input,textarea){background:var(--app-input);color:var(--app-text);border-color:var(--app-border)}
+
+/* The sidebar provides workspace navigation on desktop; mobile keeps quick links. */
+html .e2e_related_resources{display:none}
+@media(max-width:768px){
+ html .e2e_related_resources,html body.e2e-profile-reference .e2e_related_resources{display:block;margin:0 0 12px;padding:10px 12px;border-radius:14px;min-width:0}
+ html .e2e_related_resources header{display:block;width:auto;min-width:0;margin-bottom:8px;padding:0;border:0}
+ html .e2e_related_resources header strong{display:block;margin:0;font-size:11px;line-height:1.4;color:var(--app-text-muted,#667085)}
+ html .e2e_related_resources nav{display:flex;width:100%;gap:6px;overflow-x:auto;overscroll-behavior-x:contain;padding:2px 1px 4px;scrollbar-width:none}
+ html .e2e_related_resources nav a{min-height:40px;padding:0 12px;border:0;border-radius:9px;font-size:12px;white-space:nowrap;background:var(--app-surface-2,#f4f7fb);color:var(--app-text);transform:none}
+ html .e2e_related_resources nav a.active{background:var(--theme-blue,#087bff);color:#fff;border:0}
+ html .e2e_related_resources nav a:focus-visible{outline:2px solid var(--theme-blue,#087bff);outline-offset:-2px}
+}
+
+/* Compact grouped navigation with a luminous navy ribbon. */
+html .e2e_sidebar_container{isolation:isolate;background:#080e24!important;border-color:#172340!important}
+html .e2e_sidebar_container::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(180deg,#080e2400 20%,#080e2433 60%,#080e24 100%),url('../assets/sidebar-wave.svg') center bottom / 100% auto no-repeat;opacity:.8}
+.e2e_sidebar_brand_footer{flex:0 0 auto;padding:12px 9px 2px;color:#96a5c8;font-size:9px;letter-spacing:.07em;line-height:1.5;pointer-events:none}
+@media(min-width:769px){
+ html .e2e_sidebar_container{padding:0 10px 12px!important}
+ html .e2e_sidebar_logo_section{min-height:66px;border-bottom-color:#ffffff12}
+ html .e2e_sidebar_resource_scroll{padding:10px 2px 4px!important;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#5868a780 transparent;scrollbar-gutter:auto}
+ html .e2e_sidebar_resource_scroll::-webkit-scrollbar{display:block;width:3px;height:0}
+ html .e2e_sidebar_resource_scroll::-webkit-scrollbar-thumb{background:#5868a780;border-radius:5px}
+ html .e2e_sidebar_search{min-height:34px;margin-bottom:9px;border-color:#ffffff20;background:#13213ce8;border-radius:8px;backdrop-filter:blur(12px)}
+ html .e2e_sidebar_groups{gap:2px}
+ html .e2e_sidebar_group{padding:3px 0;border-bottom-color:#ffffff0d}
+ html .e2e_sidebar_group_header{min-height:32px}
+ html .e2e_sidebar_group_link{min-height:32px;gap:8px}
+ html .e2e_sidebar_group_link b{font-size:11.5px;font-weight:700}
+ html .e2e_sidebar_group_link>svg{font-size:12px;width:14px;flex-basis:14px}
+ html .e2e_sidebar_group .e2e_sidebar_menu_item{min-height:32px;padding:0 8px;gap:7px;font-size:11.5px;border-radius:8px;transition:background .2s ease,color .2s ease}
+ html .e2e_sidebar_group_reveal>.e2e_sidebar_menu{gap:3px;border-left-color:#ffffff24;padding-left:10px!important}
+ html .e2e_sidebar_group .e2e_sidebar_menu_item .menuIcon{font-size:12px;min-width:14px}
+ html .e2e_sidebar_group_link:focus-visible,html .e2e_sidebar_menu_item:focus-visible{outline:2px solid #91b8ff;outline-offset:-2px}
+}
+@media(max-width:768px){.e2e_sidebar_brand_footer{display:none}html .e2e_sidebar_container::before{background-size:100% 450px;opacity:.45}}
+
+/* Body-mounted confirmations remain above scroll containers and the navbar. */
+html .e2e_confirmation_overlay{position:fixed;inset:0;z-index:2147483646;display:grid;place-items:center;padding:20px;background:#08132999;backdrop-filter:blur(5px);overflow:auto}
+html .e2e_confirmation_dialog{width:min(440px,100%);max-height:calc(100dvh - 40px);overflow:auto;padding:28px;border:1px solid var(--app-border);border-radius:20px;background:var(--app-surface);color:var(--app-text);box-shadow:0 24px 80px #0004;text-align:center}
+html .e2e_confirmation_dialog .confirmation-symbol{display:grid;place-items:center;width:56px;height:56px;margin:0 auto 16px;border-radius:17px;background:#eaf4ff;color:#087bff;font-size:26px}
+html .e2e_confirmation_dialog.is-danger .confirmation-symbol{background:#fff0f1;color:#dc3545}
+html .e2e_confirmation_dialog h2{margin:0;font-size:21px;color:var(--app-text)}
+html .e2e_confirmation_dialog p{margin:12px 0;color:var(--app-muted);font-size:14px;line-height:1.6}
+html .e2e_confirmation_dialog footer{display:flex;gap:10px;justify-content:stretch;margin-top:22px}
+html .e2e_confirmation_dialog footer button{flex:1;min-height:44px;padding:10px 14px;border-radius:10px;border:1px solid var(--app-border);font-weight:700;cursor:pointer}
+html .e2e_confirmation_dialog .secondary{background:var(--app-surface-2);color:var(--app-text)}
+html .e2e_confirmation_dialog .primary{background:var(--theme-gradient);color:#fff;border:0}
+html .e2e_confirmation_dialog .danger{background:#dc3545;color:#fff;border:0}
+html .e2e_confirmation_dialog button:disabled{opacity:.65;cursor:wait}
+html .e2e_confirmation_dialog button:focus-visible{outline:3px solid #087bff66;outline-offset:2px}
+.attendance-confirm-summary{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px;border-radius:12px;background:var(--app-surface-2);text-align:left}
+.attendance-confirm-summary span{color:var(--app-muted);font-size:11px}
+.attendance-confirm-summary strong{display:block;margin-top:5px;color:var(--app-text);font-size:12px}
+
+html .e2e_confirmation_dialog .attendance-confirm-summary{display:grid;width:100%;height:auto;min-height:0;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0 0;padding:14px;box-sizing:border-box;border-radius:12px;background:var(--app-surface-2);text-align:left}
+html .e2e_confirmation_dialog .attendance-confirm-summary span{min-width:0;line-height:1.5}
+html .e2e_confirmation_dialog .attendance-confirm-summary strong{white-space:nowrap;font-size:11px}
+
+/* Employee directory completion and staff attendance shortcut. */
+.employee-list-completion{display:grid;gap:7px;min-width:120px;max-width:160px;padding:5px 0}
+.employee-list-completion strong{color:var(--app-text);font-size:12px;font-variant-numeric:tabular-nums}
+.employee-list-completion [role="progressbar"]{height:6px;border-radius:20px;background:var(--app-border);overflow:hidden}
+.employee-list-completion [role="progressbar"] span{display:block;height:100%;border-radius:inherit;background:var(--theme-gradient);transition:width .25s ease}
+html .reference-admin-attendance{padding:20px;background:var(--app-surface);border-radius:18px;box-shadow:0 8px 26px #356ada16}
+html .reference-admin-attendance header{justify-content:flex-start;gap:12px;padding:0;border:0}
+html .reference-admin-attendance header .admin-attendance-icon{display:grid;place-items:center;width:44px;height:44px;flex:0 0 44px;padding:0;border-radius:13px;background:var(--app-surface-2);color:var(--theme-blue);font-size:20px}
+html .reference-admin-attendance header small{display:block;margin-top:4px;font-size:11px;color:var(--app-muted);letter-spacing:0;text-transform:none}
+html .reference-admin-attendance p{margin:14px 0 18px;color:var(--app-muted);font-size:12px;line-height:1.7;letter-spacing:0;text-transform:none;font-weight:400}
+html .reference-admin-attendance>button{display:flex;width:100%;min-height:42px;align-items:center;justify-content:center;gap:9px;padding:10px 14px;border:0;border-radius:10px;background:var(--theme-gradient);color:#fff;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;transition:box-shadow .2s ease}
+html .reference-admin-attendance>button:hover{box-shadow:0 6px 16px #087bff33}
+html .reference-admin-attendance>button:focus-visible{outline:3px solid #087bff55;outline-offset:3px}
+html .reference-admin-attendance>button span{margin-left:auto;color:#fff}
+
+/* Attendance presence remains visible outside the clipped photo circle. */
+.e2e_navbar_avatar_presence{position:relative;display:inline-flex;flex:0 0 auto;overflow:visible}
+html .e2e_navbar_presence_dot{position:absolute;right:-1px;bottom:-1px;width:11px;height:11px;box-sizing:border-box;border:2px solid var(--app-surface,#fff);border-radius:50%;background:#94a3b8;box-shadow:0 1px 4px #10213b26;pointer-events:auto}
+html .e2e_navbar_presence_dot.online{background:#16c784}
+html .e2e_navbar_presence_dot.offline{background:#ef4444}
+html .e2e_navbar_presence_dot.overdue{background:#f59e0b;animation:attendance-presence-pulse 1.6s ease-in-out infinite}
+@keyframes attendance-presence-pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 #f59e0b50}50%{opacity:.5;box-shadow:0 0 0 4px #f59e0b00}}
+@media(prefers-reduced-motion:reduce){html .e2e_navbar_presence_dot.overdue{animation:none}}
+
+.e2e_sidebar_brand_footer span{float:right;color:#bcc9e5;font-variant-numeric:tabular-nums;letter-spacing:0}

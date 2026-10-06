@@ -1,0 +1,7 @@
+# Profile Time Tracking
+
+The Time Tracking tab opens the attendance dashboard directly. The reference layout uses six summary cards, working-hours trend, monthly calendar, company holidays and paginated recent attendance. Data comes from the existing employee attendance APIs. Leave Management stays in its own profile tab; the top profile attendance switch retains the existing network restrictions.
+
+From/To dates apply with Apply. Status, month and date search filter all matching attendance records on the server, with correct totals and pagination. Summary cards and trend continue to cover the applied date range. Leaves Taken counts approved working-day leave, including half days, excluding weekends and mandatory holidays. Calendar month navigation loads the entire selected month separately. Users may select dates to inspect them; marking/removing attendance, holiday management and corrections require the existing attendance edit permission with ALL scope. Clocked records remain protected.
+
+For deployment, upload the updated `modules/employee/model.php` and `modules/employee/controller.php` with the rebuilt frontend. There is no new schema migration for this attendance layout. The CLI-only backend check `tests/attendance_insights_test.php` uses temporary tables; it is a development check. Frontend checks cover date application, filters, monthly calendar requests, read-only viewing, correction retry, and holiday refresh.

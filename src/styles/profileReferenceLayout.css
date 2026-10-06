@@ -92,3 +92,7 @@ body.e2e-profile-reference .reference-profile-tabs .profile-tab-item>button,body
 body.e2e-profile-reference .reference-profile-tabs svg{font-size:12px}
 body.e2e-profile-reference .reference-profile-tabs::-webkit-scrollbar{display:block;height:3px}
 body.e2e-profile-reference .reference-profile-tabs::-webkit-scrollbar-thumb{background:#b8ccef;border-radius:4px}
+
+/* Inline editing shares the page scrollbar rather than trapping wheel input. */
+body.e2e-profile-reference .employee-profile-inline-edit>.employee-form-modal{overflow:visible!important;max-height:none!important;height:auto;overscroll-behavior:auto}
+body.e2e-profile-reference .employee-profile-inline-edit .collection-form-body{overflow:visible;max-height:none}

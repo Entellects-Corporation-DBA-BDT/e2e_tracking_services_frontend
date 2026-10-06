@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { FaCalendarCheck, FaClock, FaHistory, FaUserClock } from "react-icons/fa";
 import { editAttendance, getEmployeeAttendance } from "../api/employeeApi";
+import AttendanceInsights from "./AttendanceInsights";
 import AttendanceCalendar from "./AttendanceCalendar";
 import AttendanceActions from "./AttendanceActions";
 import ConfirmDialog from "./ConfirmDialog";
@@ -71,4 +72,4 @@ function AttendancePanel({ employeeId, employeeCode, isOwn = false, canManage = 
     </>}
   </section>;
 }
-export default AttendancePanel;
+export default function AttendanceReport(props){return props.reference?<AttendanceInsights {...props}/>:<AttendancePanel {...props}/>;}

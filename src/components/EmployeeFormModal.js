@@ -27,6 +27,7 @@ export default function EmployeeFormModal({
   addEntry=false
 }) {
   const useLoadedRecord=Boolean(inline && employee && Object.prototype.hasOwnProperty.call(employee,"collection") && employee.firstname!==undefined);
+  const [assignedCode,setAssignedCode]=useState(employee?.employee_id||"");
   const [form, setForm] = useState({
       ...empty
     }),
@@ -52,12 +53,13 @@ export default function EmployeeFormModal({
       setLoading(true);
       const hydrate = data => {
         if (!active) return;
+        setAssignedCode(data.employee_id||"");
         setForm({
           ...empty,
           ...data,
           ...Object.fromEntries(["pan_number","uan_number","pf_account_number","esi_number","bank_name","bank_account_number","ifsc_code","pay_mode"].map(key=>[key,data.payroll_profile?.[key]||""])),
-          birthdate: data.birthdate === "0000-00-00" ? "" : data.birthdate || "",
-          date_of_joining: data.date_of_joining || "",
+          birthdate: String(data.birthdate || "").slice(0,10).replace("0000-00-00", ""),
+          date_of_joining: String(data.date_of_joining || data.joining_date || "").slice(0,10).replace("0000-00-00", ""),
           position_id: data.position_id ?? "",
           schedule_id: data.schedule_id ?? ""
         });
@@ -98,7 +100,7 @@ export default function EmployeeFormModal({
     try {
       const data = collectionRequest({
           ...form,
-          ...(employee ? {} : {employee_id: undefined}),
+          ...(selfService ? {employee_id: undefined} : {}),
           collection,
           ...(editSection!=="all"?{edit_section:editSection}:{})
         }, files),
@@ -118,13 +120,13 @@ export default function EmployeeFormModal({
         padding: 20
       }}>Loading complete employee record…</p>}
  <form onSubmit={submit}><fieldset className="collection-form-body" disabled={loading || saving || loadFailed}>{["all","personal"].includes(editSection) && <div className="employee-form-grid">
- {employee ? <label>Employee ID<input readOnly value={form.employee_id} /></label> : <div className="employee-auto-id"><strong>Automatic Employee ID</strong><span>A BDT-I number is generated securely when you save.</span></div>}{field("firstname", "First Name", "text", true)}{field("lastname", "Last Name", "text", true)}{field("birthdate", "Birth Date", "date", true)}{field("contact_info", "Phone Number", "tel", true)}{field("date_of_joining", "Date of Joining", "date")}
+ <label>Employee ID<input name="employee_id" maxLength={50} readOnly={selfService || Boolean(assignedCode)} value={form.employee_id || ""} placeholder="Not assigned" onChange={change}/>{!selfService && !assignedCode && <small>Optional. Enter the assigned ID when ready. Once saved, it cannot be changed.</small>}</label>{field("firstname", "First Name", "text", true)}{field("lastname", "Last Name", "text", true)}{field("birthdate", "Birth Date", "date", true)}{field("contact_info", "Phone Number", "tel", true)}{field("date_of_joining", "Date of Joining", "date")}
  <label>Gender *<select required name="gender" value={form.gender} onChange={change}><option value="">Select</option><option>Male</option><option>Female</option><option>Other</option></select></label>
  {!selfService && <label>Position{!employee && " *"}<select required={!employee} name="position_id" value={form.position_id ?? ""} onChange={change}><option value="">Not assigned</option>{positions.map(p => <option key={p.id} value={p.id}>{p.position_name}</option>)}</select></label>}
  <label>Personal Email<input required={editSection==="personal"} type="email" value={collection.email || ""} onChange={e => setCollection(c => ({
                 ...c,
                 email: e.target.value
-              }))} /></label>{!selfService && field("schedule_id", "Schedule ID", "number")}<label className="wide">Permanent Address *<textarea required name="address" maxLength={5000} value={form.address} onChange={change} /></label></div>}
+              }))} /></label>{!selfService && field("schedule_id", "Schedule ID", "number")}<label className="wide">Permanent Address (optional)<textarea name="address" maxLength={5000} value={form.address} onChange={change} /></label></div>}
  {["all","bank"].includes(editSection) && <fieldset><legend>Statutory & Bank Details</legend><div className="employee-form-grid">{[["pan_number","PAN"],["uan_number","UAN"],["pf_account_number","PF Account Number"],["esi_number","ESI Account Number"],["bank_name","Bank Name"],["bank_account_number","Bank Account Number"],["ifsc_code","IFSC Code"],["pay_mode","Pay Mode"]].map(([key,label])=>field(key,label,"text",editSection==="bank" && ["pan_number","bank_name","bank_account_number","ifsc_code"].includes(key)))}</div></fieldset>}
  {!["personal","bank"].includes(editSection) && <EmployeeCollectionFields visibleSection={editSection} value={collection} onChange={setCollection} files={files} onFilesChange={setFiles} employeeId={employee?.id} lockUploadedDocuments={selfService} admin limits={limits} candidateName={[form.firstname, form.lastname].filter(Boolean).join(" ")} candidatePhone={form.contact_info} />}</fieldset>
  {error && <p className="e2e_alias_error" role="alert">{error}</p>}<footer><button type="button" className="secondary" disabled={saving} onClick={onClose}>Cancel</button><button type="submit" className="primary" disabled={saving || loading || loadFailed}>{saving ? "Saving…" : employee ? "Save Changes" : "Add Employee"}</button></footer></form></section></div>;

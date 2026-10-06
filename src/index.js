@@ -5,6 +5,7 @@ import App from './App';
 import './styles/responsiveHardening.css';
 import './styles/themeGlobal.css';
 import './styles/referenceTheme.css';
+import './styles/attendanceInsights.css';
 import reportWebVitals from './reportWebVitals';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));

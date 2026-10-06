@@ -9,7 +9,7 @@ import ConfirmDialog from "./ConfirmDialog";
 const emptyLeave = { leave_type: "paid", start_date: "", end_date: "", duration: "full_day", reason: "" };
 const emptyHoliday = { holiday_date: "", name: "", description: "", is_optional: false };
 
-function AttendanceActions({ employeeCode, isOwn, canManage, onChanged, showClock=true, showLeave=true, showHolidays=true, leaveTitle }) {
+function AttendanceActions({ employeeCode, isOwn, canManage, onChanged, showClock=true, showLeave=true, showHolidays=true, leaveTitle, compactHolidays=false, holidayYear=new Date().getFullYear() }) {
   const [today, setToday] = useState(null);
   const [leaves, setLeaves] = useState([]);
   const [holidays, setHolidays] = useState([]);
@@ -24,7 +24,7 @@ function AttendanceActions({ employeeCode, isOwn, canManage, onChanged, showCloc
   const load = useCallback(async () => {
     try {
       const [holidayResult,leaveResult,todayResult]=await Promise.all([
-        showHolidays?getHolidays(new Date().getFullYear()):Promise.resolve(null),
+        showHolidays?getHolidays(holidayYear):Promise.resolve(null),
         showLeave?getLeaves():Promise.resolve(null),
         isOwn&&showClock?getTodayAttendance(undefined,true):Promise.resolve(null),
       ]);
@@ -33,7 +33,7 @@ function AttendanceActions({ employeeCode, isOwn, canManage, onChanged, showCloc
     } catch (error) {
       setMessage({ text: error?.response?.data?.message || "Attendance controls could not be loaded.", error: true });
     }
-  }, [isOwn,showClock,showLeave,showHolidays]);
+  }, [isOwn,showClock,showLeave,showHolidays,holidayYear]);
   useEffect(() => { load(); }, [load]);
 
   const clock = async () => {
@@ -57,14 +57,15 @@ function AttendanceActions({ employeeCode, isOwn, canManage, onChanged, showCloc
     catch (error) { setMessage({ text: error?.response?.data?.message || "Leave could not be updated.", error: true }); }
   };
   const addHoliday = async (event) => {
-    event.preventDefault();
-    try { const result = await saveHoliday(holiday); setMessage({ text: result.message, error: false }); setHoliday(emptyHoliday); await load(); }
+    event.preventDefault();if(busy)return;setBusy(true);
+    try { const result = await saveHoliday(holiday); setMessage({ text: result.message, error: false }); setHoliday(emptyHoliday); await load(); onChanged?.(); }
     catch (error) { setMessage({ text: error?.response?.data?.message || "Holiday could not be saved.", error: true }); }
+    finally{setBusy(false);}
   };
 
   const record = today?.record;
   const nextAction = !record ? "in" : record.time_out === "00:00:00" ? "out" : "";
-  return <div className="attendance-workflows">
+  return <div className={`attendance-workflows ${compactHolidays?"compact-holidays":""}`}>
     {isOwn && showClock && <section className="attendance-clock-card">
       <div><span><FaClock /></span><div><h3>Today in Eastern Time</h3><p>{today?.work_date || "Loading..."} Â· 9:30 AMâ€“6:30 PM America/New_York</p></div></div>
       <div className="clock-status"><strong>{record ? record.work_status.replace("_", " ") : "Not timed in"}</strong>
@@ -93,14 +94,14 @@ function AttendanceActions({ employeeCode, isOwn, canManage, onChanged, showCloc
     </section>}
 
     {canManage && showHolidays && <section className="attendance-holiday-card"><header><div><FaCalendarPlus /><h3>Company Holidays</h3></div><p>Eastern Time office calendar.</p></header>
-      <form onSubmit={addHoliday}><input required type="date" value={holiday.holiday_date} onChange={e=>setHoliday({...holiday,holiday_date:e.target.value})}/><input required placeholder="Holiday name" value={holiday.name} onChange={e=>setHoliday({...holiday,name:e.target.value})}/><button>Save Holiday</button></form>
-      <div>{holidays.map(item=><span key={item.id}><b>{item.holiday_date}</b> {item.name}<button aria-label="Delete holiday" onClick={()=>setDeletingHoliday(item)}><FaTrash /></button></span>)}</div>
+      <form onSubmit={addHoliday}><input aria-label="Company holiday date" required type="date" value={holiday.holiday_date} onChange={e=>setHoliday({...holiday,holiday_date:e.target.value})}/><input aria-label="Company holiday name" required placeholder="Holiday name" value={holiday.name} onChange={e=>setHoliday({...holiday,name:e.target.value})}/><button disabled={busy}>{busy?"Saving...":"Save Holiday"}</button></form>
+      <div className="attendance-holiday-list">{compactHolidays&&<strong>Holiday Calendar</strong>}{holidays.map(item=><span key={item.id}><b>{item.holiday_date}</b> {item.name}<button aria-label="Delete holiday" onClick={()=>setDeletingHoliday(item)}><FaTrash /></button></span>)}</div>
     </section>}
     {message.text && <p className={`attendance-workflow-message ${message.error?"error":""}`}>{message.text}</p>}
     <ConfirmDialog open={Boolean(deletingHoliday)} title="Delete Holiday?"
       message={`Delete ${deletingHoliday?.name} on ${deletingHoliday?.holiday_date}?`}
-      confirmLabel="Delete Holiday" onCancel={()=>setDeletingHoliday(null)}
-      onConfirm={async()=>{const item=deletingHoliday;setDeletingHoliday(null);await deleteHoliday(item.id);load();}} />
+      confirmLabel="Delete Holiday" busy={busy} onCancel={()=>setDeletingHoliday(null)}
+      onConfirm={async()=>{const item=deletingHoliday;setDeletingHoliday(null);setBusy(true);try{await deleteHoliday(item.id);await load();onChanged?.();}catch(e){setMessage({text:e?.response?.data?.message||"Holiday could not be deleted.",error:true});}finally{setBusy(false);}}} />
   </div>;
 }
 export default AttendanceActions;

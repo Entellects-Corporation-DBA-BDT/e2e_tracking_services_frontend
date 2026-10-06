@@ -1,0 +1,42 @@
+[
+  {
+    "width": 1440,
+    "cards": 6,
+    "chart": true,
+    "calendar": true,
+    "history": 10,
+    "leaveForm": false,
+    "overflow": false,
+    "viewButton": false,
+    "errors": []
+  },
+  {
+    "width": 1440,
+    "dialog": {
+      "visible": true,
+      "inViewport": true,
+      "aboveContent": true,
+      "summary": "Attendance date\n2026-09-01\nShift (Eastern Time)\n9:30 AM to 6:30 PM"
+    }
+  },
+  {
+    "width": 390,
+    "cards": 6,
+    "chart": true,
+    "calendar": true,
+    "history": 10,
+    "leaveForm": false,
+    "overflow": false,
+    "viewButton": false,
+    "errors": []
+  },
+  {
+    "width": 390,
+    "dialog": {
+      "visible": true,
+      "inViewport": true,
+      "aboveContent": true,
+      "summary": "Attendance date\n2026-09-01\nShift (Eastern Time)\n9:30 AM to 6:30 PM"
+    }
+  }
+]

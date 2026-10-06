@@ -8,6 +8,8 @@ import { sidebarConfig } from "./SidebarConfig";
 import { useTheme } from "../../auth/ThemeContext";
 import { getCandidateData } from "../../api/candidateApi";
 import { getBenchSalesData, getRecruiterApplications } from "../../api/applicationApi";
+import useAttendancePresence from "../../hooks/useAttendancePresence";
+import useProfilePortrait from "../../hooks/useProfilePortrait";
 import HeaderCollaboration from "../../components/Collaboration/HeaderCollaboration";
 
 function Navbar() {
@@ -16,7 +18,11 @@ function Navbar() {
   const [profileSidebarOpen,setProfileSidebarOpen]=useState(true);
   useEffect(()=>{setProfileSidebarOpen(true);document.body.classList.remove("reference-sidebar-hidden")},[location.pathname]);
   const searchRef = useRef(null);
-  const { resources: allResources, user, logout, isAdmin } = usePermissions();
+  const { resources: allResources, user, logout, isAdmin, can } = usePermissions();
+  const [portrait,setPortrait]=useProfilePortrait(user?.id,can("profile","view"));
+  const presence=useAttendancePresence(user?.id,can("attendance","view"));
+  const initial=(user?.username||user?.firstname||user?.email||"U").charAt(0).toUpperCase();
+  const avatar=portrait?<img src={portrait} alt="" onError={()=>setPortrait("")}/>:initial;
   const [searchTerm, setSearchTerm] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
   const [activeSuggestion, setActiveSuggestion] = useState(-1);
@@ -220,7 +226,7 @@ const selectResource = (resource) => {
         </button><div className="e2e_navbar_account" ref={profileRef}>
           <button type="button" className="e2e_navbar_profile" onClick={() => setProfileOpen((value) => !value)}
             aria-label="Open account menu" aria-expanded={profileOpen}>
-            <div className="e2e_navbar_avatar">{user?.username?.charAt(0)?.toUpperCase() || "U"}</div>
+            <span className="e2e_navbar_avatar_presence"><span className="e2e_navbar_avatar">{avatar}</span><span className={`e2e_navbar_presence_dot ${presence.state}`} role="img" aria-label={presence.label} title={presence.label}/></span>
             <div className="e2e_navbar_profile_info">
               <h4>{user?.username || "User"}</h4>
               <p>{user?.email || "Employee"}</p>
@@ -230,7 +236,7 @@ const selectResource = (resource) => {
           {profileOpen && (
             <div className="e2e_navbar_account_menu">
               <button type="button" onClick={() => navigate("/dashboard/my-profile")}>
-                <span className="e2e_account_initial">{user?.username?.charAt(0)?.toUpperCase() || "U"}</span>
+                <span className="e2e_account_initial">{avatar}</span>
                 <span><strong>My profile</strong><small>Account & attendance</small></span>
               </button>
               <button type="button" className="e2e_account_logout" onClick={() => {

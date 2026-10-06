@@ -6,7 +6,7 @@
     "body": "E2E TRACKING\n\nSERVICES\n\nFind a resource\nOverview\nDashboard\nTalent Acquisition\nRecruiting\nJobs\nCandidates\nSales & Relationships\nBench sales\nClients\nHot list\nPrim",
     "clippedTabs": [],
     "lastProfileAction": "Performance",
-    "navbarGap": 3.9291534423828125,
+    "navbarGap": 3.0648651123046875,
     "overflow": false,
     "navMenus": [
       {
@@ -288,9 +288,15 @@
   },
   {
     "interaction": "inline-personal-responsiveness",
-    "milliseconds": 62,
+    "milliseconds": 66,
     "ready": true,
     "saveEnabled": true
+  },
+  {
+    "interaction": "wheel-over-inline-editor",
+    "before": 0,
+    "pageScroll": 350,
+    "editorOverflow": "visible"
   },
   {
     "interaction": "photo-editor",

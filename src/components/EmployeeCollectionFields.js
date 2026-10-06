@@ -40,7 +40,7 @@ export default function EmployeeCollectionFields({
     });else set(key, remaining);
     discardFiles(key === "education" ? ["education_" + row.id + "_certificate", "education_" + row.id + "_marksheets"] : [key === "employment" ? "experience_" + row.id : "certification_" + row.id], true);
   };
-  const input = (label, key, type = "text") => <label key={key}>{label}<input required={visibleSection==="family" && ["father_name","father_phone","mother_name","mother_phone"].includes(key)} type={type} value={value[key] || ""} maxLength={500} disabled={readOnly} onChange={e => set(key, e.target.value)} /></label>;
+  const input = (label, key, type = "text") => <label key={key}>{label}<input required={visibleSection==="family" && ["father_name","mother_name"].includes(key)} type={type} value={value[key] || ""} maxLength={500} disabled={readOnly} onChange={e => set(key, e.target.value)} /></label>;
   const rowInput = (group, row, key, label, type = "text", required = false) => <label key={key}>{label}{required && !readOnly && " *"}<input aria-label={label + " " + row.id} type={type} value={row[key] || ""} maxLength={type === "text" || type === "tel" ? 500 : undefined} min={type === "number" ? 1900 : undefined} max={type === "number" ? new Date().getFullYear() + 1 : undefined} step={type === "number" ? 1 : undefined} required={required && !readOnly} disabled={readOnly} onChange={e => updateRow(group, row.id, key, e.target.value)} /></label>;
   const download = async doc => {
     setError("");
@@ -78,7 +78,7 @@ export default function EmployeeCollectionFields({
         });
       }}>{i + 1}. {label}</a>)}</nav>}
  {error && <p className="collection-error" role="alert">{error}</p>}
- {section(1, "Family Details", <><div className="collection-grid">{input("Father's Name", "father_name")}{input("Father's Cell Phone", "father_phone", "tel")}{input("Mother's Name", "mother_name")}{input("Mother's Cell Phone", "mother_phone", "tel")}</div><h4>Siblings <small>Optional</small></h4>{value.siblings.map((s, i) => <div className="collection-row" key={i}>{[["name", "Sibling Name"], ["relationship", "Relationship"], ["phone", "Cell Phone Number"]].map(([k, l]) => <label key={k}>{l}<input value={s[k] || ""} disabled={readOnly} maxLength={250} onChange={e => set("siblings", value.siblings.map((r, j) => j === i ? {
+ {section(1, "Family Details", <><div className="collection-grid">{input("Father's Name", "father_name")}{input("Father's Cell Phone (optional)", "father_phone", "tel")}{input("Mother's Name", "mother_name")}{input("Mother's Cell Phone (optional)", "mother_phone", "tel")}</div><h4>Siblings <small>Optional</small></h4>{value.siblings.map((s, i) => <div className="collection-row" key={i}>{[["name", "Sibling Name"], ["relationship", "Relationship"], ["phone", "Cell Phone Number"]].map(([k, l]) => <label key={k}>{l}<input value={s[k] || ""} disabled={readOnly} maxLength={250} onChange={e => set("siblings", value.siblings.map((r, j) => j === i ? {
             ...r,
             [k]: e.target.value
           } : r))} /></label>)}{!readOnly && <button type="button" aria-label={"Remove sibling " + (i + 1)} onClick={() => set("siblings", value.siblings.filter((_, j) => i !== j))}>Remove</button>}</div>)}{!readOnly && value.siblings.length < 10 && <button className="collection-add" type="button" onClick={() => set("siblings", [...value.siblings, {

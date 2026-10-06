@@ -106,10 +106,10 @@ test("removing a company cannot remove files from an entry with a similar ID",()
 
 test("manual add generates the employee ID on the server",async()=>{
  createEmployee.mockResolvedValue({success:true,message:"Saved BDT-I-50"});const onSaved=jest.fn();render(<EmployeeFormModal onClose={jest.fn()} onSaved={onSaved}/>);
- await screen.findByRole("option",{name:"Developer"});expect(screen.queryByLabelText("Employee ID")).not.toBeInTheDocument();expect(screen.getByText("Automatic Employee ID")).toBeInTheDocument();
+ await screen.findByRole("option",{name:"Developer"});expect(screen.getByLabelText(/^Employee ID/)).not.toHaveAttribute("readonly");expect(screen.queryByText("Automatic Employee ID")).not.toBeInTheDocument();
  for(const [label,value] of [["First Name","Test"],["Last Name","Candidate"],["Birth Date","1995-01-01"],["Phone Number","1234567890"],["Permanent Address","Test address"]])fireEvent.change(screen.getByLabelText(new RegExp("^"+label)),{target:{value}});
  fireEvent.change(screen.getByLabelText(/^Gender/),{target:{value:"Female"}});fireEvent.change(screen.getByLabelText(/^Position/),{target:{value:"1"}});fillEducation();
- fireEvent.click(screen.getByRole("button",{name:"Add Employee"}));await waitFor(()=>expect(onSaved).toHaveBeenCalledWith("Saved BDT-I-50"));expect(JSON.parse(createEmployee.mock.calls[0][0].get("payload"))).not.toHaveProperty("employee_id");
+ fireEvent.click(screen.getByRole("button",{name:"Add Employee"}));await waitFor(()=>expect(onSaved).toHaveBeenCalledWith("Saved BDT-I-50"));expect(JSON.parse(createEmployee.mock.calls[0][0].get("payload")).employee_id).toBe("");
 });
 
 test("invitation stays unavailable until the sender is configured",async()=>{
@@ -129,3 +129,10 @@ test("self profile editing uses the owner endpoint and hides assignment fields",
  await screen.findByDisplayValue("Saved Bank");expect(screen.queryByLabelText(/^Position/)).not.toBeInTheDocument();expect(screen.queryByLabelText("Schedule ID")).not.toBeInTheDocument();expect(screen.getByLabelText("Employee ID")).toHaveAttribute("readonly");expect(screen.getByLabelText("Date of Joining")).toHaveAttribute("readonly");expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
  fireEvent.change(screen.getByLabelText(/^Phone Number/),{target:{value:"987"}});fireEvent.click(screen.getByRole("button",{name:"Save Changes"}));await waitFor(()=>expect(onSaved).toHaveBeenCalledWith("Profile saved"));expect(updateMyEmployeeProfile).toHaveBeenCalled();expect(updateEmployee).not.toHaveBeenCalled();
 });
+
+ test("public submission leaves employee ID pending and permanent address optional",async()=>{
+ submitEmployeeOnboarding.mockResolvedValue({success:true,message:"Submitted",employee_id:null,edit_until:"2026-10-10T12:00:00Z"});await openPublic();fillBasic();fillEducation();
+ const address=screen.getByLabelText(/^Permanent Address/);expect(address).not.toBeRequired();fireEvent.change(address,{target:{value:""}});
+ fireEvent.click(screen.getByLabelText(/I confirm/));fireEvent.click(submitButton());await screen.findByText(/Your employee ID will be assigned by HR/);getEmployeeOnboardingInvite.mockResolvedValue({success:true,personal_email:"candidate@example.com",employee_id:null,edit_until:"2026-10-10T12:00:00Z",data:JSON.parse(submitEmployeeOnboarding.mock.calls[0][1].get("payload"))});fireEvent.click(screen.getByRole("button",{name:"Edit Submitted Details"}));expect(await screen.findByText("Employee ID pending assignment")).toBeInTheDocument();
+ expect(JSON.parse(submitEmployeeOnboarding.mock.calls[0][1].get("payload"))).not.toHaveProperty("employee_id");
+ });
