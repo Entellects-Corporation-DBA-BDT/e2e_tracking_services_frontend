@@ -174,3 +174,10 @@ html .e2e_navbar_presence_dot.offline{background:#ef4444}
 html .e2e_navbar_presence_dot.overdue{background:#f59e0b;animation:attendance-presence-pulse 1.6s ease-in-out infinite}
 @keyframes attendance-presence-pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 #f59e0b50}50%{opacity:.5;box-shadow:0 0 0 4px #f59e0b00}}
 @media(prefers-reduced-motion:reduce){html .e2e_navbar_presence_dot.overdue{animation:none}}
+
+.e2e_sidebar_brand_footer span{float:right;color:#bcc9e5;font-variant-numeric:tabular-nums;letter-spacing:0}
+
+.reference-employee-id{display:inline-flex;align-items:center;gap:9px;margin-bottom:12px;padding:8px 13px;border:1px solid #087bff33;border-radius:11px;background:var(--app-surface);box-shadow:0 3px 12px #087bff0d}
+html .reference-profile-hero .reference-employee-id>svg{font-size:21px;color:var(--theme-blue)}
+html .reference-profile-hero .reference-employee-id span{font-size:9px;color:var(--app-muted);line-height:1.4;letter-spacing:.04em}
+html .reference-profile-hero .reference-employee-id strong{display:block;font-size:15px;color:var(--app-text);letter-spacing:.035em}
