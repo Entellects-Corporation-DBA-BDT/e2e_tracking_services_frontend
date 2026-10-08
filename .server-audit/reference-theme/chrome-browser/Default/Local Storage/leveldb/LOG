@@ -1,4 +1,4 @@
-2026/10/07-20:23:14.763 32f8 Reusing MANIFEST C:\Users\ADMIN\Desktop\e2e_tracking_services_frontend\.server-audit\reference-theme\chrome-browser\Default\Local Storage\leveldb/MANIFEST-000001
-2026/10/07-20:23:14.766 32f8 Recovering log #3
-2026/10/07-20:23:14.767 32f8 (ignoring error) C:\Users\ADMIN\Desktop\e2e_tracking_services_frontend\.server-audit\reference-theme\chrome-browser\Default\Local Storage\leveldb/000003.log: dropping 96 bytes; Corruption: checksum mismatch
-2026/10/07-20:23:14.785 32f8 Reusing old log C:\Users\ADMIN\Desktop\e2e_tracking_services_frontend\.server-audit\reference-theme\chrome-browser\Default\Local Storage\leveldb/000003.log 
+2026/10/07-23:15:39.866 4754 Reusing MANIFEST C:\Users\ADMIN\Desktop\e2e_tracking_services_frontend\.server-audit\reference-theme\chrome-browser\Default\Local Storage\leveldb/MANIFEST-000001
+2026/10/07-23:15:39.868 4754 Recovering log #3
+2026/10/07-23:15:39.949 4754 (ignoring error) C:\Users\ADMIN\Desktop\e2e_tracking_services_frontend\.server-audit\reference-theme\chrome-browser\Default\Local Storage\leveldb/000003.log: dropping 159 bytes; Corruption: checksum mismatch
+2026/10/07-23:15:39.958 4754 Reusing old log C:\Users\ADMIN\Desktop\e2e_tracking_services_frontend\.server-audit\reference-theme\chrome-browser\Default\Local Storage\leveldb/000003.log 

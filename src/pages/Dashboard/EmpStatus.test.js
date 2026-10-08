@@ -1,0 +1,12 @@
+import {fireEvent,render,screen,waitFor} from "@testing-library/react";
+import EmployeeStatusReport from "./EmpStatus";
+import {getEmployees} from "../../api/employeeApi";
+jest.mock("react-router-dom",()=>({useNavigate:()=>jest.fn()}),{virtual:true});
+jest.mock("../../auth/PermissionContext",()=>({usePermissions:()=>({can:()=>true,isAdmin:true}),ProtectedComponent:({children})=>children}));
+jest.mock("../../api/employeeApi",()=>({getEmployees:jest.fn(),deleteEmployee:jest.fn()}));
+jest.mock("../../components/EmployeeOnboardingInvite",()=>()=>null);
+jest.mock("../../components/EmployeeFormModal",()=>()=>null);
+jest.mock("../../components/AssignCompanyNameModal",()=>()=>null);
+beforeEach(()=>{jest.clearAllMocks();getEmployees.mockResolvedValue({data:[{id:1,employee_id:"BDT-I-132",legal_name:"Test Employee",user_id:2,user_status:"Active",profile_completion:75,date_of_joining:"2026-10-01"}],total:1,total_pages:1,summary:{total:128,active:112,inactive:16,recruiters:32,bench_sales:48,other_roles:48},options:{companies:["Beedata"],roles:["Recruiter"]}})});
+test("shows global metrics, one Status column, joining date and completion",async()=>{render(<EmployeeStatusReport/>);await screen.findByText("BDT-I-132");expect(screen.getByText("128")).toBeInTheDocument();expect(screen.getAllByRole("columnheader",{name:"Status"})).toHaveLength(1);expect(screen.queryByRole("columnheader",{name:"Assignment"})).toBeNull();expect(screen.getByText("Oct 01, 2026")).toBeInTheDocument();expect(screen.getByRole("progressbar")).toHaveAttribute("aria-valuenow","75");});
+test("filters are sent to the server and Clear resets them",async()=>{render(<EmployeeStatusReport/>);await screen.findByText("BDT-I-132");fireEvent.change(screen.getByLabelText("Filter employees by company"),{target:{value:"Beedata"}});await waitFor(()=>expect(getEmployees).toHaveBeenLastCalledWith(expect.objectContaining({company:"Beedata"})));fireEvent.change(screen.getByLabelText("Filter employees by status"),{target:{value:"unassigned"}});await waitFor(()=>expect(getEmployees).toHaveBeenLastCalledWith(expect.objectContaining({status:"unassigned"})));fireEvent.click(screen.getByRole("button",{name:"Clear"}));await waitFor(()=>expect(getEmployees).toHaveBeenLastCalledWith(expect.objectContaining({company:"",status:""})));});

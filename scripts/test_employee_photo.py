@@ -25,7 +25,7 @@ with tempfile.TemporaryDirectory(prefix="e2e-photo-test-") as folder:
             with urllib.request.urlopen(req,timeout=30) as response:result=json.loads(response.read())
             assert result["passed"],result
             print("PASS",json.dumps(result))
-            for method in ["GET","POST"]:
+            for method in ["GET","POST","DELETE"]:
                 req=urllib.request.Request(f"http://127.0.0.1:{port}/employees/7/photo",method=method,data=body if method=="POST" else None,headers={"Content-Type":"multipart/form-data; boundary="+boundary})
                 try:urllib.request.urlopen(req,timeout=10);raise AssertionError("Photo endpoint accepted an unauthenticated request")
                 except urllib.error.HTTPError as error:assert error.code==401,(error.code,error.read());print("PASS unauthenticated",method,"photo request rejected")

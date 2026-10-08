@@ -1,0 +1,247 @@
+/* Shared reference theme. Presentation changes only; existing behaviors remain intact. */
+:root{--app-bg:#edf5ff;--app-surface:#fff;--app-surface-2:#f4f8ff;--app-text:#101936;--app-muted:#4e638d;--app-border:#e2ebfa;--app-input:#fff;--app-shadow:rgba(35,83,164,.07);--theme-blue:#087bff;--theme-violet:#7845ff;--theme-navy:#0d1c33;--theme-radius:18px;--theme-gradient:linear-gradient(110deg,#087bff,#7845ff);--theme-hero:linear-gradient(115deg,#faeafa,#dce5ff 37%,#e4f2ff 72%,#d6d2ff)}
+html.e2e-dark{--app-bg:#091426;--app-surface:#111f35;--app-surface-2:#182941;--app-text:#eef5ff;--app-muted:#a6badb;--app-border:#2c4060;--app-input:#0d1b30;--theme-hero:linear-gradient(115deg,#30264a,#1c365f 55%,#223650)}
+body,.e2e_dashboard_main_layout{background:var(--app-bg);color:var(--app-text)}
+.e2e_dashboard_scroll_content{background:radial-gradient(ellipse at 90% 0%,#ddeaff80,transparent 60%),var(--app-bg)}
+.e2e-dark .e2e_dashboard_scroll_content{background:var(--app-bg)}
+/* Navy navigation in both appearance modes. */
+html .e2e_sidebar_container{background:var(--theme-navy)!important;border-color:#1d3152!important;box-shadow:8px 0 28px #1939690a!important;color:#f1f6ff}
+html .e2e_sidebar_logo_section{border-color:#27364e}html .e2e_sidebar_logo_section h2{color:#fff}html .e2e_sidebar_logo_section p{color:#b5c8e9}
+html .e2e_sidebar_group{border-color:#ffffff0b}html .e2e_sidebar_group_header{border-left:0}
+html .e2e_sidebar_group_link,html .e2e_sidebar_group_link:visited{color:#dbe8ff}html .e2e_sidebar_group_link>svg,html .e2e_sidebar_group_toggle{color:#a5bce4}
+html .e2e_sidebar_group_link:hover,html .e2e_sidebar_group_toggle:hover{color:#fff}html .e2e_sidebar_group_reveal>.e2e_sidebar_menu{border-left-color:#2b3c57}
+html .e2e_sidebar_search{border-color:#304362;background:#172842;color:#bdd0ef}html .e2e_sidebar_search input{color:#eaf2ff;background:transparent}html .e2e_sidebar_search input::placeholder{color:#a4b7d5}
+html .e2e_sidebar_group .e2e_sidebar_menu_item{color:#d6e2f8;border-radius:11px;min-height:40px}html .e2e_sidebar_group .e2e_sidebar_menu_item .menuIcon{color:#c5d8fb}
+html .e2e_sidebar_group .e2e_sidebar_menu_item:hover{background:#243b5b!important;color:#fff!important;transform:none}
+html .e2e_sidebar_group .e2e_sidebar_menu_item.e2e_sidebar_active,html .e2e_sidebar_group .e2e_sidebar_menu_item.e2e_sidebar_active:visited{background:var(--theme-gradient)!important;color:#fff!important;box-shadow:0 5px 18px #087bff25!important;transform:none}
+html .e2e_sidebar_group .e2e_sidebar_menu_item.e2e_sidebar_active .menuIcon,html .e2e_sidebar_group .e2e_sidebar_menu_item:hover .menuIcon{color:#fff!important}html .e2e_sidebar_group .e2e_sidebar_menu_item.e2e_sidebar_active::before{display:none}
+/* Header, search and shared navigation strips. */
+html .e2e_navbar_container{background:var(--app-surface);border-color:var(--app-border);box-shadow:0 4px 22px var(--app-shadow)}
+html .e2e_navbar_title,html .e2e_navbar_profile_info h3{color:var(--app-text)}html .e2e_navbar_subtitle{color:var(--app-muted)}
+html .e2e_navbar_search_wrap{border-color:transparent;border-radius:28px;background:var(--app-surface-2)}html .e2e_navbar_search_icon{color:#365f9e}
+html .e2e_navbar_notification,html .e2e_navbar_utility{background:var(--app-surface-2);color:var(--app-muted);border-radius:50%}
+html .e2e_related_resources,html .e2e_candidate_navbar_sections{background:var(--app-surface);border-color:var(--app-border);border-radius:16px;box-shadow:0 4px 18px var(--app-shadow)}
+html .e2e_related_resources a.active{color:var(--theme-blue);border-bottom-color:var(--theme-blue)}html .e2e_related_resources header strong{color:var(--app-text)}
+/* Resource modules share surfaces and tables; destructive/status colors stay semantic. */
+html .e2e_dashboard_scroll_content :is([class$="_table_wrapper"],[class$="_table_container"],.e2e_record_card,.e2e_record_section,.e2e_single_card,.e2e_graph_card,.attendance-panel,.attendance-admin-section,.user-management,.performance-dashboard,.profile-performance,.workforce-panel,.employee-drilldown,.latest-submissions,.profile-information-card,.profile-attendance-insights,.attendance-configurations,.e2e_confidential_notice,.notification-page>section,.notification-page>header){background:var(--app-surface);border:1px solid var(--app-border);border-radius:var(--theme-radius);color:var(--app-text);box-shadow:0 6px 24px var(--app-shadow)}
+html .e2e_dashboard_scroll_content :is([class$="_filters"],.user-toolbar,.performance-filters){background:var(--app-surface);border-color:var(--app-border);border-radius:14px}
+html .e2e_dashboard_scroll_content table{background:var(--app-surface);color:var(--app-text)}html .e2e_dashboard_scroll_content table th{background:var(--app-surface-2);color:var(--app-muted);border-color:var(--app-border)}html .e2e_dashboard_scroll_content table td{border-color:var(--app-border)}html .e2e_dashboard_scroll_content table tbody tr:hover{background:var(--app-surface-2)}
+html :is(.e2e_dashboard_scroll_content,.employee-form-modal,.collection-section,.onboarding-card) :is(input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),select,textarea){background-color:var(--app-input);color:var(--app-text);border-color:var(--app-border);border-radius:10px}
+html :is(.e2e_dashboard_scroll_content,.employee-form-modal,.collection-section) :is(input,select,textarea):focus-visible{outline:3px solid #087bff33;outline-offset:2px}
+html :is([class$="_add_btn"],[class$="_add_button"],.profile-primary-action,.employee-form-modal button[type="submit"],.onboarding-submit button){background:var(--theme-gradient);color:#fff;border-color:transparent;box-shadow:0 4px 12px #087bff18}
+html .e2e_dashboard_scroll_content [class$="_heading_line"]{background:var(--theme-gradient)}.e2e_dashboard_scroll_content :is(h1,h2,h3){letter-spacing:-.025em}
+/* Profile hero and cards. */
+html .e2e_record_hero{background:var(--theme-hero);border-color:transparent;border-radius:20px;box-shadow:0 8px 28px var(--app-shadow);color:var(--app-text)}html .e2e_record_hero h1{color:var(--app-text)}html .e2e_record_hero :is(p,span){color:var(--app-muted)}
+html .e2e_record_avatar{background:var(--app-surface);border:5px solid #ffffffb3;color:var(--theme-blue);box-shadow:0 8px 22px #496dbc15}
+html .employee-profile-actions{background:var(--app-surface);padding:7px;border:1px solid var(--app-border);border-radius:16px;box-shadow:0 5px 18px var(--app-shadow)}html .employee-profile-actions :is(a,button){background:transparent;border-color:transparent;border-radius:9px;color:var(--app-muted)}html .employee-profile-actions :is(a,button):hover,html .employee-profile-actions button[aria-expanded="true"]{color:var(--theme-blue);background:var(--app-surface-2)}
+html .profile-information-card h2{color:var(--app-text)}html .profile-information-card>header>span{background:var(--app-surface-2);color:var(--theme-blue)}html .profile-information-grid dt{color:var(--app-muted)}html .profile-information-grid dd{color:var(--app-text)}
+html .profile-entry-list article,html .profile-document-list article{background:var(--app-surface-2);border-color:var(--app-border)}html .profile-entry-list h3{color:var(--app-text)}html .profile-section-actions button{background:var(--app-surface);border-color:#b9d2ff;border-radius:8px;color:var(--theme-blue)}html .profile-section-actions button:hover{background:var(--app-surface-2)}
+html .profile-needs-details{border-color:#f3b8bd}html .profile-required-warning,html .profile-information-grid dd.missing{color:#bb3246}
+html .profile-completion-ring{background:conic-gradient(#087bff var(--completion),var(--app-border) 0)}html .profile-completion-ring::before{background:var(--app-surface)}html .profile-completion-ring strong{color:var(--theme-blue)}
+html .employee-attendance-switch{background:var(--app-surface);border-color:var(--app-border);box-shadow:0 5px 18px var(--app-shadow)}html .employee-shift-control>button[aria-checked="true"]{background:#00bd88}
+html .e2e_single_card:nth-child(4n+1){background:linear-gradient(120deg,var(--app-surface),#e8f3ff)}html .e2e_single_card:nth-child(4n+2){background:linear-gradient(120deg,var(--app-surface),#f1ebff)}html .e2e_single_card:nth-child(4n+3){background:linear-gradient(120deg,var(--app-surface),#e4fbf3)}html .e2e_single_card:nth-child(4n+4){background:linear-gradient(120deg,var(--app-surface),#fff3e5)}html.e2e-dark .e2e_single_card{background:var(--app-surface-2)}
+html :is(.employee-form-modal,.e2e_alias_modal,.reminder-modal,.confirm-modal){border-radius:var(--theme-radius)}html .e2e_global_theme_toggle{border-color:var(--app-border);box-shadow:0 4px 16px var(--app-shadow)}
+@media(min-width:769px){html .e2e_sidebar_container{border-radius:0 20px 20px 0}}
+@media(max-width:768px){html .e2e_sidebar_container{border-radius:16px 16px 0 0}html .e2e_sidebar_group .e2e_sidebar_menu_item{min-height:44px}html .e2e_dashboard_scroll_content{padding:14px}html .employee-profile-actions{flex-wrap:nowrap;overflow-x:auto}html .employee-profile-actions>*{flex:0 0 auto;white-space:nowrap}}
+@media(prefers-reduced-motion:reduce){html .e2e_sidebar_container,html .e2e_sidebar_menu_item{animation:none;transition:none}}/* Public pages and collection forms use the same brand palette. */
+html :is(.employee-onboarding,.e2e_about_container,.e2e_contact_container,.auth-page){background:var(--app-bg);color:var(--app-text)}
+html :is(.employee-onboarding>form,.onboarding-state,.loginContainer,.e2e_contact_card,.e2e_contact_form,.e2e_about_stat_card,.e2e_about_feature_card){background:var(--app-surface);border-color:var(--app-border);border-radius:var(--theme-radius);box-shadow:0 8px 28px var(--app-shadow);color:var(--app-text)}
+html .employee-onboarding form>header,html .e2e_contact_header{background:var(--theme-hero);color:var(--app-text)}
+html .employee-onboarding :is(input,select,textarea){background:var(--app-input);border-color:var(--app-border);color:var(--app-text)}
+html .collection-section{background:var(--app-surface);border-color:var(--app-border);border-radius:16px}
+html .collection-dynamic-card{background:var(--app-surface-2);border-color:var(--app-border)}
+html :is(.collection-section h2,.collection-section h3,.onboarding-intro h2,.onboarding-grid label){color:var(--app-text)}
+html :is(.onboarding-submit button,.e2e_about_btn,.e2e_contact_form button[type="submit"],.loginButton,.attendance-config-actions button.primary){background:var(--theme-gradient);color:#fff;border-color:transparent}
+html .attendance-configurations{--mail-bg:var(--app-surface);--mail-text:var(--app-text);--mail-border:var(--app-border)}
+html :is(.attendance-mail-card,.attendance-chart,.attendance-history,.attendance-today-card,.attendance-restriction-card,.attendance-admin-calendar,.profile-performance-charts>article){border-color:var(--app-border);background:var(--app-surface);border-radius:16px;box-shadow:0 4px 18px var(--app-shadow)}
+html .e2e_navbar_profile_info h4{color:var(--app-text)}
+html.e2e-dark :is(.profile-required-warning,.profile-information-grid dd.missing){color:#fda4af}
+/* Legacy resource wrappers are normalized without changing their layout. */
+html .e2e_dashboard_scroll_content :is([class$="_page"],.permission-matrix,.document-reminders-page,.w2-admin){background:var(--app-surface);border-color:var(--app-border);color:var(--app-text);box-shadow:0 6px 24px var(--app-shadow);border-radius:var(--theme-radius)}
+html .e2e_dashboard_scroll_content .e2e_record_page{background:transparent;box-shadow:none}
+html .e2e_dashboard_scroll_content :is(.permission-role,.permission-tabs,.permission-tools,.w2-tools,.document-reminders-filters){background:var(--app-surface-2);border-color:var(--app-border)}
+html .e2e_dashboard_scroll_content :is(.permission-matrix h2,.document-reminders-heading h1,.w2-admin h1){color:var(--app-text)}
+html .e2e_dashboard_scroll_content .permission-tabs button.active{background:var(--theme-gradient);color:#fff}
+html .e2e_dashboard_scroll_content :is(.e2e_graph_container,.e2e_table_container,.operations-command-center,.workforce-analytics){background:var(--app-surface);border-color:var(--app-border);border-radius:var(--theme-radius)}
+html .e2e_record_hero{min-height:180px;gap:24px}
+html .e2e_record_avatar{width:110px;height:110px;border-radius:50%;flex-shrink:0}
+html .e2e_record_hero h1{font-size:clamp(26px,2.4vw,36px);letter-spacing:-.035em}
+@media(max-width:600px){html .e2e_record_hero{gap:16px;min-height:0}html .e2e_record_avatar{width:76px;height:76px}}
+
+html.e2e-dark .e2e_sidebar_container{background:var(--theme-navy)!important;border-color:#1d3152!important}
+html .e2e_dashboard_scroll_content .profile-information-card.profile-needs-details{border-color:#f3b8bd}
+
+
+@media(max-width:768px){html .e2e_sidebar_group .e2e_sidebar_menu_item{width:96px!important;min-width:96px;max-width:96px;flex:0 0 96px;padding:7px 9px}}
+
+/* Consistent public-page contrast, including sections previously styled for navy backgrounds. */
+html .e2e_about_hero{background:var(--theme-hero)}
+html .e2e_about_container :is(h1,h2,h3,li){color:var(--app-text)}
+html .e2e_about_container p{color:var(--app-muted)}
+html .e2e_about_company,html .e2e_about_company_left ul{color:var(--app-text)}
+html :is(.e2e_about_stats_section,.e2e_about_services){background:var(--app-bg)}
+html :is(.e2e_about_glass_card,.e2e_about_service_card){background:var(--app-surface);color:var(--app-text);border:1px solid var(--app-border);box-shadow:0 6px 24px var(--app-shadow)}
+html .e2e_about_stat_card svg,html .e2e_about_service_card svg{color:var(--theme-blue)}
+html .e2e_contact_form :is(input,textarea){border:1px solid var(--app-border);background:var(--app-input);color:var(--app-text)}
+html .e2eRegisterPage,html .w2-public{background:var(--app-bg);color:var(--app-text)}
+html .e2eRegisterContainer,html .w2-intro,html .w2-form{background:var(--app-surface);color:var(--app-text);border-color:var(--app-border);border-radius:var(--theme-radius);box-shadow:0 8px 28px var(--app-shadow)}
+@media(max-width:768px){html .e2e_sidebar_groups .e2e_sidebar_menu{width:max-content!important;min-width:0!important;flex:0 0 auto}}
+/* Readable shared typography and dark-mode secondary text. */
+html :is(.e2e_dashboard_main_layout,.employee-onboarding,.e2e_about_container,.e2e_contact_container,.e2eRegisterPage,.w2-public) *{font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+html.e2e-dark .e2e_dashboard_scroll_content table td{color:var(--app-text)}
+html.e2e-dark .e2e_dashboard_scroll_content :is(.profile-information-card,.employee-attendance-switch,.profile-attendance-insights,.attendance-configurations) :is(p,small):not(.profile-required-warning):not(.collection-error):not([role="alert"]){color:var(--app-muted)}
+html.e2e-dark .e2e_navbar_notification{color:var(--app-muted)}
+html.e2e-dark :is(.e2e_about_container,.e2e_contact_container) :is(input,textarea){background:var(--app-input);color:var(--app-text);border-color:var(--app-border)}
+
+/* The sidebar provides workspace navigation on desktop; mobile keeps quick links. */
+html .e2e_related_resources{display:none}
+@media(max-width:768px){
+ html .e2e_related_resources,html body.e2e-profile-reference .e2e_related_resources{display:block;margin:0 0 12px;padding:10px 12px;border-radius:14px;min-width:0}
+ html .e2e_related_resources header{display:block;width:auto;min-width:0;margin-bottom:8px;padding:0;border:0}
+ html .e2e_related_resources header strong{display:block;margin:0;font-size:11px;line-height:1.4;color:var(--app-text-muted,#667085)}
+ html .e2e_related_resources nav{display:flex;width:100%;gap:6px;overflow-x:auto;overscroll-behavior-x:contain;padding:2px 1px 4px;scrollbar-width:none}
+ html .e2e_related_resources nav a{min-height:40px;padding:0 12px;border:0;border-radius:9px;font-size:12px;white-space:nowrap;background:var(--app-surface-2,#f4f7fb);color:var(--app-text);transform:none}
+ html .e2e_related_resources nav a.active{background:var(--theme-blue,#087bff);color:#fff;border:0}
+ html .e2e_related_resources nav a:focus-visible{outline:2px solid var(--theme-blue,#087bff);outline-offset:-2px}
+}
+
+/* Compact grouped navigation with a luminous navy ribbon. */
+html .e2e_sidebar_container{isolation:isolate;background:#080e24!important;border-color:#172340!important}
+html .e2e_sidebar_container::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(180deg,#080e2400 20%,#080e2433 60%,#080e24 100%),url('../assets/sidebar-wave.svg') center bottom / 100% auto no-repeat;opacity:.8}
+.e2e_sidebar_brand_footer{flex:0 0 auto;padding:12px 9px 2px;color:#96a5c8;font-size:9px;letter-spacing:.07em;line-height:1.5;pointer-events:none}
+@media(min-width:769px){
+ html .e2e_sidebar_container{padding:0 10px 12px!important}
+ html .e2e_sidebar_logo_section{min-height:66px;border-bottom-color:#ffffff12}
+ html .e2e_sidebar_resource_scroll{padding:10px 2px 4px!important;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#5868a780 transparent;scrollbar-gutter:auto}
+ html .e2e_sidebar_resource_scroll::-webkit-scrollbar{display:block;width:3px;height:0}
+ html .e2e_sidebar_resource_scroll::-webkit-scrollbar-thumb{background:#5868a780;border-radius:5px}
+ html .e2e_sidebar_search{min-height:34px;margin-bottom:9px;border-color:#ffffff20;background:#13213ce8;border-radius:8px;backdrop-filter:blur(12px)}
+ html .e2e_sidebar_groups{gap:2px}
+ html .e2e_sidebar_group{padding:3px 0;border-bottom-color:#ffffff0d}
+ html .e2e_sidebar_group_header{min-height:32px}
+ html .e2e_sidebar_group_link{min-height:32px;gap:8px}
+ html .e2e_sidebar_group_link b{font-size:11.5px;font-weight:700}
+ html .e2e_sidebar_group_link>svg{font-size:12px;width:14px;flex-basis:14px}
+ html .e2e_sidebar_group .e2e_sidebar_menu_item{min-height:32px;padding:0 8px;gap:7px;font-size:11.5px;border-radius:8px;transition:background .2s ease,color .2s ease}
+ html .e2e_sidebar_group_reveal>.e2e_sidebar_menu{gap:3px;border-left-color:#ffffff24;padding-left:10px!important}
+ html .e2e_sidebar_group .e2e_sidebar_menu_item .menuIcon{font-size:12px;min-width:14px}
+ html .e2e_sidebar_group_link:focus-visible,html .e2e_sidebar_menu_item:focus-visible{outline:2px solid #91b8ff;outline-offset:-2px}
+}
+@media(max-width:768px){.e2e_sidebar_brand_footer{display:none}html .e2e_sidebar_container::before{background-size:100% 450px;opacity:.45}}
+
+/* Body-mounted confirmations remain above scroll containers and the navbar. */
+html .e2e_confirmation_overlay{position:fixed;inset:0;z-index:2147483646;display:grid;place-items:center;padding:20px;background:#08132999;backdrop-filter:blur(5px);overflow:auto}
+html .e2e_confirmation_dialog{width:min(440px,100%);max-height:calc(100dvh - 40px);overflow:auto;padding:28px;border:1px solid var(--app-border);border-radius:20px;background:var(--app-surface);color:var(--app-text);box-shadow:0 24px 80px #0004;text-align:center}
+html .e2e_confirmation_dialog .confirmation-symbol{display:grid;place-items:center;width:56px;height:56px;margin:0 auto 16px;border-radius:17px;background:#eaf4ff;color:#087bff;font-size:26px}
+html .e2e_confirmation_dialog.is-danger .confirmation-symbol{background:#fff0f1;color:#dc3545}
+html .e2e_confirmation_dialog h2{margin:0;font-size:21px;color:var(--app-text)}
+html .e2e_confirmation_dialog p{margin:12px 0;color:var(--app-muted);font-size:14px;line-height:1.6}
+html .e2e_confirmation_dialog footer{display:flex;gap:10px;justify-content:stretch;margin-top:22px}
+html .e2e_confirmation_dialog footer button{flex:1;min-height:44px;padding:10px 14px;border-radius:10px;border:1px solid var(--app-border);font-weight:700;cursor:pointer}
+html .e2e_confirmation_dialog .secondary{background:var(--app-surface-2);color:var(--app-text)}
+html .e2e_confirmation_dialog .primary{background:var(--theme-gradient);color:#fff;border:0}
+html .e2e_confirmation_dialog .danger{background:#dc3545;color:#fff;border:0}
+html .e2e_confirmation_dialog button:disabled{opacity:.65;cursor:wait}
+html .e2e_confirmation_dialog button:focus-visible{outline:3px solid #087bff66;outline-offset:2px}
+.attendance-confirm-summary{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px;border-radius:12px;background:var(--app-surface-2);text-align:left}
+.attendance-confirm-summary span{color:var(--app-muted);font-size:11px}
+.attendance-confirm-summary strong{display:block;margin-top:5px;color:var(--app-text);font-size:12px}
+
+html .e2e_confirmation_dialog .attendance-confirm-summary{display:grid;width:100%;height:auto;min-height:0;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0 0;padding:14px;box-sizing:border-box;border-radius:12px;background:var(--app-surface-2);text-align:left}
+html .e2e_confirmation_dialog .attendance-confirm-summary span{min-width:0;line-height:1.5}
+html .e2e_confirmation_dialog .attendance-confirm-summary strong{white-space:nowrap;font-size:11px}
+
+/* Employee directory completion and staff attendance shortcut. */
+.employee-list-completion{display:grid;gap:7px;min-width:120px;max-width:160px;padding:5px 0}
+.employee-list-completion strong{color:var(--app-text);font-size:12px;font-variant-numeric:tabular-nums}
+.employee-list-completion [role="progressbar"]{height:6px;border-radius:20px;background:var(--app-border);overflow:hidden}
+.employee-list-completion [role="progressbar"] span{display:block;height:100%;border-radius:inherit;background:var(--theme-gradient);transition:width .25s ease}
+html .reference-admin-attendance{padding:20px;background:var(--app-surface);border-radius:18px;box-shadow:0 8px 26px #356ada16}
+html .reference-admin-attendance header{justify-content:flex-start;gap:12px;padding:0;border:0}
+html .reference-admin-attendance header .admin-attendance-icon{display:grid;place-items:center;width:44px;height:44px;flex:0 0 44px;padding:0;border-radius:13px;background:var(--app-surface-2);color:var(--theme-blue);font-size:20px}
+html .reference-admin-attendance header small{display:block;margin-top:4px;font-size:11px;color:var(--app-muted);letter-spacing:0;text-transform:none}
+html .reference-admin-attendance p{margin:14px 0 18px;color:var(--app-muted);font-size:12px;line-height:1.7;letter-spacing:0;text-transform:none;font-weight:400}
+html .reference-admin-attendance>button{display:flex;width:100%;min-height:42px;align-items:center;justify-content:center;gap:9px;padding:10px 14px;border:0;border-radius:10px;background:var(--theme-gradient);color:#fff;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;transition:box-shadow .2s ease}
+html .reference-admin-attendance>button:hover{box-shadow:0 6px 16px #087bff33}
+html .reference-admin-attendance>button:focus-visible{outline:3px solid #087bff55;outline-offset:3px}
+html .reference-admin-attendance>button span{margin-left:auto;color:#fff}
+
+/* Attendance presence remains visible outside the clipped photo circle. */
+.e2e_navbar_avatar_presence{position:relative;display:inline-flex;flex:0 0 auto;overflow:visible}
+html .e2e_navbar_presence_dot{position:absolute;right:-1px;bottom:-1px;width:11px;height:11px;box-sizing:border-box;border:2px solid var(--app-surface,#fff);border-radius:50%;background:#94a3b8;box-shadow:0 1px 4px #10213b26;pointer-events:auto}
+html .e2e_navbar_presence_dot.online{background:#16c784}
+html .e2e_navbar_presence_dot.offline{background:#ef4444}
+html .e2e_navbar_presence_dot.overdue{background:#f59e0b;animation:attendance-presence-pulse 1.6s ease-in-out infinite}
+@keyframes attendance-presence-pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 #f59e0b50}50%{opacity:.5;box-shadow:0 0 0 4px #f59e0b00}}
+@media(prefers-reduced-motion:reduce){html .e2e_navbar_presence_dot.overdue{animation:none}}
+
+.e2e_sidebar_brand_footer span{float:right;color:#bcc9e5;font-variant-numeric:tabular-nums;letter-spacing:0}
+
+/* Role and employee ID share a clean second line beneath the name. */
+.reference-role-identity{display:flex;align-items:baseline;flex-wrap:wrap;gap:8px 16px;margin:0 0 12px}
+html .reference-profile-hero .reference-role-identity h2{margin:0!important}
+html .reference-profile-hero .reference-employee-id{display:inline-block;margin:0;padding:0;border:0;border-radius:0;box-shadow:none;font-size:16px;font-weight:800;line-height:1.4;letter-spacing:.025em;color:#7845ff;background:transparent}
+@supports(background-clip:text){html .reference-profile-hero .reference-employee-id{background:linear-gradient(110deg,#8750ff,#a238ed);background-clip:text;-webkit-background-clip:text;color:transparent}}
+@media(forced-colors:active){html .reference-profile-hero .reference-employee-id{background:none;color:CanvasText}}
+
+
+/* Keep profile contact information in aligned rows beneath role and ID. */
+html .reference-profile-hero .reference-contact-line{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:20px;row-gap:10px;width:100%;margin-top:4px;font-size:12px;line-height:1.6}
+html .reference-profile-hero .reference-contact-line>span{display:block;position:relative;min-width:0;max-width:none;padding-left:23px;overflow-wrap:anywhere;word-break:normal}
+html .reference-profile-hero .reference-contact-line>span>svg{position:absolute;left:0;top:3px;width:15px;height:15px;color:var(--app-muted)}
+@media(max-width:768px){html .reference-profile-hero .reference-contact-line{grid-template-columns:minmax(0,1fr);gap:9px;font-size:11px}html .reference-profile-hero .reference-contact-line>span{padding-left:21px}}
+
+html .profile-photo-actions{display:flex;align-items:stretch;width:100%;min-height:35px;border:1px solid #c7d2ff;border-radius:12px;background:var(--app-surface);overflow:hidden;box-shadow:0 3px 10px #087bff0a}
+html .profile-photo-actions .profile-photo-change{position:static;transform:none;display:flex;align-items:center;justify-content:center;gap:6px;flex:1;min-width:0;width:auto;margin:0;padding:8px 6px;border:0;border-radius:0;background:transparent;box-shadow:none;font-size:11px;color:var(--theme-blue)}
+html .profile-photo-actions .profile-photo-remove{display:grid;place-items:center;flex:0 0 32px;padding:0;border:0;border-left:1px solid var(--app-border);background:transparent;color:#dc3545;cursor:pointer;font-size:11px}
+html .profile-photo-actions button:hover{background:var(--app-surface-2)}
+html .profile-photo-actions button:focus-visible{outline:2px solid var(--theme-blue);outline-offset:-3px}
+html .profile-photo-actions button:disabled{opacity:.6;cursor:wait}
+
+html .profile-photo-actions .profile-photo-change span{color:inherit}
+@media(max-width:768px){html .profile-photo-actions{min-height:44px}html .profile-photo-actions .profile-photo-change{font-size:10px;padding:8px 3px;gap:4px}html .profile-photo-actions .profile-photo-word{display:none}html .profile-photo-actions .profile-photo-remove{flex-basis:28px}}
+
+/* Employee directory: compact reference layout with permission-aware row menus. */
+html .e2e_empstatus_page{padding:18px;background:transparent;border:0;border-radius:16px;box-shadow:none}
+html .e2e_empstatus_top{align-items:center;margin-bottom:14px}
+html .e2e_empstatus_top h2{display:flex;align-items:center;gap:10px;font-size:22px}
+html .e2e_empstatus_top h2 svg{padding:7px;box-sizing:content-box;border-radius:9px;background:#e3efff;color:#087bff;font-size:18px}
+html .e2e_empstatus_top p{font-size:11px;margin-top:4px}
+html .e2e_empstatus_heading_line{display:none}
+html .e2e_employee_add{min-height:36px;padding:8px 13px;border:0;border-radius:8px;background:var(--theme-gradient);color:#fff;font-size:11px;font-weight:700;cursor:pointer}
+.employee-directory-stats{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.employee-directory-stats article{display:flex;align-items:center;gap:9px;min-width:0;padding:13px 10px;border:1px solid var(--app-border);border-radius:11px;background:var(--app-surface);box-shadow:0 3px 12px #356ada09}
+.employee-directory-stats article>span{display:grid;place-items:center;flex:0 0 32px;height:32px;border-radius:8px;background:#e6f0ff;color:#087bff;font-size:15px}
+.employee-directory-stats .green>span{background:#e2fbef;color:#00a876}.employee-directory-stats .red>span{background:#ffe9ed;color:#ec4666}.employee-directory-stats .violet>span{background:#efe8ff;color:#7845ff}.employee-directory-stats .orange>span{background:#fff0df;color:#ef9300}
+.employee-directory-stats p{margin:0 0 4px;font-size:9px;color:var(--app-muted);font-weight:600;line-height:1.4}
+.employee-directory-stats strong{font-size:20px;color:var(--app-text);line-height:1}
+html .e2e_empstatus_page .employee-invitation-card{position:relative;margin-bottom:14px;padding:16px 18px;border-radius:13px;border:1px solid #dddfff;background:linear-gradient(115deg,var(--app-surface),#e9e8ff80);overflow:hidden}
+html .e2e_empstatus_page .employee-invitation-card .attendance-config-heading h2{font-size:17px}
+html .e2e_empstatus_page .employee-invitation-card .attendance-config-heading p{font-size:10px}
+html .e2e_empstatus_page .employee-invitation-card .attendance-config-actions{gap:8px;margin-top:12px}
+html .e2e_empstatus_page .employee-invitation-card .attendance-config-actions button{font-size:10px;min-height:32px;padding:7px 11px;border-radius:7px}
+html .e2e_empstatus_filters{display:flex;flex-wrap:wrap;gap:8px;padding:11px;margin-bottom:0;border-radius:12px 12px 0 0;background:var(--app-surface)}
+html .e2e_empstatus_search_wrap{width:auto;flex:1 1 210px;min-width:180px;border-radius:7px;padding:0 10px}
+html .e2e_empstatus_search_wrap input{min-height:34px;padding:7px 0;font-size:11px}
+html .e2e_empstatus_filters>select,html .employee-joining-filter,html .employee-filter-clear{min-height:34px;max-width:170px;padding:6px 9px;border:1px solid var(--app-border);border-radius:7px;background:var(--app-surface);color:var(--app-muted);font-size:10px}
+.employee-joining-filter{display:flex;align-items:center;gap:6px}.employee-joining-filter input{min-width:0;width:112px;border:0;background:transparent;font-size:10px}.employee-filter-clear{cursor:pointer}
+.employee-directory-table-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 13px;background:var(--app-surface);border-inline:1px solid var(--app-border);color:var(--app-muted);font-size:11px}
+html .e2e_empstatus_entries{font-size:10px}html .e2e_empstatus_entries select{padding:4px 6px}
+html .e2e_empstatus_table_wrapper{border:1px solid var(--app-border);border-radius:0 0 12px 12px;background:var(--app-surface)}
+html .e2e_empstatus_table{min-width:950px;border-spacing:0}
+html .e2e_empstatus_table th{padding:11px 12px;font-size:9px;white-space:nowrap}
+html .e2e_empstatus_table td{padding:10px 12px;font-size:11px;border-top:0;border-bottom:1px solid var(--app-border)}
+html .e2e_empstatus_table tbody tr{box-shadow:none}
+.employee-directory-name{display:flex;align-items:center;gap:8px;font-weight:650}.employee-directory-name i{display:grid;place-items:center;flex:0 0 29px;height:29px;border-radius:50%;background:linear-gradient(135deg,#e7eeff,#f0eaff);color:#576bb1;font-size:9px;font-weight:700;font-style:normal}
+.employee-directory-status{display:inline-flex;white-space:nowrap;padding:4px 8px;border-radius:6px;font-size:10px;font-weight:700}.employee-directory-status.active{background:#dcfce7;color:#149763}.employee-directory-status.inactive{background:#ffe5eb;color:#d93459}.employee-directory-status.unassigned{background:var(--app-surface-2);color:var(--app-muted)}
+html .e2e_empstatus_table .employee-list-completion{min-width:95px;max-width:120px;gap:5px}.employee-list-completion strong{font-size:10px}
+.employee-row-menu-trigger{display:grid;place-items:center;width:30px;height:30px;padding:0;border:0;border-radius:8px;background:transparent;color:var(--app-muted);cursor:pointer}
+.employee-row-menu-trigger:hover,.employee-row-menu-trigger[aria-expanded="true"]{background:var(--app-surface-2);color:var(--theme-blue)}
+.employee-row-menu{position:fixed;z-index:2147483645;width:180px;box-sizing:border-box;padding:6px;border:1px solid var(--app-border);border-radius:12px;background:var(--app-surface);box-shadow:0 12px 36px #10213b26;animation:employee-menu-in .14s ease-out}
+.employee-row-menu button{display:flex;align-items:center;gap:10px;width:100%;min-height:40px;padding:8px 10px;border:0;border-radius:8px;background:transparent;color:var(--app-text);text-align:left;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer}
+.employee-row-menu button svg{color:var(--theme-blue);font-size:12px}.employee-row-menu button:hover,.employee-row-menu button:focus-visible{background:var(--app-surface-2);outline:0}.employee-row-menu button.danger,.employee-row-menu button.danger svg{color:#dc3545}
+.employee-row-menu-trigger:focus-visible{outline:2px solid var(--theme-blue);outline-offset:2px}
+@keyframes employee-menu-in{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+@media(max-width:1100px){.employee-directory-stats{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:600px){html .e2e_empstatus_page{padding:0}.employee-directory-stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.employee-directory-stats article{padding:11px 9px}html .e2e_empstatus_top h2{font-size:20px}html .e2e_empstatus_filters>select{flex:1 1 100px;max-width:none}html .employee-joining-filter{flex:1;max-width:none}html .employee-joining-filter input{width:100%}.employee-row-menu button{min-height:44px}}
+@media(prefers-reduced-motion:reduce){.employee-row-menu{animation:none}}

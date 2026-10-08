@@ -1,0 +1,15 @@
+import {useEffect,useRef,useState} from "react";
+import {createPortal} from "react-dom";
+import {FaEllipsisV,FaEye,FaPen,FaTrashAlt,FaUserPlus} from "react-icons/fa";
+export default function EmployeeRowActions({employee,canEdit,canDelete,canAssign,onView,onEdit,onDelete,onAssign,actions}){
+ const [position,setPosition]=useState(null),trigger=useRef(null),menu=useRef(null),timer=useRef(null);
+ const items=actions||[["View",FaEye,onView],...(canEdit?[["Edit",FaPen,onEdit]]:[]),...(canDelete?[["Delete",FaTrashAlt,onDelete]]:[]),...(!employee.user_id&&canAssign?[["Assign User",FaUserPlus,onAssign]]:[])];
+ const cancelTimer=()=>window.clearTimeout(timer.current);
+ const close=()=>{cancelTimer();setPosition(null);};
+ const open=()=>{cancelTimer();const b=trigger.current.getBoundingClientRect(),height=items.length*(window.innerWidth<=600?44:40)+12;setPosition({left:Math.max(8,Math.min(window.innerWidth-188,b.right-180)),top:b.bottom+height+8>window.innerHeight?Math.max(8,b.top-height):b.bottom+5});};
+ const delayClose=()=>{cancelTimer();timer.current=window.setTimeout(close,180);};
+ useEffect(()=>()=>window.clearTimeout(timer.current),[]);
+ useEffect(()=>{if(!position)return;const close=()=>{window.clearTimeout(timer.current);setPosition(null);};const outside=e=>{if(!trigger.current?.contains(e.target)&&!menu.current?.contains(e.target))close();};const scroll=e=>{if(!menu.current?.contains(e.target))close();};document.addEventListener("pointerdown",outside);window.addEventListener("scroll",scroll,true);window.addEventListener("resize",close);return()=>{document.removeEventListener("pointerdown",outside);window.removeEventListener("scroll",scroll,true);window.removeEventListener("resize",close);};},[position]);
+
+ return <><button ref={trigger} type="button" className="employee-row-menu-trigger" aria-label={`Actions for ${employee.legal_name}`} aria-haspopup="menu" aria-expanded={Boolean(position)} onMouseEnter={open} onMouseLeave={delayClose} onClick={()=>{cancelTimer();if(!position)open();else menu.current?.querySelector('button:not(:disabled)')?.focus();}} onKeyDown={e=>{if(e.key==="ArrowDown"){e.preventDefault();open();window.requestAnimationFrame(()=>menu.current?.querySelector('button:not(:disabled)')?.focus());}if(e.key==="Escape")close();}}><FaEllipsisV/></button>{position&&createPortal(<div ref={menu} className="employee-row-menu" role="menu" aria-label={`Employee actions for ${employee.legal_name}`} style={position} onMouseEnter={cancelTimer} onMouseLeave={delayClose} onKeyDown={e=>{const buttons=[...menu.current.querySelectorAll('button:not(:disabled)')],i=buttons.indexOf(document.activeElement);if(e.key==="Escape"){close();trigger.current.focus();}if(e.key==="ArrowDown"||e.key==="ArrowUp"){e.preventDefault();buttons[(i+(e.key==="ArrowDown"?1:-1)+buttons.length)%buttons.length]?.focus();}if(e.key==="Tab")close();}}>{items.map(([label,Icon,action,disabled=false,hint])=><button key={label} type="button" role="menuitem" disabled={disabled} title={hint} className={label==="Delete"?"danger":""} onClick={()=>{close();action();}}><Icon/><span>{label}</span></button>)}</div>,document.body)}</>;
+}

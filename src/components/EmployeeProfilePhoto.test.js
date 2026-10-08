@@ -1,7 +1,7 @@
 import {render,screen,fireEvent,waitFor} from "@testing-library/react";
 import EmployeeProfilePhoto from "./EmployeeProfilePhoto";
-import {uploadEmployeePhoto,getEmployeePhoto} from "../api/employeeApi";
-jest.mock("../api/employeeApi",()=>({uploadEmployeePhoto:jest.fn(),getEmployeePhoto:jest.fn()}));
+import {uploadEmployeePhoto,getEmployeePhoto,removeEmployeePhoto} from "../api/employeeApi";
+jest.mock("../api/employeeApi",()=>({uploadEmployeePhoto:jest.fn(),getEmployeePhoto:jest.fn(),removeEmployeePhoto:jest.fn()}));
 beforeEach(()=>{URL.createObjectURL=jest.fn(()=>"blob:photo-preview");URL.revokeObjectURL=jest.fn();});
 const employee={id:7,legal_name:"Test Employee"};
 test("previews and saves a profile photo, then offers replacement",async()=>{uploadEmployeePhoto.mockResolvedValue({success:true,message:"Photo saved"});const saved=jest.fn();render(<EmployeeProfilePhoto employee={employee} canEdit onSaved={saved}/>);fireEvent.click(screen.getByRole("button",{name:"Add profile photo"}));const file=new File(["photo"],"photo.png",{type:"image/png"});fireEvent.change(screen.getByLabelText("Choose profile photo"),{target:{files:[file]}});expect(screen.getByAltText("Portrait preview")).toBeInTheDocument();fireEvent.click(screen.getByRole("button",{name:"Save Photo"}));await waitFor(()=>expect(saved).toHaveBeenCalledWith("Photo saved"));expect(uploadEmployeePhoto).toHaveBeenCalledWith(7,file);expect(screen.getByRole("button",{name:"Update profile photo"})).toBeInTheDocument();expect(screen.queryByRole("form",{name:"Edit profile photo"})).not.toBeInTheDocument();});
@@ -10,3 +10,11 @@ test("failed save keeps the editor available for retry",async()=>{uploadEmployee
 test("view-only profiles display protected portraits without an edit control",async()=>{getEmployeePhoto.mockResolvedValue(new Blob(["photo"],{type:"image/png"}));const {unmount}=render(<EmployeeProfilePhoto employee={{...employee,photo:"stored.photo.enc"}}/>);await screen.findByAltText("Test Employee");expect(getEmployeePhoto).toHaveBeenCalledWith(7);expect(screen.queryByRole("button")).not.toBeInTheDocument();unmount();expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:photo-preview");});
 
 test("photo editor is a dialog outside the profile cover and closes with Escape",()=>{render(<div className="reference-profile-hero"><EmployeeProfilePhoto employee={employee} canEdit/></div>);const trigger=screen.getByRole("button",{name:"Add profile photo"});trigger.focus();fireEvent.click(trigger);const dialog=screen.getByRole("dialog",{name:"Update profile portrait"});expect(document.querySelector('.reference-profile-hero')).not.toContainElement(dialog);expect(screen.getByLabelText("Choose profile photo")).toHaveFocus();fireEvent.keyDown(document,{key:"Escape"});expect(screen.queryByRole("dialog")).not.toBeInTheDocument();expect(trigger).toHaveFocus();});
+
+test("photo removal requires confirmation and keeps the image after failure until retry succeeds",async()=>{
+ removeEmployeePhoto.mockRejectedValueOnce({response:{data:{message:"Please retry"}}}).mockResolvedValueOnce({success:true,message:"Profile photo removed."});
+ const saved=jest.fn();render(<EmployeeProfilePhoto employee={{...employee,profile_photo_url:"/portrait.png"}} canEdit onSaved={saved}/>);
+ fireEvent.click(screen.getByRole("button",{name:"Remove profile photo"}));expect(removeEmployeePhoto).not.toHaveBeenCalled();fireEvent.click(screen.getByRole("button",{name:"Cancel"}));expect(screen.getByAltText("Test Employee")).toBeInTheDocument();
+ fireEvent.click(screen.getByRole("button",{name:"Remove profile photo"}));fireEvent.click(screen.getByRole("button",{name:"Remove Photo"}));await screen.findByText("Please retry");expect(screen.getByAltText("Test Employee")).toBeInTheDocument();
+ fireEvent.click(screen.getByRole("button",{name:"Remove Photo"}));await waitFor(()=>expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument());expect(screen.queryByAltText("Test Employee")).not.toBeInTheDocument();expect(saved).toHaveBeenCalledWith("Profile photo removed.");expect(screen.getByRole("button",{name:"Add profile photo"})).toBeInTheDocument();
+});

@@ -1,4 +1,5 @@
 import axiosInstance from "./axiosInstance";
+import Cookies from "js-cookie";
 
 export const getEmployees = async (params = {}) => {
   const response = await axiosInstance.get("/employees", { params });
@@ -7,6 +8,7 @@ export const getEmployees = async (params = {}) => {
 
 export const getEmployeeById = async (id) => {
   const response = await axiosInstance.get(`/employees/${id}`, {timeout:15000});
+  if(response.data?.data?.photo)getEmployeePhoto(id).catch(()=>{});
   return response.data;
 };
 
@@ -92,5 +94,16 @@ export const downloadEmployeeOnboardingDocument = async (token,documentId,name) 
  const url=URL.createObjectURL(response.data);const link=document.createElement('a');link.href=url;link.download=name||'document';document.body.appendChild(link);link.click();link.remove();window.setTimeout(()=>URL.revokeObjectURL(url),1000);
 };
 
-export const getEmployeePhoto = async id => (await axiosInstance.get(`/employees/${id}/photo`, {responseType:"blob",timeout:15000})).data;
-export const uploadEmployeePhoto = async (id,file) => {const data=new FormData();data.append("photo",file);return (await axiosInstance.post(`/employees/${id}/photo`,data,{timeout:30000})).data;};
+const portraitCache=new Map();let portraitSession="";
+function portraitKey(id){const session=Cookies.get("jwtToken")||"";if(session!==portraitSession){portraitCache.clear();portraitSession=session;}return String(id);}
+export const getEmployeePhoto = id => {
+ const key=portraitKey(id),cached=portraitCache.get(key);
+ if(cached&&cached.expires>Date.now())return cached.promise;
+ const promise=axiosInstance.get(`/employees/${id}/photo`,{responseType:"blob",timeout:15000}).then(r=>r.data).catch(error=>{if(portraitCache.get(key)?.promise===promise)portraitCache.delete(key);throw error;});
+ if(portraitCache.size>=20)portraitCache.delete(portraitCache.keys().next().value);
+ portraitCache.set(key,{promise,expires:Date.now()+300000});return promise;
+};
+export const uploadEmployeePhoto = async (id,file) => {const data=new FormData();data.append("photo",file);const result=(await axiosInstance.post(`/employees/${id}/photo`,data,{timeout:30000})).data;if(result.success){portraitCache.set(portraitKey(id),{promise:Promise.resolve(file),expires:Date.now()+300000});}return result;};
+export const removeEmployeePhoto = async id => {const result=(await axiosInstance.delete(`/employees/${id}/photo`,{timeout:15000})).data;if(result.success)portraitCache.delete(portraitKey(id));return result;};
+
+export const adminLogoutAttendance = async (id,data) => (await axiosInstance.post(`/attendance/records/${id}/logout`,data)).data;

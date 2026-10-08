@@ -1,12 +1,14 @@
 import { useCallback, useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
-import { FaCalendarCheck, FaCheck, FaClock, FaEdit, FaPlus, FaTimes, FaTrash, FaUserCheck, FaUserTimes } from "react-icons/fa";
+import { useSearchParams, useNavigate } from "react-router-dom";
+import { FaCalendarCheck, FaCheck, FaPlus, FaTimes, FaTrash } from "react-icons/fa";
 import {
   addEmployeeLeave, deleteHoliday, getEmployees, getHolidays, getLeaves,
   getAttendanceIpPermissions, getMonthlyAttendance, getTodayAttendance, reviewLeave, saveHoliday, updateEmployeeWfhPermission, updateMonthlyAttendance,
 } from "../../api/employeeApi";
 import { usePermissions } from "../../auth/PermissionContext";
 import MyProfile from "./MyProfile";
+import DailyAttendanceDashboard from "../../components/DailyAttendanceDashboard";
+import EmployeeRowActions from "../../components/EmployeeRowActions";
 import ConfirmDialog from "../../components/ConfirmDialog";
 import AttendanceConfigurations from "../../components/AttendanceConfigurations";
 import PayslipManager from "../../components/PayslipManager";
@@ -16,6 +18,7 @@ const blankLeave = { employee_id:"", leave_type:"paid", start_date:"", end_date:
 const blankHoliday = { holiday_date:"", name:"", description:"", is_optional:false };
 
 function AttendanceManagement() {
+  const navigate=useNavigate();
   const { can, user } = usePermissions();
   const [assistantParams] = useSearchParams();
   const admin = can("attendance","edit");
@@ -70,20 +73,10 @@ function AttendanceManagement() {
     <nav>{[["today","Daily Attendance"],["monthly","Monthly Summary"],...(payslipAccess?[["payslips","Payslips"]]:[]),...(configurationAccess?[["configurations","Configurations"]]:[]),...(superAdmin?[["restriction","IP Restriction"]]:[]),["approvals","Leave Approvals"],["add-leave","Add Employee Leave"],["holidays","Holidays"]].map(([key,label])=><button key={key} className={tab===key?"active":""} onClick={()=>setTab(key)}>{label}</button>)}</nav>
     {message.text&&<p className={`attendance-admin-message ${message.error?"error":""}`}>{message.text}</p>}
     {tab==="configurations"&&configurationAccess?<AttendanceConfigurations/>:loading?<div className="attendance-loading"><span/> Loading attendance management...</div>:<>
-      {tab==="today"&&<section className="attendance-admin-section">
-        <div className="attendance-section-title"><div><h2>Daily Attendance</h2><p>Select any date to review every active employee.</p></div><label className="attendance-date-filter">Date<input type="date" max={localDate} value={selectedDate} onChange={e=>setSelectedDate(e.target.value)}/></label></div>
-        <div className="attendance-today-cards">
-          <article><FaUserCheck/><span><small>Current Employees</small><strong>{today.total_employees||0}</strong></span></article>
-          <article className="present"><FaCalendarCheck/><span><small>Present Today</small><strong>{today.present||0}</strong></span></article>
-          <article className="absent"><FaUserTimes/><span><small>Absent Today</small><strong>{today.absent||0}</strong></span></article>
-          <article className="late"><FaClock/><span><small>Late Today</small><strong>{today.late||0}</strong></span></article>
-        </div>
-        <div className="attendance-admin-table"><table><thead><tr><th>Employee</th><th>Company Login</th><th>Role</th><th>Time In</th><th>Time Out</th><th>Hours</th><th>Status</th></tr></thead>
-          <tbody>{today.data?.length?today.data.map(row=><tr key={row.id}><td><strong>{row.legal_name}</strong><small>{row.employee_id}</small></td><td><strong>{row.company_name}</strong><small>{row.username}</small></td><td>{row.role||"-"}</td><td>{row.present?`${row.time_in} ET`:"-"}</td><td>{row.present?(row.time_out==="00:00:00"?"Working":`${row.time_out} ET`):"-"}</td><td>{row.present?`${row.hours||0} h`:"-"}</td><td><mark className={row.present?"approved":"rejected"}>{row.present?(Number(row.status)===1?"Present - On time":"Present - Late"):"Absent"}</mark></td></tr>):<tr><td colSpan="7">No current employees are assigned to company users.</td></tr>}</tbody></table></div>
-      </section>}
+      {tab==="today"&&<DailyAttendanceDashboard today={today} selectedDate={selectedDate} onDateChange={setSelectedDate} localDate={localDate} onRefresh={load} canManage={admin} canExport={can("attendance","export")}/> }
       {tab==="monthly"&&<section className="attendance-admin-section">
         <div className="attendance-section-title"><div><h2>Monthly Attendance Summary</h2><p>Totals for every active employee through {monthly.end_date||"the selected month"}.</p></div><label className="attendance-date-filter">Month<input type="month" max={localDate.slice(0,7)} value={selectedMonth} onChange={e=>setSelectedMonth(e.target.value)}/></label></div>
-        <div className="attendance-admin-table monthly-policy-table"><table><thead><tr><th>Employee</th><th>Joining / Eligibility</th><th>Weekends</th><th>Holidays</th><th>Working</th><th>Present</th><th>Half</th><th>Worked</th><th>CL</th><th>PL</th><th>UPL</th><th>Payable</th><th>Hours</th><th>Edit</th></tr></thead><tbody>{monthly.data?.length?monthly.data.map(row=><tr key={row.id}><td><strong>{row.legal_name}</strong><small>{row.employee_id} · {row.role||"-"}</small></td><td><strong>{row.joining_date||"-"}</strong><small>{row.leave_eligible?"1 CL eligible":"Probation · no CL"}</small></td><td>{row.weekend_days}</td><td>{row.holiday_days}</td><td>{row.working_days}</td><td>{row.present_days}</td><td>{row.half_days}</td><td>{row.worked_days}</td><td>{row.cl_days} / {row.casual_leave_entitlement}</td><td>{row.pl_days}</td><td>{row.upl_days}</td><td><strong>{row.payable_days}</strong></td><td>{row.total_hours||0} h</td><td><button className="monthly-edit-button" onClick={()=>setMonthlyEdit({...row})}><FaEdit/></button></td></tr>):<tr><td colSpan="14">No employees found for this month.</td></tr>}</tbody></table></div>
+        <div className="attendance-admin-table monthly-policy-table"><table><thead><tr><th>Employee</th><th>Joining / Eligibility</th><th>Weekends</th><th>Holidays</th><th>Working</th><th>Present</th><th>Half</th><th>Worked</th><th>CL</th><th>PL</th><th>UPL</th><th>Payable</th><th>Hours</th><th>Actions</th></tr></thead><tbody>{monthly.data?.length?monthly.data.map(row=><tr key={row.id}><td><strong>{row.legal_name}</strong><small>{row.employee_id} · {row.role||"-"}</small></td><td><strong>{row.joining_date||"-"}</strong><small>{row.leave_eligible?"1 CL eligible":"Probation · no CL"}</small></td><td>{row.weekend_days}</td><td>{row.holiday_days}</td><td>{row.working_days}</td><td>{row.present_days}</td><td>{row.half_days}</td><td>{row.worked_days}</td><td>{row.cl_days} / {row.casual_leave_entitlement}</td><td>{row.pl_days}</td><td>{row.upl_days}</td><td><strong>{row.payable_days}</strong></td><td>{row.total_hours||0} h</td><td><EmployeeRowActions employee={row} canEdit={admin} onView={()=>navigate(`/dashboard/employee-status/${row.id}`)} onEdit={()=>setMonthlyEdit({...row})}/></td></tr>):<tr><td colSpan="14">No employees found for this month.</td></tr>}</tbody></table></div>
       </section>}
       {tab==="payslips"&&payslipAccess&&<PayslipManager month={selectedMonth} onMonthChange={setSelectedMonth} onMessage={showMessage}/>}
       {tab==="restriction"&&superAdmin&&<section className="attendance-admin-section attendance-restriction-card">
@@ -94,7 +87,7 @@ function AttendanceManagement() {
         <div className="attendance-section-title"><div><h2>Leave Requests</h2><p>Review pending requests and view completed decisions.</p></div>
           <select value={status} onChange={e=>setStatus(e.target.value)}><option value="">All statuses</option><option value="pending">Pending</option><option value="approved">Approved</option><option value="rejected">Rejected</option></select></div>
         <div className="attendance-admin-table"><table><thead><tr><th>Employee</th><th>Type</th><th>Dates</th><th>Duration</th><th>Reason</th><th>Status</th><th>Approved / Rejected By</th><th>Action</th></tr></thead>
-          <tbody>{leaves.length?leaves.map(row=><tr key={row.id}><td><strong>{row.employee_name}</strong><small>{row.employee_id}</small></td><td>{row.leave_type}</td><td>{row.start_date}<br/>{row.end_date}</td><td>{row.duration.replaceAll("_"," ")}</td><td>{row.reason}</td><td><mark className={row.status}>{row.status}</mark></td><td>{row.status==="pending"?"--":<span className="leave-reviewer"><strong>{row.reviewer_display_name||"HR"}</strong><small>{row.review_source||"Website"}{row.reviewed_at?` - ${row.reviewed_at}`:""}</small></span>}</td><td>{row.status==="pending"?<span className="attendance-decision"><button title="Approve" onClick={()=>setConfirmation({type:"leave",row,next:"approved"})}><FaCheck/></button><button title="Reject" onClick={()=>setConfirmation({type:"leave",row,next:"rejected"})}><FaTimes/></button></span>:"--"}</td></tr>):<tr><td colSpan="8">No leave requests found.</td></tr>}</tbody></table></div>
+          <tbody>{leaves.length?leaves.map(row=><tr key={row.id}><td><strong>{row.employee_name}</strong><small>{row.employee_id}</small></td><td>{row.leave_type}</td><td>{row.start_date}<br/>{row.end_date}</td><td>{row.duration.replaceAll("_"," ")}</td><td>{row.reason}</td><td><mark className={row.status}>{row.status}</mark></td><td>{row.status==="pending"?"--":<span className="leave-reviewer"><strong>{row.reviewer_display_name||"HR"}</strong><small>{row.review_source||"Website"}{row.reviewed_at?` - ${row.reviewed_at}`:""}</small></span>}</td><td>{row.status==="pending"?<EmployeeRowActions employee={{legal_name:row.employee_name}} actions={[["Approve",FaCheck,()=>setConfirmation({type:"leave",row,next:"approved"})],["Reject",FaTimes,()=>setConfirmation({type:"leave",row,next:"rejected"})]]}/>:"--"}</td></tr>):<tr><td colSpan="8">No leave requests found.</td></tr>}</tbody></table></div>
       </section>}
       {tab==="add-leave"&&<section className="attendance-admin-section"><div className="attendance-section-title"><div><h2>Add Approved Leave</h2><p>Record leave directly for an employee. It is approved immediately.</p></div></div>
         <form className="attendance-admin-form" onSubmit={addLeave}>

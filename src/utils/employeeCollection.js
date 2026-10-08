@@ -41,6 +41,8 @@ export function emptyCollection() {
   return {
     schema_version: 2,
     email: "",
+    current_address: "",
+    linkedin_profile: "",
     father_name: "",
     father_phone: "",
     mother_name: "",
