@@ -21,3 +21,7 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Local verification artifacts and regenerated Resume Match PDF worker
+/.server-audit/
+/public/resume-match/pdf.worker.min.mjs

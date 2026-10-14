@@ -65,6 +65,7 @@ export const downloadApplicationExcel = async (
     ],
     ["POC", 125, (row) => row.poc],
     ["Feedback", 220, (row) => row.feedback],
+    ["Candidate Feedback", 220, (row) => row.candidate_feedback],
   ];
 
   const storedDetailColumns = [

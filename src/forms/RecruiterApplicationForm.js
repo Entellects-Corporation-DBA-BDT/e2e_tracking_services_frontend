@@ -16,7 +16,7 @@ const emptyFiles = { resume_file: null, r2r_file: null, driving_file: null, visa
 function RecruiterApplicationForm({ onClose, applicationId, isEdit = false, refreshData }) {
   const [formData, setFormData] = useState({
     date_created: today, candidate_id: "", candidate_name: "", client: "", role: "",
-    poc: "", feedback: "", remarks: "",
+    poc: "", feedback: "", candidate_feedback: "", remarks: "",
   });
   const [files, setFiles] = useState(emptyFiles);
   const [candidates, setCandidates] = useState([]);
@@ -41,6 +41,7 @@ function RecruiterApplicationForm({ onClose, applicationId, isEdit = false, refr
           role: item.role || "",
           poc: item.poc || "",
           feedback: item.feedback || "",
+          candidate_feedback: item.candidate_feedback || "",
           remarks: item.remarks || "",
         });
       }
@@ -91,6 +92,7 @@ function RecruiterApplicationForm({ onClose, applicationId, isEdit = false, refr
       <div className="inputGroup"><label>Role / Position</label><input type="text" value={formData.role} onChange={(e) => setFormData({ ...formData, role: e.target.value })} placeholder="Enter role or position" /></div>
       <div className="inputGroup"><label>POC Name</label><input type="text" value={formData.poc} onChange={(e) => setFormData({ ...formData, poc: e.target.value })} placeholder="Enter POC name" /></div>
       <div className="inputGroup"><label>Feedback</label><input type="text" value={formData.feedback} onChange={(e) => setFormData({ ...formData, feedback: e.target.value })} placeholder="Enter feedback" /></div>
+      <div className="inputGroup"><label htmlFor="recruiter-candidate-feedback">Candidate Feedback</label><input id="recruiter-candidate-feedback" name="candidate_feedback" type="text" value={formData.candidate_feedback} onChange={(e) => setFormData({ ...formData, candidate_feedback: e.target.value })} placeholder="Enter candidate feedback" /></div>
       <div className="inputGroup fullWidth"><label>Remarks</label><textarea rows="4" value={formData.remarks} onChange={(e) => setFormData({ ...formData, remarks: e.target.value })} placeholder="Additional remarks..." /></div>
     </div>
     <div className="uploadGrid">

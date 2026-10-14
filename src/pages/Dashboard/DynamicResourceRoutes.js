@@ -1,6 +1,8 @@
 import { Route } from "react-router-dom";
 import { usePermissions } from "../../auth/PermissionContext";
 import Recruiting from "./Recruiting";
+import { lazy, Suspense } from "react";
+
 import BenchSales from "./BenchSales";
 import HotList from "./HotList";
 import Jobs from "./Jobs";
@@ -28,6 +30,8 @@ import ChatWorkspace from "../../components/Chat/ChatWorkspace";
 import NotificationsPage from "../../components/Collaboration/NotificationsPage";
 import AdminChat from "../../components/Chat/AdminChat";
 
+const ResumeMatch = lazy(() => import("./ResumeMatch"));
+
 const PAGE_COMPONENTS = {
   recruiting: <Recruiting />,
   "bench-sales": <BenchSales />,
@@ -54,6 +58,7 @@ const PAGE_COMPONENTS = {
 
 const DETAIL_COMPONENTS = {
   recruiting: [
+    { suffix: "resume-match", element: <Suspense fallback={<p role="status">Loading Resume Match...</p>}><ResumeMatch /></Suspense> },
     { suffix: "performance", element: <RecruiterPerformance module="recruiter" /> },
     { suffix: ":applicationId", element: <ApplicationPageView module="recruiter" /> },
   ],

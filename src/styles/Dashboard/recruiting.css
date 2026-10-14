@@ -523,3 +523,4 @@
 .e2e_recruiting_process_note{display:block;height:12px;margin:0;color:transparent;font-size:9px;font-weight:750;line-height:12px;white-space:nowrap;visibility:hidden}
 .e2e_recruiting_process_note.visible{color:#15803d;visibility:visible}
 @media(max-width:768px){.e2e_recruiting_td_process{width:160px;min-width:160px}.e2e_recruiting_process_badge{width:134px}}
+.e2e_recruiting_right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}

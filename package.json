@@ -13,6 +13,8 @@
     "jspdf": "^4.2.1",
     "jwt-decode": "^4.0.0",
     "lottie-react": "^2.4.1",
+    "mammoth": "1.13.0",
+    "pdfjs-dist": "5.4.624",
     "qrcode": "^1.5.4",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
@@ -26,7 +28,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "prebuild": "node scripts/sync_resume_match_worker.js",
+    "prestart": "node scripts/sync_resume_match_worker.js"
   },
   "eslintConfig": {
     "extends": [
