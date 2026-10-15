@@ -63,3 +63,8 @@ Frontend technology: the interface uses the existing React application and JavaS
 ## Recruiting Candidate Feedback deployment
 
 Candidate Feedback is an optional field immediately after Feedback in the Recruiting add/edit form, detail view and Excel download. Before deploying the updated applications backend, run migrations/20261014_recruiting_candidate_feedback.sql in the live E2E database. Then deploy modules/application/model.php and modules/application/controller.php together and rebuild/deploy the complete React build. Existing applications have an empty candidate feedback value; omitted fields are preserved during updates from other forms.
+
+
+## TechFetch website search
+
+Search TechFetch opens https://www.techfetch.com/ in a separate tab from either candidate source. Users sign in on TechFetch itself, search there and upload downloaded resumes into Resume Match. E2E does not collect TechFetch passwords or automatically import website results. Sample search stays explicitly labelled as demonstration data.
