@@ -49,11 +49,21 @@ const server=http.createServer((req,res)=>{
  await send('Page.enable');await send('Runtime.enable');await send('Network.enable');await send('Fetch.enable',{patterns:[{urlPattern:'*',resourceType:'XHR'},{urlPattern:'*',resourceType:'Fetch'}]});
  const token='fixture.'+Buffer.from(JSON.stringify({user_id:601,firstname:'Fixture',email:'fixture@example.test',position_id:4,exp:Math.floor(Date.now()/1000)+3600})).toString('base64url')+'.signature';
  await send('Network.setCookie',{name:'jwtToken',value:token,url:'http://127.0.0.1:4187'});
- await send('Emulation.setDeviceMetricsOverride',{width:1440,height:1100,deviceScaleFactor:1,mobile:false});
+ await send('Emulation.setDeviceMetricsOverride',{width:1440,height:800,deviceScaleFactor:1,mobile:false});
+ const lightInit=await send('Page.addScriptToEvaluateOnNewDocument',{source:"localStorage.setItem('e2e-theme','light')"});
  await send('Page.navigate',{url:'http://127.0.0.1:4187/dashboard/recruiting'});
  await wait("!!Array.from(document.querySelectorAll('button')).find(b=>b.textContent.includes('Resume Match'))");
+ await send('Page.removeScriptToEvaluateOnNewDocument',{identifier:lightInit.identifier});
  await run("Array.from(document.querySelectorAll('button')).find(b=>b.textContent.includes('Resume Match')).click()");
  await wait("!!document.querySelector('.resume-match-page')");
+ await wait("document.querySelector('[role=tab][aria-selected=true]').textContent.includes('TechFetch')");
+ await wait("document.querySelector('.resume-match-page').getBoundingClientRect().bottom<=innerHeight+1");
+ await new Promise(resolve=>setTimeout(resolve,350));
+ if(!await run("(()=>{const button=document.querySelector('.rm-techfetch-search button[type=submit]'),panel=document.querySelector('.rm-source-panel');return button.getBoundingClientRect().bottom<=panel.getBoundingClientRect().bottom})()"))throw Error('Search button is clipped');
+ const techfetchShot=await send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(out,'resume-match-techfetch.png'),Buffer.from(techfetchShot.data,'base64'));
+ await run("Array.from(document.querySelectorAll('[role=tab]')).find(b=>b.textContent.includes('Resume Search')).click()");
+ await wait("!!document.querySelector('input[aria-label=\"Upload resumes\"]')");
+
  const set=(selector,value)=>run("(()=>{const input=document.querySelector("+JSON.stringify(selector)+");Object.getOwnPropertyDescriptor(input.tagName==='TEXTAREA'?HTMLTextAreaElement.prototype:HTMLInputElement.prototype,'value').set.call(input,"+JSON.stringify(value)+");input.dispatchEvent(new Event('input',{bubbles:true}));input.dispatchEvent(new Event('change',{bubbles:true}))})()");
  await set('[aria-label="Job description"]','We need a React TypeScript Python AWS developer with Docker experience, SQL skills and communication.');
  const doc=await send('DOM.getDocument');
@@ -64,14 +74,7 @@ const server=http.createServer((req,res)=>{
  await run("document.querySelector('.rm-primary').click()");await wait("document.querySelectorAll('.rm-score').length===2&&!document.querySelector('.rm-primary').disabled");
  if(history[0]?.source!=='upload')throw Error('Upload history source incorrect');
  await run("document.querySelector('.rm-candidate-header').click()");await wait("document.querySelectorAll('.rm-tags.matched span').length>0");
- await run("Array.from(document.querySelectorAll('[role=tab]')).find(b=>b.textContent.includes('Demo')).click()");
- await set('[aria-label="Search keywords"]','React');
- await run("Array.from(document.querySelectorAll('button')).find(b=>b.textContent.includes('Search sample profiles')).click()");
- await wait("document.querySelectorAll('.rm-candidate').length>0");
- if(!await run("document.body.textContent.includes('Demonstration data')"))throw Error('Demo label missing');
- await run("document.querySelector('.rm-primary').click()");await wait("document.querySelectorAll('.rm-score').length>0&&!document.querySelector('.rm-primary').disabled");
- if(history[0]?.source!=='demo')throw Error('Demo history source incorrect');
- await run("Array.from(document.querySelectorAll('button')).find(b=>b.textContent.includes('My history')).click()");await wait("document.querySelectorAll('.rm-history-grid article').length===2");
+ await run("Array.from(document.querySelectorAll('button')).find(b=>b.textContent.includes('My history')).click()");await wait("document.querySelectorAll('.rm-history-grid article').length===1");
  await run("document.querySelector('[aria-label=\"Close history\"]').click()");
  const desktop=await send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(out,'resume-match-desktop.png'),Buffer.from(desktop.data,'base64'));
  await send('Emulation.setDeviceMetricsOverride',{width:390,height:1000,deviceScaleFactor:1,mobile:true});
@@ -80,7 +83,7 @@ const server=http.createServer((req,res)=>{
  const mobile=await send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(out,'resume-match-mobile.png'),Buffer.from(mobile.data,'base64'));
  await run("localStorage.setItem('e2e-theme','dark')");await send('Page.reload');await wait("!!document.querySelector('.resume-match-page.rm-dark')");
  const dark=await send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(out,'resume-match-dark.png'),Buffer.from(dark.data,'base64'));
- const result={darkTheme:true,mode:'Browser with API fixtures; actual PDF/DOCX parsing and scoring workers',recruitingButton:true,subpage:true,pdf:true,docx:true,workerScoring:true,candidateDetails:true,labelledDemo:true,history:true,mobileFit:true,errors};
+ const result={darkTheme:true,mode:'Browser with API fixtures; actual PDF/DOCX parsing and scoring workers',recruitingButton:true,subpage:true,techfetchDefault:true,desktopFit:true,pdf:true,docx:true,workerScoring:true,candidateDetails:true,history:true,mobileFit:true,errors};
  fs.writeFileSync(path.join(out,'browser-results.json'),JSON.stringify(result,null,2));console.log(JSON.stringify(result));
  if(errors.length)throw Error('Browser errors detected');
  }finally{if(ws){try{ws.send(JSON.stringify({id:999999,method:'Browser.close'}))}catch{}ws.close()}chrome.kill();server.close()}

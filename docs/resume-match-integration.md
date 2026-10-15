@@ -16,7 +16,7 @@ Open Recruiting and choose **Resume Match**, or visit /dashboard/recruiting/resu
 
 Files are parsed in the browser. Resume documents and extracted candidate text are not sent to PHP. History stores the first 5,000 job-description characters, selected source/state, candidate count, and top score. History ownership is taken from the authenticated user; a submitted user ID cannot change it.
 
-The original TechFetch fallback is now an explicit demo mode, as requested. No website passwords, Supabase settings, or TechFetch API credentials are required. Demo candidates are never presented as live search results. Live provider integration is deferred until official API access is supplied.
+Uploads and local demo search require no Supabase configuration. The TechFetch tab now calls the original Supabase techfetch-search function using the original email/password/keywords/state contract. Its techfetch-demo fallback is labelled explicitly. Real TechFetch access is not verified by this integration.
 
 ## Build and deployment
 
@@ -43,7 +43,7 @@ Scanned image-only PDFs require OCR before upload, and legacy DOC files must be 
 
 ## Source
 
-The skill catalogue, scoring engine, and demonstration profiles were imported from the supplied Resume_Match_1-main project. The integrated runtime is independent of that folder and Supabase.
+The skill catalogue, scoring engine, and demonstration profiles were imported from the supplied Resume_Match_1-main project. The integrated runtime is independent of that folder. Uploads and local demos do not require Supabase; the optional TechFetch Edge Function search does.
 
 
 ## Verification status and existing test debt
@@ -67,4 +67,32 @@ Candidate Feedback is an optional field immediately after Feedback in the Recrui
 
 ## TechFetch website search
 
-Search TechFetch opens https://www.techfetch.com/ in a separate tab from either candidate source. Users sign in on TechFetch itself, search there and upload downloaded resumes into Resume Match. E2E does not collect TechFetch passwords or automatically import website results. Sample search stays explicitly labelled as demonstration data.
+Search TechFetch opens https://www.techfetch.com/ in a separate tab from either candidate source. Users sign in on TechFetch itself, search there and upload downloaded resumes into Resume Match. The external website link does not collect TechFetch passwords or import website results. The separate TechFetch search tab submits credentials to your configured Supabase function. Sample search stays explicitly labelled as demonstration data.
+
+
+## GitHub Supabase search integration (2026-10-15)
+
+Reference: https://github.com/beedatatech2024/Resume_Match_1 at commit 884bc3412c84e41a7f557ff9865e87b940f86bb8.
+
+The frontend is React with .js components; no Vite, TypeScript frontend, new UI framework or Supabase client SDK is required. Existing E2E authentication and per-user PHP history remain in place. The scoring catalogue, aliases, weights, previews and upload pipeline remain available alongside the TechFetch search tab.
+
+1. Copy the two settings in .env.resume-match.example into the existing frontend .env. Use your project HTTPS URL and public anon key only. REACT_APP_SUPABASE_URL and REACT_APP_SUPABASE_ANON_KEY are supported aliases.
+2. Deploy supabase/functions/techfetch-search from the reference repository to that same Supabase project. Run the Supabase CLI from that repository: supabase functions deploy techfetch-search --project-ref YOUR_PROJECT_REF. The reference config uses verify_jwt=true. Do not turn authentication off to troubleshoot a bad key; use a compatible public anon JWT and check the deployment.
+3. Restart npm start, or run npm ci then npm run build. The existing prestart/prebuild hook publishes only the two public settings to public/resume-match/config.json. They are public browser configuration, not server secrets. Never use a service-role key or sb_secret_ key. Do not put TechFetch credentials in .env.
+4. Deploy the complete build, including resume-match/config.json and the PDF worker. Ensure the JSON path is served as JSON rather than the SPA HTML fallback. Both settings are fixed at build/start time; editing .env on a static hosting server will not update an already built frontend.
+5. Deploy the updated PHP modules/resume_match/model.php and modules/resume_match/routes.php to support history sources techfetch and techfetch-demo. The existing history source VARCHAR(16) accommodates both; no additional database migration is needed for these source names.
+6. In Recruiting > Resume Match > TechFetch, enter email, password, keywords and state. Search sends credentials only in the HTTPS POST body to your configured Supabase function. The integrated frontend does not store them in cookies/localStorage/history, and clears the password after each attempt. Your deployed function is responsible for its own credential handling and logging.
+
+Important limitation: the reference function sends the supplied password as a Bearer token to https://www.techfetch.com/api/resume/search and falls back to hardcoded sample candidates if that attempt fails. Setting Supabase URL/anon key enables the function call, not a verified TechFetch website login. E2E labels source=techfetch-demo as demonstration data and never treats an unlabelled response as live data. Replace the provider implementation with TechFetch's documented integration when available. Do not use an account password as an API token unless TechFetch explicitly specifies this method.
+
+The original function is a Supabase backend deployment (Deno), separate from React hosting and the existing PHP server. Its TypeScript source is not part of the React frontend. Supabase login/signup from the standalone sample is intentionally replaced by the existing E2E session; search history remains scoped to that E2E user. Supabase search_history tables/policies are not used by this integration.
+
+
+## Compact search workspace
+
+TechFetch Search is the default tab, followed by Resume Search (uploaded resumes), then Demo Search. Desktop screens use a viewport-height workspace with the job description, source controls and results side by side; long panels scroll independently. Smaller screens use a stacked layout to keep fields readable. Transitions respect reduced-motion preferences.
+
+
+## Demo Search removal
+
+The standalone Demo Search tab and local sample-search logic have been removed. The page now offers TechFetch Search (default) and Resume Search only. Existing history labels are retained. A techfetch-demo response from the external Supabase function is still explicitly labelled as fallback data, since that function is deployed separately and its output must not be represented as live results.
