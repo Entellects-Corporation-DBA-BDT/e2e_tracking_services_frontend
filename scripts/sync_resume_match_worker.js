@@ -17,3 +17,5 @@ if(publicConfig.anonKey.startsWith('sb_secret_'))throw Error('Use a public Supab
 try{const role=JSON.parse(Buffer.from(publicConfig.anonKey.split('.')[1]||'','base64').toString()).role;if(role&&role!=='anon')throw Error('Only a public anon key is allowed.');}catch(error){if(error.message==='Only a public anon key is allowed.')throw error;}
 fs.writeFileSync(path.resolve('public/resume-match/config.json'),JSON.stringify(publicConfig));
 console.log('Prepared public Resume Match configuration (credential values are not logged).');
+
+require('./sync_document_check_assets');

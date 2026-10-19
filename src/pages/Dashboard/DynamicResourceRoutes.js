@@ -30,6 +30,7 @@ import ChatWorkspace from "../../components/Chat/ChatWorkspace";
 import NotificationsPage from "../../components/Collaboration/NotificationsPage";
 import AdminChat from "../../components/Chat/AdminChat";
 
+const DocumentCheck = lazy(() => import("./DocumentCheck"));
 const ResumeMatch = lazy(() => import("./ResumeMatch"));
 
 const PAGE_COMPONENTS = {
@@ -58,6 +59,7 @@ const PAGE_COMPONENTS = {
 
 const DETAIL_COMPONENTS = {
   recruiting: [
+    { suffix: "document-check", element: <Suspense fallback={<p role="status">Loading Document Check...</p>}><DocumentCheck /></Suspense> },
     { suffix: "resume-match", element: <Suspense fallback={<p role="status">Loading Resume Match...</p>}><ResumeMatch /></Suspense> },
     { suffix: "performance", element: <RecruiterPerformance module="recruiter" /> },
     { suffix: ":applicationId", element: <ApplicationPageView module="recruiter" /> },
