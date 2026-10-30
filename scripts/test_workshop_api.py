@@ -38,12 +38,13 @@ with tempfile.TemporaryDirectory(prefix='e2e-workshop-api-') as temp:
     except urllib.error.URLError:time.sleep(.15)
    assert status==401,'Unauthenticated list was not rejected'
    options=json_request('/workshops/options')['data'];assert options['users'] and options['positions']
-   eligible=php("require 'C:/xampp/htdocs/E2E_Tracking/config/db.php';echo json_encode(array_column($conn->query(\"SELECT u.id FROM users u JOIN employees e ON e.id=u.employee_id WHERE u.status='Active'\")->fetch_all(MYSQLI_ASSOC),'id'));");assert {int(u['id']) for u in options['users']}=={int(i) for i in eligible}
+   eligible=php("require 'C:/xampp/htdocs/E2E_Tracking/config/db.php';echo json_encode(array_column($conn->query(\"SELECT u.id FROM users u WHERE u.status='Active' AND (EXISTS(SELECT 1 FROM employees e WHERE e.user_id=u.id) OR EXISTS(SELECT 1 FROM employees e WHERE e.id=u.employee_id AND (e.user_id IS NULL OR e.user_id=u.id)))\")->fetch_all(MYSQLI_ASSOC),'id'));");assert {int(u['id']) for u in options['users']}=={int(i) for i in eligible}
+   assert all(u.get('linked_employee_id') and u.get('employee_name')==u['name'] and 'company_name' in u for u in options['users'])
    fields={'meeting_date':'2026-10-30','position_id':str(identity['admin']['position_id']),'topic':prefix,'presenter_id':str(identity['admin']['id']),'attendee_ids':json.dumps([int(identity['admin']['id'])]),'remarks':'Synthetic workshop notes'}
    other=next((u for u in options['users'] if int(u['position_id'])!=int(fields['position_id'])),None)
    if other:
     bad_team={**fields,'attendee_ids':json.dumps([int(identity['admin']['id']),int(other['id'])])};json_request('/workshops','POST',bad_team,expected=422)
-   unlinked=php("require 'C:/xampp/htdocs/E2E_Tracking/config/db.php';echo json_encode($conn->query(\"SELECT u.id FROM users u LEFT JOIN employees e ON e.id=u.employee_id WHERE e.id IS NULL LIMIT 1\")->fetch_assoc());")
+   unlinked=php("require 'C:/xampp/htdocs/E2E_Tracking/config/db.php';echo json_encode($conn->query(\"SELECT u.id FROM users u WHERE NOT EXISTS(SELECT 1 FROM employees e WHERE e.user_id=u.id OR (e.id=u.employee_id AND (e.user_id IS NULL OR e.user_id=u.id))) LIMIT 1\")->fetch_assoc());")
    if unlinked:
     json_request('/workshops','POST',{**fields,'position_id':'0','presenter_id':str(unlinked['id']),'attendee_ids':json.dumps([int(unlinked['id'])])},expected=422)
    png=base64.b64decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jN1sAAAAASUVORK5CYII=')

@@ -65,13 +65,19 @@ Focused tests: `src/features/interviewReady/App.test.js`, `src/features/intervie
 
 The helper uses the official Supabase CLI through npm; it is a development/deployment helper, not frontend code or another app service. It does not deploy unrelated functions, touch the database, or expose `.env`. Commands and secret handling are based on https://supabase.com/docs/guides/functions/secrets and https://developers.openai.com/api/docs/guides/production-best-practices#api-keys .
 
-The configuration check during this update returned provider HTTP 401 for the current key, and the separate Supabase readiness probe returned HTTP 404. Replace the provider key privately before running setup. No secret was uploaded and no live text-generation request was made.
+Latest verification: the updated provider key passed model access (HTTP 200), but the configured Supabase `ai-assist` endpoint returned HTTP 404. Deployment was attempted and requires Supabase login on this computer; no provider secret was uploaded by that failed attempt. Run `npx supabase login` privately, then `npm run interview:setup` to deploy to the already configured project.
+
+The exact gateway also passed all five live provider operations locally with fictional input: analysis, tailoring, ten distinct interview questions, answer feedback and report generation. Frontend tests passed (six tests). This verifies the provider key and gateway behavior, not deployment readiness. The inspected `.env` has the provider key, Supabase URL and public anon key, but no `SUPABASE_ACCESS_TOKEN`. An anon key cannot deploy functions. Authenticate the Supabase CLI or add that separate personal access token privately before running setup.
+
+`npm run interview:check` now exits with an error when the function is missing or unconfigured, even when the provider key itself is valid. A successful model metadata request alone does not establish that the application is ready.
+
+`node scripts/test_interview_live.js` performs real analysis, tailoring, question generation, answer feedback and reporting against the deployed endpoint using fictional data. It makes five generation requests and incurs provider usage. `--local-provider` instead runs the exact gateway code locally against the provider; success in that mode does not mean the Supabase function has been deployed. Neither mode prints secrets or generated candidate content. The helper is a development tool and is not part of the browser build.
 
 ## Dark mode
 
 InterviewReady follows the shared AI Tools theme toggle. Screen backgrounds, cards, headings, inputs, banners, progress, reports, skeletons and confirmation/privacy dialogs use the dark palette. The existing theme preference persists on refresh; candidate content remains in memory only.
 
-Dark-mode Chrome verification passed the full controlled interview workflow, dark report/confirmation styling, mobile fit and theme persistence across refresh. The provider credential check still returned HTTP 401; this update does not claim live generation is operational.
+Dark-mode Chrome verification passed the full controlled interview workflow, dark report/confirmation styling, mobile fit and theme persistence across refresh. See the latest verification above for provider and deployment status.
 
 Dark button visibility correction: primary, teal, outline, ghost and destructive controls now have explicit dark surfaces; disabled controls remain readable rather than fading. Chrome measured a minimum text contrast of 5.17:1 among the checked rendered report buttons and passed hover, keyboard-focus, pressed-state and confirmation-dialog checks, alongside the full controlled interview workflow.
 

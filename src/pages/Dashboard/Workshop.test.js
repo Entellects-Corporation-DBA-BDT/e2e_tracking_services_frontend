@@ -41,3 +41,11 @@ test('requires confirmation before deleting and exports all applied filters rath
  render(<Workshop/>);await screen.findByText('Weekly learning');fireEvent.click(screen.getByRole('button',{name:'Delete meeting Weekly learning'}));expect(workshopDelete).not.toHaveBeenCalled();fireEvent.click(within(screen.getByRole('dialog')).getByRole('button',{name:'Remove meeting'}));await waitFor(()=>expect(workshopDelete).toHaveBeenCalledWith(11));
  fireEvent.click(screen.getByRole('button',{name:'Download Excel'}));await waitFor(()=>expect(downloadWorkshopWorkbook).toHaveBeenCalled());expect(workshopExport.mock.calls[0][0]).not.toHaveProperty('page');
 });
+
+test('shows linked employee and company names and searches attendees by company',async()=>{
+ workshopOptions.mockResolvedValue({positions:[{id:4,position_name:'Web Developer',status:'Active'}],users:[{...user,employee_name:'Alex Employee',company_name:'Example Company'}],permissions:{create:true,upload:true},limits:{max_photos:6,max_file_bytes:5242880,max_total_bytes:20971520}});
+ render(<Workshop/>);await screen.findByText('Weekly learning');fireEvent.click(screen.getByRole('button',{name:'Add meeting'}));const dialog=within(screen.getByRole('dialog'));
+ expect(dialog.getByLabelText('Team / position')).toHaveValue('0');expect(dialog.getByRole('option',{name:'Alex Employee - Example Company - Web Developer'})).toBeInTheDocument();
+ fireEvent.change(dialog.getByLabelText('Search meeting attendees'),{target:{value:'Example Company'}});expect(dialog.getByText('Alex Employee')).toBeInTheDocument();expect(dialog.getByText('Example Company')).toBeInTheDocument();
+ fireEvent.change(dialog.getByLabelText(/Meeting presenter/),{target:{value:'1'}});expect(dialog.getByText('Alex Employee - Example Company')).toBeInTheDocument();
+});

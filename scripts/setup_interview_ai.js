@@ -21,6 +21,7 @@ async function check(){
  const probe=await fetch(parsed.origin+'/functions/v1/ai-assist?probe=1',{headers:{Authorization:'Bearer '+anonKey,apikey:anonKey},signal:AbortSignal.timeout(20000)});
  let status={};try{status=await probe.json();}catch{}
  console.log('Interview function: HTTP '+probe.status+'; provider configured: '+(status.configured===true)+'.');
+ if(!process.argv.includes('--deploy')&&(!probe.ok||status.configured!==true))throw Error(probe.status===404?'The AI key is valid, but ai-assist is not deployed in the configured Supabase project. Run npm run interview:setup.':'InterviewReady is not ready. Configure its Supabase function and provider secrets with npm run interview:setup.');
  return {ref,url:parsed.origin,anonKey};
 }
 function cli(args){
@@ -50,3 +51,4 @@ function cli(args){
  const status=await response.json();if(!response.ok||status.configured!==true)throw Error('Deployment completed but the readiness probe did not pass.');
  console.log('InterviewReady AI is configured. Refresh the tool to use live AI.');
 })().catch(error=>{console.error(mask(error.message));process.exitCode=1;});
+
