@@ -17,6 +17,7 @@ import {
 } from "react-icons/fa";
 
 export const sidebarConfig = {
+  workshop:{icon:<FaUsers className="menuIcon blueIcon"/>,route:"/dashboard/workshop"},
   dashboard: {
     icon: <FaHome className="menuIcon" />,
     route: "/dashboard",

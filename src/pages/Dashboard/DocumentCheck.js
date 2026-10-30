@@ -7,7 +7,7 @@ import {DOCUMENT_TYPES,validateDocumentFile,reviewDocumentText,crossDocumentFind
 import {createLocalOcrSession} from '../../features/documentCheck/localOcr';
 import './DocumentCheck.css';
 const blankFiles=()=>Object.fromEntries(DOCUMENT_TYPES.map(type=>[type.id,[]]));
-export default function DocumentCheck(){
+export default function DocumentCheck({standalone=false}){
  const permissions=usePermissions(),dark=useTheme()?.darkMode;
  const route=(permissions?.getResource('recruiting')?.route||'/dashboard/recruiting').replace(/\/+$/,'');
  const [files,setFiles]=useState(blankFiles),[name,setName]=useState(''),[dob,setDob]=useState(''),[h1b,setH1b]=useState(true);
@@ -65,7 +65,7 @@ export default function DocumentCheck(){
   const url=URL.createObjectURL(new Blob([JSON.stringify(report,null,2)],{type:'application/json'})),link=document.createElement('a');link.href=url;link.download='document-review-summary.json';document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
  }
  return <main ref={pageRef} data-panel={mobilePanel} className={'doc-check'+(dark?' dc-dark':'')}>
- <header className="dc-hero"><div><Link to={route} className="dc-back"><FaArrowLeft/> Recruiting</Link><h1><span><FaShieldAlt/></span> Document Check</h1><p>Read clearly. Compare details. Review with confidence.</p></div><div className="dc-local"><FaShieldAlt/><div><strong>Local processing</strong><small>Documents stay in this browser tab</small></div></div></header>
+ <header className="dc-hero"><div>{!standalone&&<Link to={route} className="dc-back"><FaArrowLeft/> Recruiting</Link>}<h1><span><FaShieldAlt/></span> Document Check</h1><p>Read clearly. Compare details. Review with confidence.</p></div><div className="dc-local"><FaShieldAlt/><div><strong>Local processing</strong><small>Documents stay in this browser tab</small></div></div></header>
  <div className="dc-boundary"><FaExclamationTriangle/><p><strong>Document review, not an authenticity verdict.</strong> OCR can misread text. These checks do not prove a document is genuine, detect every alteration, or determine work eligibility. Compare originals and issuer records before making decisions.</p></div>
  <nav className="dc-mobile-panels" aria-label="Document review panels"><button aria-pressed={mobilePanel==='setup'} onClick={()=>setMobilePanel('setup')}>1. Reference & uploads</button><button aria-pressed={mobilePanel==='workspace'} onClick={()=>setMobilePanel('workspace')}>2. Review workspace {count?`(${count})`:''}</button></nav>
  <div className="dc-layout"><aside className="dc-setup">

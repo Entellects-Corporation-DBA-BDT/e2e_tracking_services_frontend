@@ -34,3 +34,6 @@ yarn-error.log*
 
 # Identity-document samples supplied locally for private OCR diagnostics
 /docs/*.pdf
+
+# Original interview source archive (integrated source lives under src/features).
+/Model_Interview_Questions-main.zip

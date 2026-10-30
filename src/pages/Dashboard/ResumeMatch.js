@@ -10,8 +10,9 @@ import { getResumeMatchStatus, getResumeMatchHistory, saveResumeMatchHistory } f
 import './ResumeMatch.css';
 
 const errorMessage=error=>error?.response?.data?.message||error?.message||'Something went wrong. Please try again.';
-export default function ResumeMatch(){
+export default function ResumeMatch({standalone=false}){
  const permissions=usePermissions();
+ const accountHistory=!standalone||Boolean(permissions?.user&&permissions?.can?.('recruiting','view'));
  const darkMode=useTheme()?.darkMode;
  const recruitingRoute=(permissions?.getResource('recruiting')?.route||'/dashboard/recruiting').replace(/\/+$/,'');
  const [jd,setJd]=useState(''),[source,setSource]=useState('techfetch'),[state,setState]=useState('ALL');
@@ -22,9 +23,9 @@ export default function ResumeMatch(){
  useEffect(()=>{const fit=()=>{if(pageRef.current)pageRef.current.style.setProperty('--rm-page-height',Math.max(0,window.innerHeight-Math.max(0,pageRef.current.getBoundingClientRect().top)-12)+'px')};fit();window.addEventListener('resize',fit);return()=>window.removeEventListener('resize',fit)},[]);
  const mounted=useRef(true),revision=useRef(0),analysisController=useRef(null);
  useEffect(()=>{mounted.current=true;let cancelled=false;
-  getResumeMatchStatus().then(status=>{if(!cancelled)setHistoryReady(Boolean(status.history_ready))}).catch(e=>{if(!cancelled)setNotice('Matching is available. History could not connect: '+errorMessage(e))});
+  if(accountHistory)getResumeMatchStatus().then(status=>{if(!cancelled)setHistoryReady(Boolean(status.history_ready))}).catch(e=>{if(!cancelled)setNotice('Matching is available. History could not connect: '+errorMessage(e))});
   return()=>{cancelled=true;mounted.current=false;analysisController.current?.abort()};
- },[]);
+ },[accountHistory]);
  const [remote,setRemote]=useState([]),[remoteSource,setRemoteSource]=useState('techfetch');
  const sourceLabel=source==='upload'?'Your uploads':remoteSource==='techfetch'?'TechFetch':'TechFetch (demo fallback)';
  const candidates=source==='upload'?uploads:remote;
@@ -64,18 +65,18 @@ export default function ResumeMatch(){
    if(revision.current!==currentRevision)return;
    setResults(ranked);
    if(!ranked.some(item=>item.categoryScores.some(category=>category.total>0)))setNotice('No recognised skills were found in the job description. Add specific skills to get meaningful scores.');
-   if(historyReady){
+   if(accountHistory&&historyReady){
     try{await saveResumeMatchHistory({job_description:Array.from(jd).slice(0,5000).join(''),state_filter:state,source:source==='techfetch'?remoteSource:source,candidate_count:candidates.length,top_score:ranked[0]?.score||0});if(mounted.current&&historyOpen)await loadHistory()}
     catch(e){if(mounted.current)setNotice('Ranking is ready. History could not be saved: '+errorMessage(e))}
-   }else setNotice('Ranking is ready. Saved history is unavailable; check the Resume Match database migration.');
+   }else if(accountHistory)setNotice('Ranking is ready. Saved history is unavailable; check the Resume Match database migration.');
   }catch(e){if(mounted.current&&e.name!=='AbortError')setError(errorMessage(e))}
   finally{if(mounted.current)setScoring(false)}
  }
  return <main ref={pageRef} className={'resume-match-page'+(darkMode?' rm-dark':'')}>
-  <header className="rm-hero"><div><Link className="rm-back" to={recruitingRoute}><FaArrowLeft/> Recruiting</Link><h1><span className="rm-brand-icon"><FaFileAlt/></span> Resume Match <span className="rm-workspace-tag">Recruiting workspace</span></h1><p>Compare resumes against your job description with weighted skill matching.</p></div><div className="rm-hero-actions"><a className="rm-secondary" href="https://www.techfetch.com/" target="_blank" rel="noopener noreferrer">Open TechFetch website</a><button className="rm-secondary" onClick={()=>{setHistoryOpen(!historyOpen);if(!historyOpen)loadHistory()}}><FaHistory/> My history</button></div></header>
+  <header className="rm-hero"><div>{!standalone&&<Link className="rm-back" to={recruitingRoute}><FaArrowLeft/> Recruiting</Link>}<h1><span className="rm-brand-icon"><FaFileAlt/></span> Resume Match <span className="rm-workspace-tag">{standalone?'AI tools':'Recruiting workspace'}</span></h1><p>Compare resumes against your job description with weighted skill matching.</p></div><div className="rm-hero-actions"><a className="rm-secondary" href="https://www.techfetch.com/" target="_blank" rel="noopener noreferrer">Open TechFetch website</a>{accountHistory&&<button className="rm-secondary" onClick={()=>{setHistoryOpen(!historyOpen);if(!historyOpen)loadHistory()}}><FaHistory/> My history</button>}</div></header>
   <div className="rm-steps"><span><b>1</b> Add a job description</span><span><b>2</b> Search or upload resumes</span><span><b>3</b> Score and compare</span></div>
   {error&&<div className="rm-alert error" role="alert">{error}</div>}{notice&&<div className="rm-alert" role="status">{notice}</div>}
-  {historyOpen&&<section className="rm-panel rm-history"><div className="rm-panel-heading"><h2>My matching history</h2><button className="rm-icon" aria-label="Close history" onClick={()=>setHistoryOpen(false)}><FaTimes/></button></div><p>History belongs to your E2E account. Resume files are processed locally and are not stored in history.</p>{historyBusy?<p role="status">Loading history...</p>:history.length?<div className="rm-history-grid">{history.map(row=><article key={row.id}><small>{new Date(row.created_at.replace(' ','T')+'Z').toLocaleString()}  |  {row.source==='demo'?'Demo samples':row.source==='techfetch'?'TechFetch':row.source==='techfetch-demo'?'TechFetch (demo fallback)':'Uploads'}</small><p>{row.job_description.slice(0,180)}</p><span>{row.candidate_count} candidates  |  Top match {row.top_score}%</span><button className="rm-secondary" onClick={()=>{changeJd(row.job_description);setHistoryOpen(false);setNotice('Job description restored. Upload resumes or search TechFetch to compare again.')}}>Reuse job description</button></article>)}</div>:<p>No saved comparisons yet.</p>}</section>}
+  {accountHistory&&historyOpen&&<section className="rm-panel rm-history"><div className="rm-panel-heading"><h2>My matching history</h2><button className="rm-icon" aria-label="Close history" onClick={()=>setHistoryOpen(false)}><FaTimes/></button></div><p>History belongs to your E2E account. Resume files are processed locally and are not stored in history.</p>{historyBusy?<p role="status">Loading history...</p>:history.length?<div className="rm-history-grid">{history.map(row=><article key={row.id}><small>{new Date(row.created_at.replace(' ','T')+'Z').toLocaleString()}  |  {row.source==='demo'?'Demo samples':row.source==='techfetch'?'TechFetch':row.source==='techfetch-demo'?'TechFetch (demo fallback)':'Uploads'}</small><p>{row.job_description.slice(0,180)}</p><span>{row.candidate_count} candidates  |  Top match {row.top_score}%</span><button className="rm-secondary" onClick={()=>{changeJd(row.job_description);setHistoryOpen(false);setNotice('Job description restored. Upload resumes or search TechFetch to compare again.')}}>Reuse job description</button></article>)}</div>:<p>No saved comparisons yet.</p>}</section>}
   <div className="rm-tabs" role="tablist" aria-label="Candidate source"><button role="tab" aria-selected={source==='techfetch'} disabled={busy||scoring} onClick={()=>{invalidate();setSource('techfetch')}}><FaSearch/> TechFetch Search</button><button role="tab" aria-selected={source==='upload'} disabled={busy||scoring} onClick={()=>{invalidate();setSource('upload')}}><FaUpload/> Resume Search</button></div>
   <div className="rm-layout"><section className="rm-panel rm-jd"><div className="rm-panel-heading"><h2><span className="rm-section-number">01</span> Job description</h2><label className="rm-file-button"><FaUpload/> Upload<input aria-label="Upload job description" type="file" accept=".pdf,.docx,.txt" disabled={busy||scoring} onChange={event=>{upload(event.target.files,true);event.target.value=''}}/></label></div><textarea aria-label="Job description" value={jd} maxLength={50000} disabled={busy||scoring} onChange={event=>changeJd(event.target.value)} placeholder="Paste a job description, or upload a PDF, DOCX or TXT file." rows={9}/><small>{jd.trim().split(/\s+/).filter(Boolean).length} words  |  At least 50 characters</small></section><aside className="rm-inputs">
    <section className="rm-panel rm-source-panel"><div className="rm-panel-heading rm-source-heading"><div><small className="rm-eyebrow">CANDIDATE SOURCE</small><h2><span className="rm-section-number">02</span> {source==='techfetch'?'Find the right talent':'Your resume library'}</h2></div></div>

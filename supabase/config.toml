@@ -1,0 +1,3 @@
+[functions.ai-assist]
+verify_jwt = true
+entrypoint = "./functions/ai-assist/index.js"

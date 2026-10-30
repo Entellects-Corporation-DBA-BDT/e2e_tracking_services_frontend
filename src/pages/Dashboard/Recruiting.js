@@ -7,7 +7,6 @@ import getUserDataFromCookies from "../../utils/getUserDataFromCookies";
 import { getRecruiterApplications } from "../../api/applicationApi";
 import { useNavigate } from "react-router-dom";
 import { FaArrowRight, FaFileAlt, FaShieldAlt } from "react-icons/fa";
-import { usePermissions } from "../../auth/PermissionContext";
 import ApplicationListControls from "./ApplicationListControls";
 import { downloadApplicationExcel } from "../../utils/applicationListTools";
 import { formatEasternDate } from "../../utils/easternTime";
@@ -23,7 +22,6 @@ const processStatus = (processId) => PROCESS_STATUS[Number(processId)] || { labe
 
 function Recruiting() {
   const navigate = useNavigate();
-  const permissions = usePermissions();
   const [openForm, setOpenForm] = useState(null);
   const [selectedApplicationId, setSelectedApplicationId] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -81,7 +79,7 @@ function Recruiting() {
   return <div className="e2e_recruiting_page">
     <div className="e2e_recruiting_top">
       <div className="e2e_recruiting_left"><h2>Recruiter Application List <button type="button" className="performance-arrow-button" onClick={() => navigate("/dashboard/recruiting/performance")} aria-label="Open recruiter performance" title="Recruiter performance"><FaArrowRight /></button></h2><div className="e2e_recruiting_heading_line" /></div>
-      <div className="e2e_recruiting_right"><button type="button" className="e2e_recruiting_add_btn" onClick={() => navigate((permissions?.getResource("recruiting")?.route || "/dashboard/recruiting").replace(/\/+$/, "") + "/document-check")}><FaShieldAlt /> Document Check</button><button type="button" className="e2e_recruiting_add_btn" onClick={() => navigate((permissions?.getResource("recruiting")?.route || "/dashboard/recruiting").replace(/\/+$/, "") + "/resume-match")}><FaFileAlt /> Resume Match</button><button className="e2e_recruiting_add_btn" onClick={() => open("recruiter")}>+ Add New</button></div>
+      <div className="e2e_recruiting_right"><button type="button" className="e2e_recruiting_add_btn" onClick={() => navigate("/ai-tools/document-check")}><FaShieldAlt /> Document Check</button><button type="button" className="e2e_recruiting_add_btn" onClick={() => navigate("/ai-tools/resume-match")}><FaFileAlt /> Resume Match</button><button className="e2e_recruiting_add_btn" onClick={() => open("recruiter")}>+ Add New</button></div>
     </div>
 
     {error && <p role="alert" style={{ color: "#b91c1c", fontWeight: 700 }}>{error}</p>}

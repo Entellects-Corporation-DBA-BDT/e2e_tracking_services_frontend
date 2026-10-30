@@ -1,7 +1,7 @@
-import { Route } from "react-router-dom";
+import Workshop from './Workshop';
+import { Navigate, Route } from "react-router-dom";
 import { usePermissions } from "../../auth/PermissionContext";
 import Recruiting from "./Recruiting";
-import { lazy, Suspense } from "react";
 
 import BenchSales from "./BenchSales";
 import HotList from "./HotList";
@@ -30,11 +30,10 @@ import ChatWorkspace from "../../components/Chat/ChatWorkspace";
 import NotificationsPage from "../../components/Collaboration/NotificationsPage";
 import AdminChat from "../../components/Chat/AdminChat";
 
-const DocumentCheck = lazy(() => import("./DocumentCheck"));
-const ResumeMatch = lazy(() => import("./ResumeMatch"));
 
 const PAGE_COMPONENTS = {
   recruiting: <Recruiting />,
+  workshop: <Workshop />,
   "bench-sales": <BenchSales />,
   hotlist: <HotList />,
   jobs: <Jobs />,
@@ -59,8 +58,8 @@ const PAGE_COMPONENTS = {
 
 const DETAIL_COMPONENTS = {
   recruiting: [
-    { suffix: "document-check", element: <Suspense fallback={<p role="status">Loading Document Check...</p>}><DocumentCheck /></Suspense> },
-    { suffix: "resume-match", element: <Suspense fallback={<p role="status">Loading Resume Match...</p>}><ResumeMatch /></Suspense> },
+    { suffix: "document-check", element: <Navigate to="/ai-tools/document-check" replace/> },
+    { suffix: "resume-match", element: <Navigate to="/ai-tools/resume-match" replace/> },
     { suffix: "performance", element: <RecruiterPerformance module="recruiter" /> },
     { suffix: ":applicationId", element: <ApplicationPageView module="recruiter" /> },
   ],

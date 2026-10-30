@@ -9,11 +9,13 @@
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.16.1",
+    "docx": "8.5.0",
     "exceljs": "^4.4.0",
     "js-cookie": "^3.0.8",
     "jspdf": "^4.2.1",
     "jwt-decode": "^4.0.0",
     "lottie-react": "^2.4.1",
+    "lucide-react": "0.468.0",
     "mammoth": "1.13.0",
     "pdfjs-dist": "5.4.624",
     "qrcode": "^1.5.4",
@@ -32,7 +34,9 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "prebuild": "node scripts/sync_resume_match_worker.js",
-    "prestart": "node scripts/sync_resume_match_worker.js"
+    "prestart": "node scripts/sync_resume_match_worker.js",
+    "interview:check": "node scripts/setup_interview_ai.js --check",
+    "interview:setup": "node scripts/setup_interview_ai.js --deploy"
   },
   "eslintConfig": {
     "extends": [

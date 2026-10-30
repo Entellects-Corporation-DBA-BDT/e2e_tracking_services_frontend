@@ -69,3 +69,20 @@ test('starts with TechFetch and presents the requested source order',async()=>{
  expect(tabs[0]).toHaveAttribute('aria-selected','true');
  expect(screen.getByLabelText('TechFetch username / email')).toBeInTheDocument();
 });
+
+
+test('public standalone matching skips private history and still ranks uploads',async()=>{
+ getResumeMatchStatus.mockClear();saveResumeMatchHistory.mockClear();
+ render(<ResumeMatch standalone/>);
+ expect(screen.queryByRole('button',{name:/My history/})).not.toBeInTheDocument();
+ expect(screen.queryByRole('link',{name:/Recruiting/})).not.toBeInTheDocument();
+ expect(getResumeMatchStatus).not.toHaveBeenCalled();
+ fireEvent.change(screen.getByLabelText('Job description'),{target:{value:'We need a React Python AWS engineer with experience building web applications and cloud services.'}});
+ fireEvent.click(screen.getByRole('tab',{name:'Resume Search'}));
+ fireEvent.change(screen.getByLabelText('Upload resumes'),{target:{files:[new File(['Resume text'],'resume.txt',{type:'text/plain'})]}});
+ await screen.findByRole('button',{name:'Remove Alex Example'});
+ fireEvent.click(screen.getByRole('button',{name:/Score & rank candidates/}));
+ await screen.findByText('Ranked candidates');
+ expect(saveResumeMatchHistory).not.toHaveBeenCalled();
+ expect(screen.queryByText(/database migration/)).not.toBeInTheDocument();
+});

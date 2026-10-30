@@ -43,6 +43,17 @@ const server=http.createServer((req,res)=>{
  const run=async expression=>(await send('Runtime.evaluate',{expression,returnByValue:true,awaitPromise:true})).result.value;
  const wait=async expression=>{for(let i=0;i<800;i++){if(await run(expression))return;await new Promise(r=>setTimeout(r,300))}throw Error('Wait failed: '+expression)};
  await send('Page.enable');await send('Runtime.enable');await send('Network.enable');await send('Fetch.enable',{patterns:[{urlPattern:'*',resourceType:'XHR'},{urlPattern:'*',resourceType:'Fetch'}]});
+ // Exercise pasted public links with no E2E session before testing account navigation.
+ await send('Network.clearBrowserCookies');
+ await send('Emulation.setDeviceMetricsOverride',{width:1440,height:900,deviceScaleFactor:1,mobile:false});
+ await send('Page.navigate',{url:'http://127.0.0.1:4187/ai-tools/resume-match'});
+ await wait("!!document.querySelector('.ai-tools-shell .resume-match-page')");
+ if(!await run("!Array.from(document.querySelectorAll('button')).some(b=>b.textContent.includes('My history')) && document.querySelector('.ai-tools-shell').getBoundingClientRect().width===innerWidth"))throw Error('Guest Resume Match exposes history or is not full width');
+ await send('Page.reload');await wait("!!document.querySelector('.ai-tools-shell .resume-match-page')");
+ await run("document.querySelector('.ai-tools-header a[href=\"/ai-tools/document-check\"]').click()");
+ await wait("!!document.querySelector('.ai-tools-shell .doc-check')");
+ await send('Page.reload');await wait("!!document.querySelector('.ai-tools-shell .doc-check')");
+ if(!await run("!document.querySelector('.dc-back') && location.pathname==='/ai-tools/document-check'"))throw Error('Public Document Check did not open directly');
  const token='fixture.'+Buffer.from(JSON.stringify({user_id:601,firstname:'Fixture',email:'fixture@example.test',position_id:4,exp:Math.floor(Date.now()/1000)+3600})).toString('base64url')+'.signature';
  await send('Network.setCookie',{name:'jwtToken',value:token,url:'http://127.0.0.1:4187'});
  await send('Emulation.setDeviceMetricsOverride',{width:1440,height:1000,deviceScaleFactor:1,mobile:false});
@@ -113,7 +124,7 @@ const server=http.createServer((req,res)=>{
  await run("localStorage.setItem('e2e-theme','dark')");await send('Page.reload');await wait("!!document.querySelector('.doc-check.dc-dark')");
  if(!await run("!document.querySelector('.dc-result')"))throw Error('Document results survived a reload');
  const dark=await send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(out,'document-check-dark.png'),Buffer.from(dark.data,'base64'));
- const result={imageOcr:true,scannedPdfOcr:true,pdfTextExtraction:true,localModel:true,localWasm:true,maskedFields:true,summaryRedacted:true,mobileFit:true,viewportFit:true,mobilePanelSwitch:true,darkTheme:true,clearedOnReload:true,errors};
+ const result={imageOcr:true,scannedPdfOcr:true,pdfTextExtraction:true,localModel:true,localWasm:true,maskedFields:true,summaryRedacted:true,mobileFit:true,viewportFit:true,mobilePanelSwitch:true,publicDirectLinks:true,guestHistoryHidden:true,darkTheme:true,clearedOnReload:true,errors};
  fs.writeFileSync(path.join(out,'browser-results.json'),JSON.stringify(result,null,2));console.log(JSON.stringify(result));if(errors.length)throw Error('Browser errors detected');
  }finally{if(ws){try{ws.send(JSON.stringify({id:999999,method:'Browser.close'}))}catch{}ws.close()}chrome.kill();server.close()}
 })().catch(error=>{console.log(JSON.stringify({failed:true,message:error.message}));process.exitCode=1});
