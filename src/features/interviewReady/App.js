@@ -1,7 +1,7 @@
 import './interviewReady.css';
 import {cancelInterviewRequests} from './lib/ai';
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { FileText, MessageSquare, Github } from 'lucide-react';
+import { FileText, MessageSquare, ShieldCheck } from 'lucide-react';
 import { ProgressHeader } from './components/ProgressHeader';
 import { PrivacyBanner } from './components/PrivacyBanner';
 import { ToastViewport } from './components/Toast';
@@ -443,7 +443,7 @@ function InterviewSession({onReset}) {
             InterviewReady AI · Single-user session · Content is not persisted
           </p>
           <p className="text-xs text-navy-400 flex items-center gap-1">
-            <Github className="h-3.5 w-3.5"/> Coaching assessments, not hiring predictions
+            <ShieldCheck className="h-3.5 w-3.5"/> Coaching assessments, not hiring predictions
           </p>
         </div>
       </footer>

@@ -3,6 +3,9 @@ import InterviewReady from './App';
 import * as ai from './lib/ai';
 import {DEMO_RESUME,DEMO_JD,DEMO_ANALYSIS,DEMO_TAILORED,DEMO_QUESTIONS,DEMO_FEEDBACK,DEMO_REPORT} from './lib/demoData';
 jest.mock('./lib/ai');
+// Brand icons are not available in every deployed Lucide release.
+// Rendering the complete workflow must not depend on the Github export.
+jest.mock('lucide-react',()=>({...jest.requireActual('lucide-react'),Github:undefined}));
 jest.setTimeout(30000);
 jest.mock('./lib/download',()=>({resumeToPlainText:r=>r.professionalSummary,copyToClipboard:jest.fn(),downloadResumeDocx:jest.fn(),downloadResumePdf:jest.fn(),downloadTextPdf:jest.fn(),reportToText:()=>''}));
 beforeEach(()=>{jest.clearAllMocks();ai.fetchConfigStatus.mockResolvedValue({configured:true,provider:'Fixture',model:'Fixture'});ai.analyzeMatch.mockResolvedValue(DEMO_ANALYSIS);ai.tailorResume.mockResolvedValue({...DEMO_TAILORED});ai.generateQuestions.mockResolvedValue(DEMO_QUESTIONS);ai.evaluateAnswer.mockResolvedValue(DEMO_FEEDBACK);ai.generateReport.mockResolvedValue({...DEMO_REPORT});});

@@ -24,6 +24,19 @@ test('adds a meeting using selected user ids and multipart data',async()=>{
  fireEvent.click(within(dialog).getByRole('button',{name:'Add meeting'}));
  await waitFor(()=>expect(workshopSave).toHaveBeenCalled());const form=workshopSave.mock.calls[0][1];expect(form.get('topic')).toBe('Knowledge sharing');expect(form.get('position_id')).toBe('4');expect(JSON.parse(form.get('attendee_ids'))).toEqual(['1']);
 });
+
+test('limits presenter and attendee selection to the chosen team and clears incompatible selections',async()=>{
+ const other={id:2,name:'Sam Recruiter',position_id:5,position_name:'IT Recruiter',status:'Active'};
+ workshopOptions.mockResolvedValue({positions:[{id:4,position_name:'Web Developer',status:'Active'},{id:5,position_name:'IT Recruiter',status:'Active'}],users:[user,other],permissions:{create:true,upload:true},limits:{max_photos:6,max_file_bytes:5242880,max_total_bytes:20971520}});
+ render(<Workshop/>);await screen.findByText('Weekly learning');fireEvent.click(screen.getByRole('button',{name:'Add meeting'}));const dialog=within(screen.getByRole('dialog'));
+ fireEvent.change(dialog.getByLabelText('Team / position'),{target:{value:'4'}});
+ expect(dialog.getByRole('option',{name:'Alex Fixture - Web Developer'})).toBeInTheDocument();expect(dialog.queryByRole('option',{name:'Sam Recruiter - IT Recruiter'})).not.toBeInTheDocument();
+ fireEvent.change(dialog.getByLabelText(/Meeting presenter/),{target:{value:'1'}});
+ fireEvent.change(dialog.getByLabelText('Team / position'),{target:{value:'5'}});
+ expect(dialog.getByLabelText(/Meeting presenter/)).toHaveValue('');expect(dialog.queryByText('Alex Fixture')).not.toBeInTheDocument();
+ fireEvent.change(dialog.getByLabelText('Team / position'),{target:{value:'0'}});
+ expect(dialog.getByRole('option',{name:'Alex Fixture - Web Developer'})).toBeInTheDocument();expect(dialog.getByRole('option',{name:'Sam Recruiter - IT Recruiter'})).toBeInTheDocument();
+});
 test('requires confirmation before deleting and exports all applied filters rather than one page',async()=>{
  render(<Workshop/>);await screen.findByText('Weekly learning');fireEvent.click(screen.getByRole('button',{name:'Delete meeting Weekly learning'}));expect(workshopDelete).not.toHaveBeenCalled();fireEvent.click(within(screen.getByRole('dialog')).getByRole('button',{name:'Remove meeting'}));await waitFor(()=>expect(workshopDelete).toHaveBeenCalledWith(11));
  fireEvent.click(screen.getByRole('button',{name:'Download Excel'}));await waitFor(()=>expect(downloadWorkshopWorkbook).toHaveBeenCalled());expect(workshopExport.mock.calls[0][0]).not.toHaveProperty('page');

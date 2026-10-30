@@ -74,3 +74,9 @@ InterviewReady follows the shared AI Tools theme toggle. Screen backgrounds, car
 Dark-mode Chrome verification passed the full controlled interview workflow, dark report/confirmation styling, mobile fit and theme persistence across refresh. The provider credential check still returned HTTP 401; this update does not claim live generation is operational.
 
 Dark button visibility correction: primary, teal, outline, ghost and destructive controls now have explicit dark surfaces; disabled controls remain readable rather than fading. Chrome measured a minimum text contrast of 5.17:1 among the checked rendered report buttons and passed hover, keyboard-focus, pressed-state and confirmation-dialog checks, alongside the full controlled interview workflow.
+
+## InterviewSession invalid element after deployment
+
+This React error means a rendered component resolves to `undefined`; it is not a database or AI-key error. The local screen exports match their imports and the complete workflow renders with the locked dependencies. The footer now uses `ShieldCheck` instead of the optional `Github` brand export. The workflow regression tests deliberately make `Github` unavailable to check this case. The exact component in the reported live bundle could not be inspected because the supplied URL returned HTTP 404 from the verification environment.
+
+Deploy `package.json` and `package-lock.json` together with the full source, then run `npm ci` and `npm run build` in the frontend folder. Serve the complete generated `build` folder, including its matching JavaScript chunks. If PM2 runs the React development server instead, restart that existing frontend process after installing the locked dependencies. Do not mix files from different builds or update only one JavaScript bundle. Hard-refresh the browser after deployment. No SQL migration or AI-secret change is required for this rendering correction.
