@@ -13,6 +13,7 @@ import {
 } from "react-icons/fi";
 
 import "./BenchSales.css";
+import "./RecruiterApplicationForm.css";
 
 const BenchSales = ({ onClose, applicationId, isEdit = false, refreshData }) => {
   const today = new Intl.DateTimeFormat("en-CA", {
@@ -181,10 +182,10 @@ const BenchSales = ({ onClose, applicationId, isEdit = false, refreshData }) => 
 
   return (
     // <div className="benchModalOverlay">
-    <div className="benchModal">
+    <div className="benchModal recruiter-application-form">
 
       {/* Header */}
-      <div className="benchHeader">
+      <div className="application-form-heading">
         <div>
           <h2>New Application</h2>
           <p>Bench Sales Application</p>
@@ -192,19 +193,19 @@ const BenchSales = ({ onClose, applicationId, isEdit = false, refreshData }) => 
       </div>
 
       {/* Form */}
-      <div className="formGrid">
-        <div className="inputGroup">
+      <div className="application-fields">
+        <div className="application-field">
           <label>Submission Date</label>
-          <div className="inputWrapper">
+          <div className="application-input-shell">
             <FiCalendar />
             <input type="date" name="date_created" value={formData.date_created}
               onChange={handleChange} />
           </div>
         </div>
 
-        <div className="inputGroup">
+        <div className="application-field">
           <label>Candidate Name</label>
-          <div className="inputWrapper">
+          <div className="application-input-shell">
             <FiUser />
             <select
               name="candidate_id"
@@ -230,31 +231,31 @@ const BenchSales = ({ onClose, applicationId, isEdit = false, refreshData }) => 
           {candidateError && <small className="fieldError">{candidateError}</small>}
         </div>
 
-        <div className="inputGroup">
+        <div className="application-field">
           <label>Vendor</label>
           <input type="text" placeholder="Vendor name" name="vendor" value={formData.vendor}
             onChange={handleChange} />
         </div>
 
-        <div className="inputGroup">
+        <div className="application-field">
           <label>POC Name</label>
           <input type="text" placeholder="POC name" name="poc" value={formData.poc}
             onChange={handleChange} />
         </div>
 
-        <div className="inputGroup">
+        <div className="application-field">
           <label>Feedback</label>
           <input type="text" placeholder="Feedback" name="feedback" value={formData.feedback}
             onChange={handleChange} />
         </div>
 
-        <div className="inputGroup">
+        <div className="application-field">
           <label>Client Name</label>
           <input type="text" placeholder="Client name" name="client" value={formData.client}
             onChange={handleChange} />
         </div>
 
-        <div className="inputGroup">
+        <div className="application-field">
           <label>Location Type</label>
 
           <select name="emp_loc" value={formData.emp_loc}
@@ -264,21 +265,21 @@ const BenchSales = ({ onClose, applicationId, isEdit = false, refreshData }) => 
           </select>
         </div>
 
-        <div className="inputGroup">
+        <div className="application-field">
           <label>Rate / Hour ($)</label>
           <input type="number" name="rate" placeholder="$ 50" value={formData.rate}
             onChange={handleChange} />
         </div>
 
-        <div className="inputGroup">
+        <div className="application-field">
           <label>Role</label>
           <input type="text" name="role" placeholder="React Developer" value={formData.role}
             onChange={handleChange} />
         </div>
 
-        <div className="inputGroup fullWidth">
+        <div className="application-field application-full-width">
           <label>Location</label>
-          <div className="inputWrapper">
+          <div className="application-input-shell">
             <FiMapPin />
             <input
               type="text"
@@ -290,7 +291,7 @@ const BenchSales = ({ onClose, applicationId, isEdit = false, refreshData }) => 
           </div>
         </div>
 
-        <div className="inputGroup fullWidth">
+        <div className="application-field application-full-width">
           <label>Remarks</label>
           <textarea
             rows="4"
@@ -304,10 +305,10 @@ const BenchSales = ({ onClose, applicationId, isEdit = false, refreshData }) => 
       </div>
 
       {/* Upload Section */}
-      <div className="uploadGrid">
+      <div className="application-uploads">
 
-        <div className="uploadBox">
-          <label htmlFor="resume_file" className="uploadLabel">
+        <div className="application-upload-card">
+          <label htmlFor="resume_file" className="application-upload-label">
             <FiUploadCloud size={28} />
             <h4>Upload Resume</h4>
             <p>
@@ -327,8 +328,8 @@ const BenchSales = ({ onClose, applicationId, isEdit = false, refreshData }) => 
           />
         </div>
 
-        <div className="uploadBox">
-          <label htmlFor="r2r_file" className="uploadLabel">
+        <div className="application-upload-card">
+          <label htmlFor="r2r_file" className="application-upload-label">
             <FiUploadCloud size={28} />
             <h4>Upload R2R</h4>
             <p>
@@ -348,8 +349,8 @@ const BenchSales = ({ onClose, applicationId, isEdit = false, refreshData }) => 
           />
         </div>
 
-        <div className="uploadBox">
-          <label htmlFor="driving_file" className="uploadLabel">
+        <div className="application-upload-card">
+          <label htmlFor="driving_file" className="application-upload-label">
             <FiUploadCloud size={28} />
             <h4>Driving License</h4>
             <p>
@@ -369,8 +370,8 @@ const BenchSales = ({ onClose, applicationId, isEdit = false, refreshData }) => 
           />
         </div>
 
-        <div className="uploadBox">
-          <label htmlFor="visa_file" className="uploadLabel">
+        <div className="application-upload-card">
+          <label htmlFor="visa_file" className="application-upload-label">
             <FiUploadCloud size={28} />
             <h4>Visa Copy</h4>
             <p>
@@ -393,9 +394,9 @@ const BenchSales = ({ onClose, applicationId, isEdit = false, refreshData }) => 
       </div>
 
       {/* Footer */}
-      <div className="modalFooter">
+      <div className="application-form-footer">
         <button
-          className="cancelBtn"
+          className="application-cancel-button"
           onClick={onClose}
           disabled={loading}
         >
@@ -403,7 +404,7 @@ const BenchSales = ({ onClose, applicationId, isEdit = false, refreshData }) => 
         </button>
 
         <button
-          className="saveBtn"
+          className="application-save-button"
           onClick={handleSubmit}
           disabled={loading || loadingCandidates || Boolean(candidateError)}
         >

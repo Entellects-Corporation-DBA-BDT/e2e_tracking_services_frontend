@@ -7,6 +7,7 @@ import {
   updateRecruiterApplication,
 } from "../api/applicationApi";
 import "./BenchSales.css";
+import "./RecruiterApplicationForm.css";
 import { easternDateInputValue, easternToday } from "../utils/easternTime";
 
 const today = easternToday();
@@ -53,7 +54,7 @@ function RecruiterApplicationForm({ onClose, applicationId, isEdit = false, refr
   const handleCandidateName = (event) => {
     const name = event.target.value;
     const selected = candidates.find(
-      (candidate) => candidate.name.trim().toLowerCase() === name.trim().toLowerCase()
+      (candidate) => (candidate.name || "").trim().toLowerCase() === name.trim().toLowerCase()
     );
     setFormData((current) => ({
       ...current,
@@ -83,22 +84,24 @@ function RecruiterApplicationForm({ onClose, applicationId, isEdit = false, refr
 
   if (loadingForm) return <div style={{ padding: 32 }}>Loading recruiter application...</div>;
 
-  return <form className="benchModal" onSubmit={submit}>
-    <div className="benchHeader"><div><h2>{isEdit ? "Edit Recruiter Application" : "New Recruiter Application"}</h2><p>Recruiting Candidate Submission</p></div></div>
-    <div className="formGrid">
-      <div className="inputGroup"><label>Submission Date <small>(Eastern Time)</small></label><div className="inputWrapper"><FiCalendar /><input required type="date" value={formData.date_created} onChange={(e) => setFormData({ ...formData, date_created: e.target.value })} /></div></div>
-      <div className="inputGroup"><label>Candidate Details</label><div className="inputWrapper"><FiUser /><input required list="recruiter-candidate-options" value={formData.candidate_name} onChange={handleCandidateName} placeholder="Select or enter candidate name" /><datalist id="recruiter-candidate-options">{candidates.map((candidate) => <option key={candidate.id} value={candidate.name}>{candidate.email || candidate.skills || `Candidate #${candidate.id}`}</option>)}</datalist></div><small>Select an existing candidate or type a new candidate name.</small></div>
-      <div className="inputGroup"><label>Client Name</label><input type="text" value={formData.client} onChange={(e) => setFormData({ ...formData, client: e.target.value })} placeholder="Enter client name" /></div>
-      <div className="inputGroup"><label>Role / Position</label><input type="text" value={formData.role} onChange={(e) => setFormData({ ...formData, role: e.target.value })} placeholder="Enter role or position" /></div>
-      <div className="inputGroup"><label>POC Name</label><input type="text" value={formData.poc} onChange={(e) => setFormData({ ...formData, poc: e.target.value })} placeholder="Enter POC name" /></div>
-      <div className="inputGroup"><label>Feedback</label><input type="text" value={formData.feedback} onChange={(e) => setFormData({ ...formData, feedback: e.target.value })} placeholder="Enter feedback" /></div>
-      <div className="inputGroup"><label htmlFor="recruiter-candidate-feedback">Candidate Feedback</label><input id="recruiter-candidate-feedback" name="candidate_feedback" type="text" value={formData.candidate_feedback} onChange={(e) => setFormData({ ...formData, candidate_feedback: e.target.value })} placeholder="Enter candidate feedback" /></div>
-      <div className="inputGroup fullWidth"><label>Remarks</label><textarea rows="4" value={formData.remarks} onChange={(e) => setFormData({ ...formData, remarks: e.target.value })} placeholder="Additional remarks..." /></div>
+  return <form className="benchModal recruiter-application-form" onSubmit={submit}>
+    <div className="application-form-heading"><div><h2>{isEdit ? "Edit Recruiter Application" : "New Recruiter Application"}</h2><p>Recruiting Candidate Submission</p></div></div>
+    <div className="recruiter-section-heading"><h3>Application details</h3><p>Enter the candidate, client and submission information.</p></div>
+    <div className="application-fields">
+      <div className="application-field"><label htmlFor="recruiter-field-1">Submission Date <small>(Eastern Time)</small></label><div className="application-input-shell"><FiCalendar /><input id="recruiter-field-1" required type="date" value={formData.date_created} onChange={(e) => setFormData({ ...formData, date_created: e.target.value })} /></div></div>
+      <div className="application-field"><label htmlFor="recruiter-field-2">Candidate Details</label><div className="application-input-shell"><FiUser /><input id="recruiter-field-2" required list="recruiter-candidate-options" value={formData.candidate_name} onChange={handleCandidateName} placeholder="Select or enter candidate name" /><datalist id="recruiter-candidate-options">{candidates.map((candidate) => <option key={candidate.id} value={candidate.name}>{candidate.email || candidate.skills || `Candidate #${candidate.id}`}</option>)}</datalist></div><small>Select an existing candidate or type a new candidate name.</small></div>
+      <div className="application-field"><label htmlFor="recruiter-field-3">Client Name</label><input id="recruiter-field-3" type="text" value={formData.client} onChange={(e) => setFormData({ ...formData, client: e.target.value })} placeholder="Enter client name" /></div>
+      <div className="application-field"><label htmlFor="recruiter-field-4">Role / Position</label><input id="recruiter-field-4" type="text" value={formData.role} onChange={(e) => setFormData({ ...formData, role: e.target.value })} placeholder="Enter role or position" /></div>
+      <div className="application-field"><label htmlFor="recruiter-field-5">POC Name</label><input id="recruiter-field-5" type="text" value={formData.poc} onChange={(e) => setFormData({ ...formData, poc: e.target.value })} placeholder="Enter POC name" /></div>
+      <div className="application-field"><label htmlFor="recruiter-field-6">Feedback</label><input id="recruiter-field-6" type="text" value={formData.feedback} onChange={(e) => setFormData({ ...formData, feedback: e.target.value })} placeholder="Enter feedback" /></div>
+      <div className="application-field"><label htmlFor="recruiter-candidate-feedback">Candidate Feedback</label><input id="recruiter-candidate-feedback" name="candidate_feedback" type="text" value={formData.candidate_feedback} onChange={(e) => setFormData({ ...formData, candidate_feedback: e.target.value })} placeholder="Enter candidate feedback" /></div>
+      <div className="application-field application-full-width"><label htmlFor="recruiter-field-7">Remarks</label><textarea id="recruiter-field-7" rows="3" value={formData.remarks} onChange={(e) => setFormData({ ...formData, remarks: e.target.value })} placeholder="Additional remarks..." /></div>
     </div>
-    <div className="uploadGrid">
-      {[['resume_file','Resume','PDF, DOC, DOCX','.pdf,.doc,.docx'],['r2r_file','R2R','PDF, DOC, DOCX','.pdf,.doc,.docx'],['driving_file','Driving License','PDF, PNG, JPG','.pdf,.png,.jpg,.jpeg'],['visa_file','Visa Copy','PDF, PNG, JPG','.pdf,.png,.jpg,.jpeg'],['msc_file','MSA Copy','PDF, DOC, DOCX','.pdf,.doc,.docx']].map(([key,label,hint,accept]) => <div className="uploadBox" key={key}><label htmlFor={`recruiter-${key}`} className="uploadLabel"><FiUploadCloud size={28}/><h4>Upload {label}</h4><p>{files[key]?.name || hint}</p></label><input hidden id={`recruiter-${key}`} type="file" accept={accept} onChange={(e) => setFiles({ ...files, [key]: e.target.files?.[0] || null })}/></div>)}
+    <div className="recruiter-section-heading"><h3>Supporting documents</h3><p>Attach relevant files for this submission. Existing files are kept when no replacement is selected.</p></div>
+    <div className="application-uploads">
+      {[['resume_file','Resume','PDF, DOC, DOCX','.pdf,.doc,.docx'],['r2r_file','R2R','PDF, DOC, DOCX','.pdf,.doc,.docx'],['driving_file','Driving License','PDF, PNG, JPG','.pdf,.png,.jpg,.jpeg'],['visa_file','Visa Copy','PDF, PNG, JPG','.pdf,.png,.jpg,.jpeg'],['msc_file','MSA Copy','PDF, DOC, DOCX','.pdf,.doc,.docx']].map(([key,label,hint,accept]) => <div className="application-upload-card" key={key}><label htmlFor={`recruiter-${key}`} className="application-upload-label"><FiUploadCloud size={28}/><h4>Upload {label}</h4><p>{files[key]?.name || hint}</p></label><input hidden id={`recruiter-${key}`} type="file" accept={accept} onChange={(e) => setFiles({ ...files, [key]: e.target.files?.[0] || null })}/></div>)}
     </div>
-    <div className="modalFooter"><button type="button" className="cancelBtn" onClick={onClose} disabled={loading}>Cancel</button><button type="submit" className="saveBtn" disabled={loading}>{loading ? "Saving..." : isEdit ? "Update Application" : "Save Application"}</button></div>
+    <div className="application-form-footer"><button type="button" className="application-cancel-button" onClick={onClose} disabled={loading}>Cancel</button><button type="submit" className="application-save-button" disabled={loading}>{loading ? "Saving..." : isEdit ? "Update Application" : "Save Application"}</button></div>
   </form>;
 }
 

@@ -524,3 +524,47 @@
 .e2e_recruiting_process_note.visible{color:#15803d;visibility:visible}
 @media(max-width:768px){.e2e_recruiting_td_process{width:160px;min-width:160px}.e2e_recruiting_process_badge{width:134px}}
 .e2e_recruiting_right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+/* Scoped layout: Bench Sales also uses the original recruiting classes. */
+.recruiting-workspace{width:100%;max-width:100%;min-width:0;box-sizing:border-box;padding:18px;border-radius:16px;border-color:#e4ebf5;animation:recruiting-enter .25s ease-out}
+.recruiting-workspace .e2e_recruiting_top{gap:14px;margin-bottom:16px}
+.recruiting-title{display:flex;align-items:center;gap:11px;min-width:0}
+.recruiting-title-icon{display:grid;place-items:center;flex:0 0 42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#e0efff,#ede9fe);color:#2563eb;font-size:20px}
+.recruiting-title h2{margin:0;color:#14213d;font-size:22px;line-height:1.25;font-weight:800}
+.recruiting-title p{margin:4px 0 0;color:#64748b;font-size:12px;line-height:1.5}
+.recruiting-workspace .e2e_recruiting_right{gap:7px;min-width:0}
+.recruiting-workspace .e2e_recruiting_right button{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:36px;padding:8px 11px;border:1px solid #dbe6f5;border-radius:9px;font-size:11px;line-height:1.3;transition:background .18s,box-shadow .18s;transform:none}
+.recruiting-workspace .e2e_recruiting_right .recruiting-tool-button{background:#f5f8ff;color:#31538b}
+.recruiting-workspace .e2e_recruiting_right .recruiting-tool-button:hover{background:#e8efff;border-color:#b8cef8}
+.recruiting-workspace .e2e_recruiting_right .recruiting-primary-button{background:linear-gradient(135deg,#1677ff,#2563eb);color:white;border-color:#2563eb;box-shadow:0 3px 8px #2563eb22}
+.recruiting-workspace .e2e_recruiting_right .recruiting-primary-button:hover{background:#1d4ed8}
+.recruiting-workspace .application-list-controls{background:#f8faff;box-shadow:none;flex-wrap:wrap;gap:10px;margin:0 0 12px}
+.recruiting-workspace .application-period-control{flex:0 1 150px}
+.recruiting-workspace .application-search-control{flex:1 1 190px}
+.recruiting-workspace .application-custom-dates{flex:1 1 270px;min-width:0}
+.recruiting-workspace .application-list-controls input,.recruiting-workspace .application-list-controls select{box-sizing:border-box;font-size:12px}
+.recruiting-workspace .e2e_recruiting_table_wrapper{max-width:100%;margin:0;padding:0;overflow:auto;border-radius:12px;scrollbar-width:thin}
+.recruiting-workspace table{width:100%;min-width:880px;table-layout:fixed;border-collapse:separate;border-spacing:0 7px}
+.recruiting-col-number{width:36px}.recruiting-col-date{width:100px}.recruiting-col-status{width:128px}.recruiting-col-actions{width:144px}
+.recruiting-workspace .e2e_recruiting_table_wrapper th{padding:11px 8px;background:#f1f5fc;color:#536783;border-top:1px solid #e1e8f4;border-bottom:1px solid #e1e8f4;font-size:10px;letter-spacing:.035em;line-height:1.5;overflow-wrap:anywhere}
+.recruiting-workspace .e2e_recruiting_table_wrapper td{padding:12px 8px;border-top:1px solid #edf1f7;border-bottom:1px solid #edf1f7;font-size:12px;line-height:1.5;font-weight:500;vertical-align:middle;overflow-wrap:anywhere;background:#fff}
+.recruiting-workspace .e2e_recruiting_table_wrapper th:first-child,.recruiting-workspace .e2e_recruiting_table_wrapper td:first-child{border-left:1px solid #edf1f7;border-radius:10px 0 0 10px;text-align:center}
+.recruiting-workspace .e2e_recruiting_table_wrapper th:last-child,.recruiting-workspace .e2e_recruiting_table_wrapper td:last-child{border-right:1px solid #edf1f7;border-radius:0 10px 10px 0}
+.recruiting-workspace .e2e_recruiting_table_wrapper tbody tr:hover td{background:#f8fbff}
+.recruiting-workspace .e2e_recruiting_table_wrapper .recruiting-row-placed td{border-top-color:#ccebd8;border-bottom-color:#ccebd8;background:#f7fdf9}
+.recruiting-workspace .e2e_recruiting_table_wrapper .recruiting-row-placed td:first-child{border-left:3px solid #22c55e}
+.recruiting-candidate-role{display:block;margin-top:3px;color:#64748b;font-size:10px;font-weight:500}
+.recruiting-workspace .e2e_recruiting_td_process{width:auto;min-width:0}
+.recruiting-workspace .e2e_recruiting_process_content{min-height:32px;gap:3px}
+.recruiting-workspace .e2e_recruiting_process_badge{width:auto;max-width:100%;min-height:28px;padding:5px 8px;font-size:10px;white-space:normal}
+.recruiting-workspace .e2e_recruiting_process_note{display:none}
+.recruiting-workspace .e2e_recruiting_process_note.visible{display:block;font-size:9px}
+.recruiting-workspace .e2e_recruiting_actions{gap:4px;flex-wrap:wrap}
+.recruiting-workspace .e2e_recruiting_actions button{padding:6px 8px;min-height:30px;font-size:10px;border-radius:7px}
+.recruiting-workspace .application-list-footer{align-items:center;flex-wrap:wrap;gap:10px;margin-top:10px}
+.recruiting-page-caption{color:#64748b;font-size:11px}
+.recruiting-workspace .application-list-footer .e2e_pagination_container{flex-wrap:wrap;gap:5px}
+.recruiting-workspace button:focus-visible,.recruiting-workspace .e2e_recruiting_table_wrapper:focus-visible{outline:2px solid #2563eb;outline-offset:3px}
+@keyframes recruiting-enter{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:1100px){.recruiting-workspace .e2e_recruiting_right{width:100%}.recruiting-workspace .e2e_recruiting_right .recruiting-primary-button{margin-left:auto}}
+@media(max-width:680px){.recruiting-workspace{padding:12px}.recruiting-workspace .e2e_recruiting_top{align-items:stretch;gap:12px}.recruiting-title h2{font-size:20px}.recruiting-workspace .e2e_recruiting_right{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.recruiting-workspace .e2e_recruiting_right button{width:100%;min-height:40px}.recruiting-workspace .e2e_recruiting_right .recruiting-primary-button{margin-left:0}.recruiting-workspace .application-list-controls{padding:10px}.recruiting-workspace .application-period-control,.recruiting-workspace .application-search-control,.recruiting-workspace .application-custom-dates{flex:auto;width:100%}.recruiting-workspace .application-list-footer{flex-direction:row}.recruiting-workspace .application-list-footer .e2e_pagination_container{width:100%;justify-content:center}.recruiting-workspace .recruiting-page-caption{margin-left:auto}}
+@media(prefers-reduced-motion:reduce){.recruiting-workspace{animation:none}.recruiting-workspace *{transition:none!important}}

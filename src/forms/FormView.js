@@ -1,4 +1,7 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { FiMinus, FiSquare, FiCopy, FiX, FiFileText } from "react-icons/fi";
+import "./RecruiterApplicationForm.css";
 import ApplicationView from "./ApplicationView";
 import BenchSales from "./BenchSales";
 import "./index.css"
@@ -26,6 +29,33 @@ const FormView = ({
   candidateId,
   recordName
 }) => {
+
+  const windowRef=useRef(null);
+  const [windowMode,setWindowMode]=useState("normal");
+  const benchWindow=openForm==="bench"||openForm==="benchEdit";
+  const recruiterWindow=benchWindow||openForm==="recruiter"||openForm==="recruiterEdit";
+  const windowTitle=benchWindow?(openForm==="benchEdit"?"Edit Bench Sales Application":"New Bench Sales Application"):(openForm==="recruiterEdit"?"Edit Recruiter Application":"New Recruiter Application");
+  useEffect(()=>{setWindowMode("normal")},[openForm,applicationId]);
+  useEffect(()=>{
+    if(!recruiterWindow)return;
+    const previous=document.activeElement;
+    windowRef.current?.querySelector('button')?.focus();
+    return()=>{if(previous?.isConnected)previous.focus();};
+  },[recruiterWindow]);
+  const trapWindowFocus=event=>{
+    if(event.key!=="Tab"||windowMode==="minimized")return;
+    const fields=Array.from(windowRef.current.querySelectorAll('button:not(:disabled),input:not(:disabled):not([hidden]),textarea:not(:disabled),select:not(:disabled),[tabindex="0"]'));
+    const first=fields[0],last=fields[fields.length-1];
+    if(event.shiftKey&&document.activeElement===first){event.preventDefault();last?.focus();}
+    else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first?.focus();}
+  };
+
+  useEffect(()=>{
+    if(!recruiterWindow||windowMode==="minimized")return;
+    const previous=document.body.style.overflow;
+    document.body.style.overflow="hidden";
+    return()=>{document.body.style.overflow=previous};
+  },[recruiterWindow,windowMode]);
 
   const usesOwnHeader = openForm === "job" || openForm === "jobEdit";
 
@@ -150,6 +180,21 @@ const FormView = ({
         return null;
     }
   };
+
+  if(recruiterWindow)return createPortal(
+    <div className={`recruiter-window-overlay ${windowMode}`}>
+      <section ref={windowRef} onKeyDown={trapWindowFocus} className="recruiter-window" role="dialog" aria-modal={windowMode!=="minimized"?true:undefined} aria-label={windowTitle}>
+        <header className="recruiter-window-header">
+          <div className="recruiter-window-title"><FiFileText/><div><h2>{windowTitle}</h2><p>Candidate submission & supporting documents</p></div></div>
+          <div className="recruiter-window-controls">
+            <button type="button" aria-label={windowMode==="minimized"?"Restore form":"Minimize form"} title={windowMode==="minimized"?"Restore":"Minimize"} onClick={()=>setWindowMode(windowMode==="minimized"?"normal":"minimized")}><FiMinus/></button>
+            <button type="button" aria-label={windowMode==="maximized"?"Restore window size":"Maximize form"} title={windowMode==="maximized"?"Restore size":"Maximize"} onClick={()=>setWindowMode(windowMode==="maximized"?"normal":"maximized")}>{windowMode==="maximized"?<FiCopy/>:<FiSquare/>}</button>
+            <button type="button" aria-label="Close form" title="Close" onClick={()=>setOpenForm(null)}><FiX/></button>
+          </div>
+        </header>
+        <div className="recruiter-window-content" hidden={windowMode==="minimized"}>{renderForms()}</div>
+      </section>
+    </div>,document.body);
 
   return (
     <>

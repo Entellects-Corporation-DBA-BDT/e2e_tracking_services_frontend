@@ -6,7 +6,7 @@ import FormView from "../../forms/FormView";
 import getUserDataFromCookies from "../../utils/getUserDataFromCookies";
 import { getRecruiterApplications } from "../../api/applicationApi";
 import { useNavigate } from "react-router-dom";
-import { FaArrowRight, FaFileAlt, FaShieldAlt } from "react-icons/fa";
+import { FaArrowRight, FaFileAlt, FaShieldAlt, FaPlus, FaUsers, FaCheck } from "react-icons/fa";
 import ApplicationListControls from "./ApplicationListControls";
 import { downloadApplicationExcel } from "../../utils/applicationListTools";
 import { formatEasternDate } from "../../utils/easternTime";
@@ -76,11 +76,16 @@ function Recruiting() {
 
   if (initialLoading) return <Loader fullPage />;
 
-  return <div className="e2e_recruiting_page">
-    <div className="e2e_recruiting_top">
-      <div className="e2e_recruiting_left"><h2>Recruiter Application List <button type="button" className="performance-arrow-button" onClick={() => navigate("/dashboard/recruiting/performance")} aria-label="Open recruiter performance" title="Recruiter performance"><FaArrowRight /></button></h2><div className="e2e_recruiting_heading_line" /></div>
-      <div className="e2e_recruiting_right"><button type="button" className="e2e_recruiting_add_btn" onClick={() => navigate("/ai-tools/document-check")}><FaShieldAlt /> Document Check</button><button type="button" className="e2e_recruiting_add_btn" onClick={() => navigate("/ai-tools/resume-match")}><FaFileAlt /> Resume Match</button><button className="e2e_recruiting_add_btn" onClick={() => open("recruiter")}>+ Add New</button></div>
-    </div>
+  return <div className="e2e_recruiting_page recruiting-workspace">
+    <header className="e2e_recruiting_top">
+      <div className="recruiting-title"><span className="recruiting-title-icon"><FaUsers /></span><div><h2>Recruiting</h2><p>Manage candidate submissions, feedback and placements.</p></div></div>
+      <div className="e2e_recruiting_right">
+        <button type="button" className="recruiting-tool-button" onClick={() => navigate("/dashboard/recruiting/performance")}><FaArrowRight /> Performance</button>
+        <button type="button" className="recruiting-tool-button" onClick={() => navigate("/ai-tools/document-check")}><FaShieldAlt /> Document Check</button>
+        <button type="button" className="recruiting-tool-button" onClick={() => navigate("/ai-tools/resume-match")}><FaFileAlt /> Resume Match</button>
+        <button type="button" className="recruiting-primary-button" onClick={() => open("recruiter")}><FaPlus /> Add New</button>
+      </div>
+    </header>
 
     {error && <p role="alert" style={{ color: "#b91c1c", fontWeight: 700 }}>{error}</p>}
     <ApplicationListControls
@@ -94,17 +99,17 @@ function Recruiting() {
       exporting={exporting}
     />
 
-    <div className="e2e_recruiting_table_wrapper"><table><thead><tr><th>#</th><th>Submission Date</th><th>Recruiter Name</th><th>Candidate Name</th><th>Client</th><th>Status</th><th>POC</th><th>Feedback</th><th>Action</th></tr></thead>
-      <tbody>{tableLoading ? <tr><td colSpan="9" style={{ textAlign:"center",padding:30 }}>Loading...</td></tr> : tableData.length ? tableData.map((item,index) => <tr key={item.id}>
+    <div className="e2e_recruiting_table_wrapper" role="region" aria-label="Recruiter applications" tabIndex={0}><table><colgroup><col className="recruiting-col-number" /><col className="recruiting-col-date" /><col /><col /><col /><col className="recruiting-col-status" /><col /><col /><col className="recruiting-col-actions" /></colgroup><thead><tr><th>#</th><th>Submission Date</th><th>Recruiter Name</th><th>Candidate Name</th><th>Client</th><th>Status</th><th>POC</th><th>Feedback</th><th>Action</th></tr></thead>
+      <tbody>{tableLoading ? <tr><td colSpan="9" style={{ textAlign:"center",padding:30 }}>Loading...</td></tr> : tableData.length ? tableData.map((item,index) => <tr key={item.id} className={Number(item.process_id) === 3 ? "recruiting-row-placed" : ""}>
         <td>{(currentPage-1)*entries+index+1}</td>
         <td>{displayDate(item.date_created)}</td>
         <td style={{ color:Number(loginUserId)===Number(item.employee_id)?"#16a34a":"inherit",fontWeight:Number(loginUserId)===Number(item.employee_id)?700:400 }}>{item.employee_name || "-"}</td>
-        <td><strong>{item.candidate_name || "-"}</strong></td>
+        <td><strong>{item.candidate_name || "-"}</strong>{item.role && <small className="recruiting-candidate-role">{item.role}</small>}</td>
         <td>{item.client || "-"}</td>
         <td className="e2e_recruiting_td_process">
           <div className="e2e_recruiting_process_content">
             <span className={["e2e_recruiting_process_badge", "e2e_recruiting_process_" + processStatus(item.process_id).className].join(" ")}>
-              {processStatus(item.process_id).className === "placed" && <span aria-hidden="true">✓</span>}
+              {processStatus(item.process_id).className === "placed" && <FaCheck aria-hidden="true" />}
               {processStatus(item.process_id).label}
             </span>
             <small className={["e2e_recruiting_process_note", processStatus(item.process_id).className === "placed" ? "visible" : ""].join(" ")}>
@@ -117,7 +122,8 @@ function Recruiting() {
       </tr>) : <tr><td colSpan="9" style={{ textAlign:"center",padding:30 }}>No recruiter applications found.</td></tr>}</tbody>
     </table></div>
     <div className="application-list-footer">
-      <label className="application-bottom-rows"><select aria-label="Rows per page" value={entries} onChange={(event) => { setEntries(Number(event.target.value)); setCurrentPage(1); }}>{[5, 10, 25, 50, 100].map((value) => <option key={value} value={value}>{value}</option>)}</select></label>
+      <label className="application-bottom-rows">Rows<select aria-label="Rows per page" value={entries} onChange={(event) => { setEntries(Number(event.target.value)); setCurrentPage(1); }}>{[5, 10, 25, 50, 100].map((value) => <option key={value} value={value}>{value}</option>)}</select></label>
+      <span className="recruiting-page-caption">Page {currentPage} of {totalPages}</span>
       <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
     </div>
     <FormView openForm={openForm} setOpenForm={setOpenForm} applicationId={selectedApplicationId} refreshData={fetchApplications} />

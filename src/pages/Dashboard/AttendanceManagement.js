@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { FaCalendarCheck, FaCheck, FaPlus, FaTimes, FaTrash } from "react-icons/fa";
+import { FaCalendarCheck, FaFileExcel, FaCheck, FaPlus, FaTimes, FaTrash } from "react-icons/fa";
 import {
   addEmployeeLeave, deleteHoliday, getEmployees, getHolidays, getLeaves,
-  getAttendanceIpPermissions, getMonthlyAttendance, getTodayAttendance, reviewLeave, saveHoliday, updateEmployeeWfhPermission, updateMonthlyAttendance,
+  getAttendanceIpPermissions, getMonthlyAttendance, getPayslipRoster, getTodayAttendance, reviewLeave, saveHoliday, updateEmployeeWfhPermission, updateMonthlyAttendance,
 } from "../../api/employeeApi";
 import { usePermissions } from "../../auth/PermissionContext";
 import MyProfile from "./MyProfile";
+import { downloadMonthlyPayrollWorkbook } from "../../utils/monthlyPayrollExport";
 import DailyAttendanceDashboard from "../../components/DailyAttendanceDashboard";
 import EmployeeRowActions from "../../components/EmployeeRowActions";
 import ConfirmDialog from "../../components/ConfirmDialog";
@@ -33,6 +34,7 @@ function AttendanceManagement() {
   const [monthly,setMonthly]=useState({data:[]}),[ipPermissions,setIpPermissions]=useState([]),[savingRestriction,setSavingRestriction]=useState(null),[restrictionSearch,setRestrictionSearch]=useState("");
   const [leave,setLeave]=useState(blankLeave),[holiday,setHoliday]=useState(blankHoliday);
   const [status,setStatus]=useState(""),[message,setMessage]=useState({text:"",error:false}),[loading,setLoading]=useState(true);
+  const [exportingMonthly,setExportingMonthly]=useState(false);
   const [confirmation,setConfirmation]=useState(null),[monthlyEdit,setMonthlyEdit]=useState(null),[monthlySaving,setMonthlySaving]=useState(false);
   useEffect(()=>{const requested=assistantParams.get("assistant");if(["monthly","payslips","approvals","holidays","configurations"].includes(requested))setTab(requested)},[assistantParams]);
   const showMessage=(text,error=false)=>setMessage({text,error});
@@ -53,6 +55,21 @@ function AttendanceManagement() {
   if(!admin && tab==="configurations" && configurationAccess)return <main className="attendance-management"><AttendanceConfigurations/></main>;
   if(!admin)return <MyProfile/>;
 
+  const exportMonthly=async()=>{
+    if(exportingMonthly)return;
+    setExportingMonthly(true);
+    try{
+      const report=await getMonthlyAttendance(selectedMonth);
+      let salaries=[],salaryAvailable=false;
+      if(payslipAccess){
+        try{const result=await getPayslipRoster(selectedMonth);salaries=result.data||[];salaryAvailable=true;}
+        catch{salaryAvailable=false;}
+      }
+      await downloadMonthlyPayrollWorkbook({...report,month:selectedMonth},salaries,{salaryAvailable});
+      showMessage(salaryAvailable?"Monthly payroll Excel downloaded. Review the Read Me sheet before finalizing payroll.":"Excel downloaded with blank salary fields. Saved salaries were unavailable; enter them in the blue cells.");
+    }catch(error){showMessage(error?.response?.data?.message||error.message||"Monthly Excel report could not be generated.",true);}
+    finally{setExportingMonthly(false);}
+  };
   const saveMonthlyEdit=async(event)=>{event.preventDefault();setMonthlySaving(true);try{const result=await updateMonthlyAttendance(monthlyEdit.id,{...monthlyEdit,month:selectedMonth});setMessage({text:result.message,error:false});setMonthlyEdit(null);await load()}catch(error){setMessage({text:error?.response?.data?.message||"Monthly attendance could not be updated.",error:true})}finally{setMonthlySaving(false)}};  const decide=async(id,next)=>{
     try{const result=await reviewLeave(id,{status:next});setMessage({text:result.message,error:false});load();}
     catch(error){setMessage({text:error?.response?.data?.message||"Leave could not be updated.",error:true});}
@@ -75,7 +92,8 @@ function AttendanceManagement() {
     {tab==="configurations"&&configurationAccess?<AttendanceConfigurations/>:loading?<div className="attendance-loading"><span/> Loading attendance management...</div>:<>
       {tab==="today"&&<DailyAttendanceDashboard today={today} selectedDate={selectedDate} onDateChange={setSelectedDate} localDate={localDate} onRefresh={load} canManage={admin} canExport={can("attendance","export")}/> }
       {tab==="monthly"&&<section className="attendance-admin-section">
-        <div className="attendance-section-title"><div><h2>Monthly Attendance Summary</h2><p>Totals for every active employee through {monthly.end_date||"the selected month"}.</p></div><label className="attendance-date-filter">Month<input type="month" max={localDate.slice(0,7)} value={selectedMonth} onChange={e=>setSelectedMonth(e.target.value)}/></label></div>
+        <div className="attendance-section-title"><div><h2>Monthly Attendance Summary</h2><p>Totals for every active employee through {monthly.end_date||"the selected month"}.</p></div><div className="attendance-monthly-actions"><label className="attendance-date-filter">Month<input type="month" disabled={exportingMonthly} max={localDate.slice(0,7)} value={selectedMonth} onChange={e=>setSelectedMonth(e.target.value)}/></label>{can("attendance","export")&&<button type="button" className="attendance-monthly-export" disabled={exportingMonthly||!monthly.data?.length} onClick={exportMonthly}><FaFileExcel/>{exportingMonthly?"Preparing Excel?":"Download Payroll Excel"}</button>}</div></div>
+        <p className="attendance-monthly-report-note">Excel includes editable salary, deductions and incentives, with half days counted as 0.5. Leave deduction uses salary ? 30 ? (working days ? worked days). Current-month exports are provisional.</p>
         <div className="attendance-admin-table monthly-policy-table"><table><thead><tr><th>Employee</th><th>Joining / Eligibility</th><th>Weekends</th><th>Holidays</th><th>Working</th><th>Present</th><th>Half</th><th>Worked</th><th>CL</th><th>PL</th><th>UPL</th><th>Payable</th><th>Hours</th><th>Actions</th></tr></thead><tbody>{monthly.data?.length?monthly.data.map(row=><tr key={row.id}><td><strong>{row.legal_name}</strong><small>{row.employee_id} · {row.role||"-"}</small></td><td><strong>{row.joining_date||"-"}</strong><small>{row.leave_eligible?"1 CL eligible":"Probation · no CL"}</small></td><td>{row.weekend_days}</td><td>{row.holiday_days}</td><td>{row.working_days}</td><td>{row.present_days}</td><td>{row.half_days}</td><td>{row.worked_days}</td><td>{row.cl_days} / {row.casual_leave_entitlement}</td><td>{row.pl_days}</td><td>{row.upl_days}</td><td><strong>{row.payable_days}</strong></td><td>{row.total_hours||0} h</td><td><EmployeeRowActions employee={row} canEdit={admin} onView={()=>navigate(`/dashboard/employee-status/${row.id}`)} onEdit={()=>setMonthlyEdit({...row})}/></td></tr>):<tr><td colSpan="14">No employees found for this month.</td></tr>}</tbody></table></div>
       </section>}
       {tab==="payslips"&&payslipAccess&&<PayslipManager month={selectedMonth} onMonthChange={setSelectedMonth} onMessage={showMessage}/>}
