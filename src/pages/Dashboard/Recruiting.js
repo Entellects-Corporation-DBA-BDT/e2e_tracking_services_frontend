@@ -6,7 +6,7 @@ import FormView from "../../forms/FormView";
 import getUserDataFromCookies from "../../utils/getUserDataFromCookies";
 import { getRecruiterApplications } from "../../api/applicationApi";
 import { useNavigate } from "react-router-dom";
-import { FaArrowRight, FaFileAlt, FaShieldAlt, FaPlus, FaUsers, FaCheck } from "react-icons/fa";
+import { FaArrowRight, FaFileAlt, FaClone, FaShieldAlt, FaPlus, FaUsers, FaCheck } from "react-icons/fa";
 import ApplicationListControls from "./ApplicationListControls";
 import { downloadApplicationExcel } from "../../utils/applicationListTools";
 import { formatEasternDate } from "../../utils/easternTime";
@@ -83,6 +83,7 @@ function Recruiting() {
         <button type="button" className="recruiting-tool-button" onClick={() => navigate("/dashboard/recruiting/performance")}><FaArrowRight /> Performance</button>
         <button type="button" className="recruiting-tool-button" onClick={() => navigate("/ai-tools/document-check")}><FaShieldAlt /> Document Check</button>
         <button type="button" className="recruiting-tool-button" onClick={() => navigate("/ai-tools/resume-match")}><FaFileAlt /> Resume Match</button>
+        <button type="button" className="recruiting-tool-button" onClick={() => navigate("/ai-tools/duplicate-checker")}><FaClone /> Duplicate Checker</button>
         <button type="button" className="recruiting-primary-button" onClick={() => open("recruiter")}><FaPlus /> Add New</button>
       </div>
     </header>
