@@ -1,0 +1,15 @@
+// Offline SQL data reader. Never executes SQL; keeps credentials out of console output.
+const fs=require('fs'),path=require('path');
+function parseTeamflowDump(text){
+ const tables={};const insert=/INSERT\s+INTO\s+`([a-zA-Z0-9_]+)`\s*\(([^)]+)\)\s*VALUES\s*/gi;let match;
+ while((match=insert.exec(text))){const table=match[1],columns=[...match[2].matchAll(/`([^`]+)`/g)].map(x=>x[1]);let i=insert.lastIndex;
+  const ws=()=>{while(/\s/.test(text[i]||'')&&i<text.length)i++;};
+  const value=()=>{ws();if(text[i]==="'"){i++;let result='';while(i<text.length){const c=text[i++];if(c==='\\'){if(i>=text.length)throw Error('Truncated SQL escape');const e=text[i++];result+=({'0':'\0',b:'\b',n:'\n',r:'\r',t:'\t',Z:'\x1a'}[e]??e);}else if(c==="'"){if(text[i]==="'"){result+="'";i++;}else return result;}else result+=c;}throw Error('Unclosed SQL string');}
+   const start=i;while(i<text.length&&text[i]!==','&&text[i]!==')')i++;const raw=text.slice(start,i).trim();if(/^NULL$/i.test(raw))return null;if(/^-?\d+(?:\.\d+)?$/.test(raw))return Number(raw);throw Error('Unsupported SQL value in '+table);};
+  for(;;){ws();if(text[i]!=='(')throw Error('Expected SQL row in '+table);i++;const values=[];for(;;){values.push(value());ws();if(text[i]===')'){i++;break;}if(text[i]!==',')throw Error('Expected SQL field separator');i++;}if(values.length!==columns.length)throw Error('Column mismatch in '+table);(tables[table]??=[]).push(Object.fromEntries(columns.map((c,j)=>[c,values[j]])));ws();if(text[i]===';'){i++;break;}if(text[i]!==',')throw Error('Expected SQL row separator');i++;}
+  insert.lastIndex=i;
+ }
+ return tables;
+}
+if(require.main===module){try{const filename=process.argv[2];if(!filename)throw Error('Usage: node scripts/prepare_teamflow_import.js <dump.sql> [--output private.json]');const tables=parseTeamflowDump(fs.readFileSync(filename,'utf8'));const outputIndex=process.argv.indexOf('--output');if(outputIndex>=0){const output=path.resolve(process.argv[outputIndex+1]);fs.mkdirSync(path.dirname(output),{recursive:true});fs.writeFileSync(output,JSON.stringify({format:'e2e-teamflow-v1',source_hash:require('crypto').createHash('sha256').update(fs.readFileSync(filename)).digest('hex'),tables}),{mode:0o600});}const summary={tables:Object.fromEntries(Object.entries(tables).map(([name,rows])=>[name,rows.length])),passwordFormats:{},references:{}};for(const row of tables.users||[]){const type=/^\$2[aby]\$/.test(row.password)?'bcrypt':'unsupported';summary.passwordFormats[type]=(summary.passwordFormats[type]||0)+1;}for(const [table,cols] of Object.entries({projects:['lead'],issues:['assignee','project','linked_issue'],teams:['team_members','created_by','updated_by']})){for(const col of cols){const values=(tables[table]||[]).map(r=>r[col]).filter(v=>v!==null&&v!=='');summary.references[table+'.'+col]={numeric:values.filter(v=>/^\d+$/.test(String(v))).length,jsonArrays:values.filter(v=>String(v).startsWith('[')).length,other:values.filter(v=>!/^\d+$/.test(String(v))&&!String(v).startsWith('[')).length};}}console.log(JSON.stringify(summary,null,2));}catch(error){console.error(error.message);process.exitCode=1;}}
+module.exports={parseTeamflowDump};

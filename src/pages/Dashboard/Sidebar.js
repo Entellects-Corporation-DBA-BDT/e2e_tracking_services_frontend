@@ -9,8 +9,9 @@ import {RESOURCE_GROUPS,groupResources} from "./ResourceGroups";
 const STORE="e2e-sidebar-open-groups",count=n=>n>99?"99+":n;
 const initialOpen=()=>{try{const value=JSON.parse(localStorage.getItem(STORE));if(Array.isArray(value))return value}catch(e){}return [RESOURCE_GROUPS[0].id]};
 export default function Sidebar(){
- const{resources}=usePermissions(),location=useLocation(),[unread,setUnread]=useState({chat:0,notifications:0}),[open,setOpen]=useState(initialOpen),[query,setQuery]=useState("");
- const visible=useMemo(()=>resources.filter(item=>item.permissions?.view&&item.route&&item.resource_type==="PAGE"&&item.component_key),[resources]);
+ const{resources,user,can}=usePermissions(),location=useLocation(),[unread,setUnread]=useState({chat:0,notifications:0}),[open,setOpen]=useState(initialOpen),[query,setQuery]=useState("");
+ const attendanceInProfile=Boolean(user?.is_teamflow_candidate)&&can('profile','view');
+ const visible=useMemo(()=>resources.filter(item=>item.permissions?.view&&item.route&&item.resource_type==="PAGE"&&item.component_key&&!(attendanceInProfile&&item.resource==='teamflow_attendance')),[resources,attendanceInProfile]);
  const groups=useMemo(()=>{const term=query.trim().toLowerCase();return groupResources(visible).map(group=>term?{...group,items:group.items.filter(item=>`${item.display_name} ${item.resource}`.toLowerCase().includes(term))}:group).filter(group=>group.items.length)},[visible,query]);
  const refresh=useCallback(async()=>{try{const[chats,alerts]=await Promise.all([getConversations(),getNotificationCenter()]);setUnread({chat:chats.reduce((sum,item)=>sum+Number(item.unread_count||0),0),notifications:Number(alerts.unread||0)})}catch(e){}},[]);
  useEffect(()=>{refresh();const timer=setInterval(()=>document.visibilityState==="visible"&&refresh(),15000),watch=()=>document.visibilityState==="visible"&&refresh();document.addEventListener("visibilitychange",watch);return()=>{clearInterval(timer);document.removeEventListener("visibilitychange",watch)}},[refresh]);

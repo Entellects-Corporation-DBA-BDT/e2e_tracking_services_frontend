@@ -1,3 +1,4 @@
+import useTeamflowPortrait from '../../features/teamflow/useTeamflowPortrait';
 import "../../styles/Dashboard/navbar.css";
 import { FaBars, FaArrowLeft, FaBriefcase, FaCalendarAlt, FaChevronDown, FaFileAlt, FaMedal, FaMoon, FaPrint, FaRedo, FaSearch, FaSignOutAlt, FaSun, FaUserTie } from 'react-icons/fa';
 import { useLocation, useNavigate } from "react-router-dom";
@@ -19,10 +20,12 @@ function Navbar() {
   useEffect(()=>{setProfileSidebarOpen(true);document.body.classList.remove("reference-sidebar-hidden")},[location.pathname]);
   const searchRef = useRef(null);
   const { resources: allResources, user, logout, isAdmin, can } = usePermissions();
-  const [portrait,setPortrait]=useProfilePortrait(user?.id,can("profile","view"));
-  const presence=useAttendancePresence(user?.id,can("attendance","view"));
-  const initial=(user?.username||user?.firstname||user?.email||"U").charAt(0).toUpperCase();
-  const avatar=portrait?<img src={portrait} alt="" onError={()=>setPortrait("")}/>:initial;
+  const [portrait,setPortrait]=useProfilePortrait(user?.id,can("profile","view")&&!user?.is_teamflow_candidate);
+  const presence=useAttendancePresence(user?.id,user?.is_teamflow_candidate?can("teamflow_attendance","view"):can("attendance","view"),Boolean(user?.is_teamflow_candidate));
+  const initial=(user?.display_name||user?.username||user?.firstname||user?.email||"U").charAt(0).toUpperCase();
+  const candidatePortrait=useTeamflowPortrait(user?.teamflow_photo_id,Boolean(user?.is_teamflow_candidate)&&can("profile","view"));
+  const visiblePortrait=user?.is_teamflow_candidate?candidatePortrait:portrait;
+  const avatar=visiblePortrait?<img src={visiblePortrait} alt="" onError={()=>setPortrait("")}/>:initial;
   const [searchTerm, setSearchTerm] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
   const [activeSuggestion, setActiveSuggestion] = useState(-1);

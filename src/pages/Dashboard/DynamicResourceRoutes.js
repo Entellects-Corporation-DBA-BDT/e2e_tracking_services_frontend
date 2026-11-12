@@ -1,3 +1,7 @@
+import TeamflowPage from '../../features/teamflow/TeamflowPage';
+import TeamflowProfile from '../../features/teamflow/TeamflowProfile';
+import CandidatePortalManagement from '../../features/teamflow/CandidatePortalManagement';
+import CandidateAttendanceRoute from '../../features/teamflow/CandidateAttendanceRoute';
 import Workshop from './Workshop';
 import { Navigate, Route } from "react-router-dom";
 import { usePermissions } from "../../auth/PermissionContext";
@@ -32,6 +36,9 @@ import AdminChat from "../../components/Chat/AdminChat";
 
 
 const PAGE_COMPONENTS = {
+  "candidate-access": <CandidatePortalManagement />,
+  ...Object.fromEntries(["candidates","projects","issues","timesheets","reports","attendance"].map(section=>["teamflow-"+section,<TeamflowPage section={section}/>])),
+  "teamflow-attendance": <CandidateAttendanceRoute />,
   recruiting: <Recruiting />,
   workshop: <Workshop />,
   "bench-sales": <BenchSales />,
@@ -57,6 +64,7 @@ const PAGE_COMPONENTS = {
 };
 
 const DETAIL_COMPONENTS = {
+  "teamflow-candidates":[{suffix:":candidateId/profile",element:<TeamflowProfile/>}],
   recruiting: [
     { suffix: "document-check", element: <Navigate to="/ai-tools/document-check" replace/> },
     { suffix: "resume-match", element: <Navigate to="/ai-tools/resume-match" replace/> },

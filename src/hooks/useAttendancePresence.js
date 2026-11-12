@@ -1,3 +1,4 @@
+import {teamflowApi} from '../features/teamflow/api';
 import {useEffect,useState} from "react";
 import {getTodayAttendance} from "../api/employeeApi";
 
@@ -14,16 +15,16 @@ export function attendancePresence(snapshot,now=Date.now()){
  const end=data.schedule?.work_end||"18:30:00";
  return time>end?{state:"overdue",label:"Shift ended - attendance logout pending"}:{state:"online",label:"Online - clocked in"};
 }
-export default function useAttendancePresence(userId,enabled){
+export default function useAttendancePresence(userId,enabled,teamflow=false){
  const [snapshot,setSnapshot]=useState(null),[now,setNow]=useState(Date.now);
  useEffect(()=>{
   let active=true,inFlight=false;setSnapshot(null);
   if(!userId||!enabled)return;
-  const refresh=async()=>{if(inFlight||document.visibilityState==="hidden")return;inFlight=true;try{const data=await getTodayAttendance(undefined,true);if(active){setSnapshot(data.success===false?null:{data,receivedAt:Date.now()});setNow(Date.now());}}catch(error){if(active)setSnapshot(null);}finally{inFlight=false;}};
+  const refresh=async()=>{if(inFlight||document.visibilityState==="hidden")return;inFlight=true;try{const data=teamflow?await teamflowApi.presence():await getTodayAttendance(undefined,true);if(active){setSnapshot(data.success===false?null:{data,receivedAt:Date.now()});setNow(Date.now());}}catch(error){if(active)setSnapshot(null);}finally{inFlight=false;}};
   const tick=()=>{setNow(Date.now());refresh();};
   refresh();const timer=window.setInterval(tick,30000);
   window.addEventListener("e2e-attendance-changed",refresh);window.addEventListener("focus",tick);document.addEventListener("visibilitychange",tick);
   return()=>{active=false;window.clearInterval(timer);window.removeEventListener("e2e-attendance-changed",refresh);window.removeEventListener("focus",tick);document.removeEventListener("visibilitychange",tick);};
- },[userId,enabled]);
+ },[userId,enabled,teamflow]);
  return attendancePresence(snapshot,now);
 }

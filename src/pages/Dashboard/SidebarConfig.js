@@ -17,6 +17,13 @@ import {
 } from "react-icons/fa";
 
 export const sidebarConfig = {
+  candidate_portal_admin:{icon:<FaUsers className="menuIcon blueIcon"/>,route:"/dashboard/candidate-access"},
+  teamflow_candidates:{icon:<FaUsers className="menuIcon blueIcon"/>,route:"/dashboard/teamflow/candidates"},
+  teamflow_projects:{icon:<FaBriefcase className="menuIcon blueIcon"/>,route:"/dashboard/teamflow/projects"},
+  teamflow_issues:{icon:<FaClipboardList className="menuIcon orangeIcon"/>,route:"/dashboard/teamflow/issues"},
+  teamflow_timesheets:{icon:<FaCalendarCheck className="menuIcon purpleIcon"/>,route:"/dashboard/teamflow/timesheets"},
+  teamflow_reports:{icon:<FaFileInvoiceDollar className="menuIcon blueIcon"/>,route:"/dashboard/teamflow/reports"},
+  teamflow_attendance:{icon:<FaCalendarCheck className="menuIcon blueIcon"/>,route:"/dashboard/teamflow/attendance"},
   workshop:{icon:<FaUsers className="menuIcon blueIcon"/>,route:"/dashboard/workshop"},
   dashboard: {
     icon: <FaHome className="menuIcon" />,
