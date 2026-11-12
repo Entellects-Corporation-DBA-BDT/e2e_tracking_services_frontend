@@ -19,4 +19,4 @@ SELECT p.id,r.id,1,1,'ALL' FROM positions p JOIN resources r ON r.resource_name=
 INSERT IGNORE INTO permissions(position_id,resource_id,can_view,can_edit,data_scope)
 SELECT p.id,r.id,1,1,'OWN' FROM positions p JOIN resources r ON r.resource_name='chat_notifications' WHERE p.id IN(1,2) OR LOWER(p.position_name) LIKE '%develop%';
 INSERT IGNORE INTO permissions(position_id,resource_id,can_view,can_create,data_scope)
-SELECT p.id,r.id,1,1,'OWN' FROM positions p JOIN resources r ON r.resource_name='chat' WHERE LOWER(p.position_name) LIKE '%develop%';
+SELECT p.id,r.id,1,1,'OWN' FROM positions p JOIN resources r ON r.resource_name='chat' WHERE p.id IN(1,2) OR LOWER(p.position_name) LIKE '%develop%';

@@ -77,12 +77,12 @@ test('calendar date selects the work entries for that day',()=>{
  expect(screen.getByText('Synthetic project')).toBeInTheDocument();
 });
 
-test('attendance-generated timesheets keep hours read-only while allowing submission',async()=>{
+test('attendance-generated timesheets accept draft corrections with a reason',async()=>{
  teamflowApi.list.mockResolvedValue({...response,data:[{...timesheet,source_type:'attendance'}]});
  mount(<TeamflowPage section="timesheets"/>);
  fireEvent.click(await screen.findByRole('button',{name:'Actions for Synthetic task'}));
  fireEvent.click(screen.getByRole('menuitem',{name:'Edit'}));
- const dialog=screen.getByRole('dialog');expect(within(dialog).getByLabelText('Mon hours')).toBeDisabled();
+ const dialog=screen.getByRole('dialog');expect(within(dialog).getByLabelText('Mon hours')).toBeEnabled();fireEvent.change(within(dialog).getByLabelText('Adjustment reason'),{target:{value:'Recorded work confirmed'}});
  fireEvent.change(within(dialog).getByLabelText('Status'),{target:{value:'Pending'}});
  fireEvent.click(within(dialog).getByRole('button',{name:'Save record'}));
  await waitFor(()=>expect(teamflowApi.save).toHaveBeenCalledWith('timesheets',101,expect.objectContaining({mon_hours:8,status:'Pending'}),null));

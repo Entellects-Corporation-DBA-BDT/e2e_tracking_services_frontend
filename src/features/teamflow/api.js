@@ -8,6 +8,12 @@ const payload = (value, attachment, photo, documents = {}) => {
  return data;
 };
 export const teamflowApi = {
+ weekly:(params,signal)=>axios.get('/teamflow/timesheets/weekly',{params,signal}).then(unpack),
+ saveWeek:value=>axios.post('/teamflow/timesheets/weekly/save',value).then(unpack),
+ copyWeek:value=>axios.post('/teamflow/timesheets/weekly/copy',value).then(unpack),
+ importWeek:value=>axios.post('/teamflow/timesheets/weekly/import',value).then(unpack),
+ reviewWeek:value=>axios.post('/teamflow/timesheets/weekly/review',value).then(unpack),
+ tasks:(id,signal)=>axios.get(`/teamflow/projects/${id}/tasks`,{signal}).then(unpack),
  list:(section,params={},signal)=>axios.get(`/teamflow/${section}`,{params,signal}).then(unpack),
  options:(resource,signal)=>axios.get('/teamflow/options',{params:{resource},signal}).then(unpack),
  detail:(section,id)=>axios.get(`/teamflow/${section}/${id}`).then(unpack),

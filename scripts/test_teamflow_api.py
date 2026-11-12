@@ -104,7 +104,7 @@ try:
  auto=[t for t in request('GET','/teamflow/timesheets')['data'] if t.get('source_type')=='attendance'];assert auto
  assert abs(sum(float(t['total_hours']) for t in auto)-1.5)<0.03
  sheet=auto[0];detail=request('GET',f"/teamflow/timesheets/{sheet['id']}")['data'];assert detail['worklogs'] and float(detail['worklogs'][0]['progress_percent'])==80
- request('POST',f"/teamflow/timesheets/{sheet['id']}",value={**sheet,'mon_hours':24},expected=403)
+ request('POST',f"/teamflow/timesheets/{sheet['id']}",value={**sheet,'mon_hours':24},expected=422)
  request('POST',f"/teamflow/timesheets/{sheet['id']}",value={**sheet,'status':'Pending'})
  request('POST',f"/teamflow/timesheets/{sheet['id']}/review",'admin',{'status':'Approved'})
  request('POST',f"/teamflow/timesheets/{sheet['id']}",value={**sheet,'status':'Draft'},expected=403)
