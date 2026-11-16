@@ -125,4 +125,14 @@ Local backups, manifests and audit results are under ignored `.server-audit/`. T
 
 ## Weekly collaboration upgrade
 
+Candidate shifts now have a nine-hour automatic clock-out and an audited admin correction flow. See [candidate attendance deployment](teamflow-attendance-auto-clockout.md) for the backend package and every-minute scheduler command. No new SQL migration is required.
+
 See [Weekly timesheets and project collaboration](teamflow-weekly-timesheets.md) for the latest weekly grid, review workflow, notifications, scoped project discussions and deployment checklist. Apply `20261113_teamflow_weekly_collaboration.sql` after the earlier migrations and deploy the updated `modules/chat/model.php` and `modules/chat/routes.php` alongside the complete TeamFlow backend and React build.
+
+## Project, issue and candidate profile presentation
+
+Projects open as a card gallery, with a list-view switch. Each project workspace has Overview, Issues, Files and Discussion sections. Issues open as a status board with a list alternative. Selecting an issue opens its own shareable workspace at `/dashboard/teamflow/issues/:issueId`, with description, ownership, attachments and discussion. Authorized editing stays inline on that page. Issues opened from a project include a Back to project action. Board groups represent the current filtered page; existing pagination and permission checks still apply. Entrance and hover animations respect reduced-motion preferences.
+
+Candidate profiles share the employee profile header styles and ID-card component, while retaining their own candidate identity and work-status controls. The eye beside the Candidate ID opens the two-sided card and PDF download. Its QR points to the candidate profile and requires an authorized login. Missing photos use name initials. The photo editor supports whole-photo fitting, frame filling, zoom and positioning; the saved portrait also appears on the ID card.
+
+Deploy the updated frontend `build/` for these presentation changes. No additional SQL migration or data import is needed. Browser verification is available in `scripts/verify_teamflow_workplace_browser.js`; it uses synthetic data and checks the card PDF, portrait editor, project and issue views, mobile layouts and reduced motion.

@@ -6,7 +6,8 @@ import CandidatePortalManagement from './CandidatePortalManagement';
 import {CandidateWorkSwitch,CandidateAttendancePanel} from './CandidateAttendance';
 import {Navigate} from 'react-router-dom';
 import {teamflowApi} from './api';
-jest.mock('react-router-dom',()=>({Navigate:jest.fn(()=>null),useLocation:()=>({search:''}),useNavigate:()=>jest.fn(),useParams:()=>({})}),{virtual:true});
+const mockNavigate=jest.fn();
+jest.mock('react-router-dom',()=>({Navigate:jest.fn(()=>null),useLocation:()=>({search:''}),useNavigate:()=>mockNavigate,useParams:()=>({})}),{virtual:true});
 const mockRefresh=jest.fn();
 const mockCan=jest.fn(()=>true);
 jest.mock('../../auth/PermissionContext',()=>({usePermissions:()=>({user:{id:37,is_teamflow_candidate:true},refresh:mockRefresh,can:mockCan})}));
@@ -92,6 +93,7 @@ test('candidate can update current address in their separate profile',async()=>{
  teamflowApi.profile.mockResolvedValue({can_edit:true,can_manage:false,data:{id:9,user_id:37,candidate_code:'TF-C-0009',username:'synthetic@example.test',firstname:'Synthetic',lastname:'Candidate',current_address:'Old address',profile:{},collection:{schema_version:2,education:[],documents:[],employment:[],certifications:[],references:[],siblings:[],has_experience:false}}});
  teamflowApi.saveProfile.mockResolvedValue({success:true});
  mount(<TeamflowProfile/>);
+ fireEvent.click(await screen.findByRole('button',{name:'Personal'}));
  fireEvent.click(await screen.findByRole('button',{name:'Edit / Add details'}));
  fireEvent.change(screen.getByLabelText('Current address'),{target:{value:'Updated synthetic address'}});
  fireEvent.click(screen.getByRole('button',{name:'Save profile'}));
@@ -106,4 +108,23 @@ test('missing legacy file is clearly labelled and accepts a later upload',async(
  fireEvent.change(screen.getByLabelText('Upload missing.pdf'),{target:{files:[new File(['fixture'],'replacement.pdf',{type:'application/pdf'})]}});
  await waitFor(()=>expect(teamflowApi.replaceFile).toHaveBeenCalledWith(8,expect.any(File)));
  expect(onChange).toHaveBeenCalled();
+});
+
+test('projects start as accessible cards and retain the list view',async()=>{
+ teamflowApi.list.mockResolvedValue({...response,data:[{id:4,name:'Synthetic project',projectKey:'SYN',type:'Web app'}]});
+ mount(<TeamflowPage section="projects"/>);
+ expect(await screen.findByRole('button',{name:'Open project Synthetic project'})).toBeEnabled();
+ fireEvent.click(screen.getByRole('button',{name:'List',exact:true}));
+ expect(screen.getByRole('region',{name:'Projects list'})).toBeInTheDocument();
+ expect(screen.queryByRole('button',{name:'Open project Synthetic project'})).toBeNull();
+});
+
+test('issue board opens a dedicated issue route without a popup',async()=>{
+ const issue={id:7,summary:'Fix onboarding validation',project:'4',project_name:'Synthetic project',status:'In progress',priority:'High',description:'Validate the complete application before submission.',files:[]};
+ teamflowApi.list.mockResolvedValue({...response,data:[issue],permissions:{view:true}});
+ teamflowApi.detail.mockResolvedValue({data:issue});
+ mount(<TeamflowPage section="issues"/>);
+ fireEvent.click(await screen.findByRole('button',{name:issue.summary}));
+ expect(mockNavigate).toHaveBeenCalledWith('/dashboard/teamflow/issues/7',{state:{projectId:null}});
+ expect(screen.queryByRole('dialog')).toBeNull();
 });

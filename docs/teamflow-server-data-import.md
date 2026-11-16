@@ -50,6 +50,14 @@ The package does not contain database connection secrets. PHP continues using th
    Both commands must use the same `TEAMFLOW_FILE_DIR` configuration as the PHP web process. Ensure PHP can write/read this private destination. The importer copies original uploads into private storage; missing source documents stay marked **Awaiting upload** for later replacement.
 6. Deploy the latest React build and the initial TeamFlow backend registration/auth changes described in `docs/teamflow-integration.md` if not already deployed. Sign out/in. An administrator should see 74 candidate accounts, 46 projects, 220 issues, 145 weekly timesheets, 895 daily work records and 434 reports from the original dataset. Candidates see only their own permitted records. Change week/date filters to the historical dates to see imported timesheets and work sessions.
 
+## Existing `uploads/uploads` attachments
+
+Deploy `modules/teamflow/legacy_files.php` together with the updated TeamFlow `model.php` and `routes.php` from the private backend package. Imported project logos, reports, issue attachments, project documents and daily status documents can then read their original files from `<PHP backend>/uploads/uploads`, including its `DailyStatusReports` subfolder. No SQL migration or repeat import is required for this change.
+
+If the original files live elsewhere, set `TEAMFLOW_LEGACY_UPLOAD_DIR` in the PHP environment to that upload directory. Keep its original subfolders. Private replacement uploads continue to use `TEAMFLOW_FILE_DIR`; replacing an attachment takes priority over its original file.
+
+The frontend uses the existing authenticated `/teamflow/files/{id}` endpoint for these files, with `?preview=1` for project images. Access checks still apply. A reference without a corresponding file stays **Awaiting upload** and can be replaced by an authorized user. The API does not expose filesystem paths.
+
 ## If the import stops
 
 - **Already imported:** rerunning the same completed source returns `already_imported`; it does not duplicate or overwrite records.

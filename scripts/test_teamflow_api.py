@@ -4,6 +4,7 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1];AUDIT=ROOT/'.server-audit';BACKEND=Path(os.environ.get('E2E_BACKEND_PATH','C:/xampp/htdocs/E2E_Tracking'));PHP='C:/xampp/php/php.exe'
 meta=json.loads((AUDIT/'teamflow-test-db.json').read_text());assert meta['database'].startswith('e2e_teamflow_verify_')
 env=os.environ.copy();env['DB_NAME']=meta['database'];env['TEAMFLOW_FILE_DIR']=str(AUDIT/'teamflow-test-files');env['EMPLOYEE_DOCUMENT_DIR']=str(AUDIT/'teamflow-test-profile-documents')
+legacy_root=AUDIT/'teamflow-test-legacy-uploads';legacy_root.mkdir(exist_ok=True);env['TEAMFLOW_LEGACY_UPLOAD_DIR']=str(legacy_root)
 fixture=subprocess.run([PHP,str(AUDIT/'teamflow-test-fixtures.php')],env=env,capture_output=True,text=True,check=True)
 users=json.loads(fixture.stdout.lstrip('\ufeff'))
 router=AUDIT/'teamflow-test-router.php';router.write_text("<?php $_SERVER['SCRIPT_NAME']='/index.php';require "+json.dumps(str(BACKEND/'index.php').replace('\\','/'))+";",encoding='utf-8')
@@ -69,6 +70,19 @@ try:
  record=request('GET',f'/teamflow/reports/{report}')['data'];assert int(record['userId'])==users['a']['id'];attachment=record['files'][0]['id']
  assert request('GET',f'/teamflow/files/{attachment}',raw=True)==png
  request('GET',f'/teamflow/files/{attachment}','b',expected=403)
+ # Imported references read the existing nested uploads folder through the same permission checks.
+ (legacy_root/'legacy-proof.png').write_bytes(png)
+ legacy_id=subprocess.run([PHP,str(ROOT/'scripts/test_teamflow_legacy_fixture.php'),str(report)],env=env,capture_output=True,text=True,check=True).stdout.strip()
+ try:
+  legacy_record=request('GET',f'/teamflow/reports/{report}')['data']
+  legacy_file=next(f for f in legacy_record['files'] if str(f['id'])==legacy_id)
+  assert not int(legacy_file['missing']) and 'original_path' not in legacy_file and 'storage_name' not in legacy_file
+  assert request('GET',f'/teamflow/files/{legacy_id}?preview=1',raw=True)==png
+  request('GET',f'/teamflow/files/{legacy_id}','b',expected=403)
+  request('GET',f'/teamflow/files/{legacy_id}',None,expected=401)
+ finally:
+  subprocess.run([PHP,str(ROOT/'scripts/test_teamflow_legacy_fixture.php'),'delete',legacy_id],env=env,check=True)
+  (legacy_root/'legacy-proof.png').unlink(missing_ok=True)
  request('POST',f'/teamflow/files/{attachment}/replace','b',file=('file','replace.png',png,'image/png'),expected=403)
  request('POST',f"/teamflow/files/{users['missing_file']}/replace",'admin',file=('file','restored.png',png,'image/png'))
  assert request('GET',f"/teamflow/files/{users['missing_file']}",'admin',raw=True)==png
@@ -107,13 +121,41 @@ try:
  request('POST',f"/teamflow/timesheets/{sheet['id']}",value={**sheet,'mon_hours':24},expected=422)
  request('POST',f"/teamflow/timesheets/{sheet['id']}",value={**sheet,'status':'Pending'})
  request('POST',f"/teamflow/timesheets/{sheet['id']}/review",'admin',{'status':'Approved'})
+ approved_session=request('GET','/teamflow/attendance')['data'][0]
+ request('POST',f"/teamflow/attendance/{approved_session['id']}/correct",'admin',{'login_time':approved_session['login_time'],'logout_time':approved_session['logout_time'],'reason':'Cannot change approved hours'},expected=403)
  request('POST',f"/teamflow/timesheets/{sheet['id']}",value={**sheet,'status':'Draft'},expected=403)
  request('POST','/teamflow/attendance/clock',value={'action':'in','project_id':project,'module_name':'Next task','working_on':'Additional work'})
  request('POST','/teamflow/attendance/clock',value={'action':'out','worked_on':'Finished next task','progress_percent':100})
  assert request('GET',f"/teamflow/timesheets/{sheet['id']}")['data']['status']=='Approved'
+ # Missed clock-out: a three-day-old shift closes at exactly nine elapsed hours.
+ stale=request('POST','/teamflow/attendance/clock',value={'action':'in','project_id':project,'module_name':'Missed clock-out','working_on':'Test nine-hour cutoff'})['data']['id']
+ subprocess.run([PHP,str(AUDIT/'teamflow-clock-fixture.php'),'overdue',str(users['a']['id'])],env=env,capture_output=True,text=True,check=True)
+ insights=request('GET','/teamflow/attendance/insights')['data'];assert insights['open_session'] is None
+ closed=request('GET',f'/teamflow/attendance/{stale}')['data'];assert closed['status']=='Auto clocked out' and int(closed['login_status'])==0
+ from datetime import datetime,timedelta
+ start=datetime.fromisoformat(closed['login_utc']);end=datetime.fromisoformat(closed['logout_utc']);assert (end-start).total_seconds()==32400
+ presence=request('GET','/teamflow/attendance/presence')['data'];assert presence['record'] is None
+ # Cleanup is idempotent even without browser traffic.
+ cleanup=json.loads(subprocess.run([PHP,'C:/xampp/htdocs/E2E_Tracking/scripts/close_teamflow_shifts.php'],env=env,capture_output=True,text=True,check=True).stdout);assert cleanup['closed']==0
+ correction={'login_time':closed['login_time'],'logout_time':(datetime.fromisoformat(closed['login_time'])+timedelta(hours=1)).isoformat(sep=' '),'reason':'Verified actual one-hour work session'}
+ request('POST',f'/teamflow/attendance/{stale}/correct',value=correction,expected=403)
+ request('POST',f'/teamflow/attendance/{stale}/correct','admin',{**correction,'reason':''},expected=422)
+ request('POST',f'/teamflow/attendance/{stale}/correct','admin',correction)
+ corrected=request('GET',f'/teamflow/attendance/{stale}')['data'];assert corrected['status']=='Corrected'
+ allocations=[]
+ for t in request('GET','/teamflow/timesheets')['data']:
+  if t.get('source_type')=='attendance':
+   logs=request('GET',f"/teamflow/timesheets/{t['id']}")['data']['worklogs']
+   allocations.extend(log for log in logs if log['module_name']=='Missed clock-out')
+ assert sum(int(log['duration_seconds']) for log in allocations)==3600
+ # A fresh workday is possible, with an explicit deadline for the UI.
+ request('POST','/teamflow/attendance/clock',value={'action':'in','project_id':project,'module_name':'Fresh workday','working_on':'New day after missed logout'})
+ assert request('GET','/teamflow/attendance/insights')['data']['open_session']['auto_clock_out_at']
+ request('POST','/teamflow/attendance/clock',value={'action':'out','worked_on':'Fresh day completed'})
  counts=json.loads(subprocess.run([PHP,str(AUDIT/'teamflow-clock-fixture.php'),'counts'],env=env,capture_output=True,text=True,check=True).stdout);assert counts['employee_attendance']==users['attendance_baseline']
  assert request('GET','/teamflow/reports/export')['total']==1
  summary={'success':True,'shared_login_bcrypt':True,'candidate_role_and_separate_profile':True,'own_scope_enforced':True,'cross_user_profile_and_file_access_denied':True,'project_assignment':True,'timesheet_hours_and_approval':True,'reports_and_uploads':True,'missing_file_replacement':True,'encrypted_profile_document_download':True,'profile_photo_add_remove':True,'candidate_remote_clock_without_ip_or_wfh':True,'clock_in_out_and_duplicate_prevention':True,'profile_calendar_and_progress':True,'automatic_timesheets_from_actual_hours':True,'approved_timesheets_stay_locked':True,'employee_attendance_unchanged':True,'own_export':True}
+ summary.update({'three_day_missed_logout_capped_at_nine_hours':True,'cleanup_idempotent':True,'admin_correction_reason_and_scope_enforced':True,'corrected_draft_allocations_rebuilt':True,'approved_attendance_correction_blocked':True,'fresh_clock_in_after_auto_logout':True})
  (AUDIT/'teamflow-api-results.json').write_text(json.dumps(summary,indent=2),encoding='utf-8');print(json.dumps(summary))
 finally:
  server.terminate()

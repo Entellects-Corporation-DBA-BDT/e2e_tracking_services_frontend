@@ -1,0 +1,9 @@
+import {useState} from 'react';
+import TeamflowModal from './TeamflowModal';
+import {teamflowApi,teamflowMessage} from './api';
+
+export default function AttendanceCorrectionModal({row,onClose,onSaved}){
+ const [form,setForm]=useState({login_time:(row.login_time||'').replace(' ','T'),logout_time:(row.logout_time||'').replace(' ','T'),reason:''}),[busy,setBusy]=useState(false),[error,setError]=useState('');
+ const save=async event=>{event.preventDefault();setBusy(true);setError('');try{await teamflowApi.correctAttendance(row.id,form);onSaved();window.dispatchEvent(new Event('e2e-attendance-changed'));onClose();}catch(e){setError(teamflowMessage(e));}finally{setBusy(false);}};
+ return <TeamflowModal title="Correct candidate attendance" busy={busy} onClose={onClose}><form onSubmit={save}><p className="tf-muted">Enter actual clock times in US Eastern Time. Sessions are limited to nine hours. Draft timesheet hours update automatically; submitted timesheets must be rejected first. Approved timesheets stay locked.</p>{error&&<p className="tf-error" role="alert">{error}</p>}<div className="tf-form-grid"><label>Clock in (ET)<input required type="datetime-local" step="1" value={form.login_time} onChange={e=>setForm({...form,login_time:e.target.value})}/></label><label>Clock out (ET)<input required type="datetime-local" step="1" value={form.logout_time} onChange={e=>setForm({...form,logout_time:e.target.value})}/></label><label className="tf-wide">Reason for correction<textarea required maxLength={1000} rows={3} value={form.reason} onChange={e=>setForm({...form,reason:e.target.value})}/></label></div><footer className="tf-modal-footer"><button type="button" className="tf-secondary" disabled={busy} onClick={onClose}>Cancel</button><button disabled={busy}>{busy?'Saving…':'Save correction'}</button></footer></form></TeamflowModal>;
+}

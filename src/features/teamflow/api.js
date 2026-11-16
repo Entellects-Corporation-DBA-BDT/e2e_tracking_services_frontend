@@ -22,6 +22,7 @@ export const teamflowApi = {
  review:(id,status)=>axios.post(`/teamflow/timesheets/${id}/review`,{status}).then(unpack),
  assign:(id,user_ids)=>axios.post(`/teamflow/projects/${id}/assign`,{user_ids}).then(unpack),
  clock:value=>axios.post('/teamflow/attendance/clock',value).then(unpack),
+ correctAttendance:(id,value)=>axios.post(`/teamflow/attendance/${id}/correct`,value).then(unpack),
  insights:(params,signal)=>axios.get('/teamflow/attendance/insights',{params,signal}).then(unpack),
  updateWork:value=>axios.post('/teamflow/attendance/work',value).then(unpack),
  presence:()=>axios.get('/teamflow/attendance/presence').then(unpack),

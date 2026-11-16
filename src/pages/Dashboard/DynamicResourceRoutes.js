@@ -4,6 +4,7 @@ import CandidatePortalManagement from '../../features/teamflow/CandidatePortalMa
 import CandidateAttendanceRoute from '../../features/teamflow/CandidateAttendanceRoute';
 import WeeklyTimesheets from '../../features/teamflow/WeeklyTimesheets';
 import TeamflowProjectView from '../../features/teamflow/TeamflowProjectView';
+import TeamflowIssueView from '../../features/teamflow/TeamflowIssueView';
 import Workshop from './Workshop';
 import { Navigate, Route } from "react-router-dom";
 import { usePermissions } from "../../auth/PermissionContext";
@@ -68,6 +69,7 @@ const PAGE_COMPONENTS = {
 
 const DETAIL_COMPONENTS = {
   "teamflow-projects":[{suffix:":projectId",element:<TeamflowProjectView/>}],
+  "teamflow-issues":[{suffix:":issueId",element:<TeamflowIssueView/>}],
   "teamflow-candidates":[{suffix:":candidateId/profile",element:<TeamflowProfile/>}],
   recruiting: [
     { suffix: "document-check", element: <Navigate to="/ai-tools/document-check" replace/> },

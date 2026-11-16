@@ -162,6 +162,10 @@ const selectResource = (resource) => {
           ? "Prime Vendor Details"
         : /^\/dashboard\/employee-status\/\d+$/.test(location.pathname)
           ? "Employee Identity Details"
+        : /^\/dashboard\/teamflow\/projects\/\d+$/.test(location.pathname)
+          ? 'Project workspace'
+        : /^\/dashboard\/teamflow\/candidates\/\d+\/profile$/.test(location.pathname)
+          ? 'Candidate profile'
         : pageTitles[location.pathname] || resources.find((item) => item.route === location.pathname)?.display_name || "Dashboard";
 
   return (

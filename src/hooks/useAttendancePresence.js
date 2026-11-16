@@ -10,6 +10,8 @@ export function attendancePresence(snapshot,now=Date.now()){
  const parts=new Intl.DateTimeFormat("en-CA",{timeZone:"America/New_York",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit",hourCycle:"h23"}).formatToParts(new Date(serverTime+Math.max(0,now-receivedAt)));
  const fields=Object.fromEntries(parts.map(p=>[p.type,p.value]));
  const date=`${fields.year}-${fields.month}-${fields.day}`,time=`${fields.hour}:${fields.minute}:${fields.second}`;
+ const deadline=Date.parse(data.auto_clock_out_at);
+ if(Number.isFinite(deadline)&&serverTime+Math.max(0,now-receivedAt)>=deadline)return {state:"offline",label:"Offline - automatically clocked out after 9 hours"};
  const record=data.record;
  if(!record||data.work_date!==date||record.time_out!=="00:00:00")return {state:"offline",label:"Offline - not clocked in"};
  const end=data.schedule?.work_end||"18:30:00";
