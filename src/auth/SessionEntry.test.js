@@ -1,0 +1,13 @@
+import {render,screen} from '@testing-library/react';
+import SessionEntry from './SessionEntry';
+let mockState={},mockToken=null;
+jest.mock('./PermissionContext',()=>({usePermissions:()=>mockState}));
+jest.mock('js-cookie',()=>({get:()=>mockToken}));
+jest.mock('react-router-dom',()=>({Navigate:({to})=><div>Redirect: {to}</div>}),{virtual:true});
+jest.mock('../pages/Homepage',()=>()=> <div>Login page</div>);
+jest.mock('../components/Loader',()=>()=> <div role="status">Checking session</div>);
+beforeEach(()=>{mockToken=null;mockState={loading:false,authenticated:false,error:'',refresh:jest.fn()};});
+test('anonymous visitors keep the normal login page',()=>{render(<SessionEntry/>);expect(screen.getByText('Login page')).toBeInTheDocument();});
+test('verified users go straight to their profile',()=>{mockToken='saved';mockState.authenticated=true;render(<SessionEntry/>);expect(screen.getByText('Redirect: /dashboard/my-profile')).toBeInTheDocument();expect(screen.queryByText('Login page')).toBeNull();});
+test('a saved cookie alone never opens protected content or flashes the login form',()=>{mockToken='saved';mockState.loading=true;render(<SessionEntry/>);expect(screen.getByRole('status')).toHaveTextContent('Checking session');expect(screen.queryByText('Login page')).toBeNull();});
+test('offline verification offers retry without forcing a fresh login',()=>{mockToken='saved';mockState.error='unavailable';render(<SessionEntry/>);expect(screen.getByRole('alert')).toHaveTextContent('Unable to verify your session');expect(screen.queryByText('Login page')).toBeNull();});

@@ -1,6 +1,7 @@
 import axios from "axios";
 import { baseUrl } from "../Config/env";
 import Cookies from "js-cookie";
+import {clearAuthSession} from '../auth/session';
 
 const axiosInstance = axios.create({
   baseURL: baseUrl,
@@ -21,9 +22,9 @@ axiosInstance.interceptors.request.use(
     }
 
     // Allow these public routes without token
-    const publicRoutes = ["/login", "/register", "/send-otp", "/verify-otp"];
+    const publicRoutes = ["/auth/login", "/auth/register", "/login", "/register", "/send-otp", "/verify-otp"];
 
-    if (token && !publicRoutes.includes(config.url)) {
+    if (token && !publicRoutes.includes(config.url?.split('?')[0]) && !config.headers?.Authorization) {
       config.headers["Authorization"] = `Bearer ${token}`;
     }
 
@@ -31,6 +32,13 @@ axiosInstance.interceptors.request.use(
   },
   (error) => Promise.reject(error)
 );
+
+axiosInstance.interceptors.response.use(response=>response,error=>{
+ const status=error?.response?.status,message=error?.response?.data?.error;
+ const sent=error?.config?.headers?.Authorization||error?.config?.headers?.get?.('Authorization');
+ if(sent&&(status===401||(status===403&&['Invalid token','User is inactive','Position is inactive'].includes(message))))clearAuthSession(String(sent).replace(/^Bearer\s+/i,''));
+ return Promise.reject(error);
+});
 
 
 export default axiosInstance;

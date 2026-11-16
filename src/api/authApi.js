@@ -1,5 +1,6 @@
 import axiosInstance from "./axiosInstance";
 import Cookies from "js-cookie";
+import {notifySessionChanged,sessionCookieOptions,SELF_PROFILE_PATH} from '../auth/session';
 
 
 export const loginUser = async (loginDetails) => {
@@ -12,31 +13,18 @@ export const loginUser = async (loginDetails) => {
     const token = response?.data?.token;
     const userData = response?.data?.user;
 
-    Cookies.set("jwtToken", token, {
-      expires: 30,
-    });
+    if(typeof token!=='string'||!token.trim())throw new Error('The server did not return a valid session. Please try again.');
+    Cookies.set("jwtToken", token, sessionCookieOptions(token));
 
-    localStorage.setItem(
+    try{localStorage.setItem(
       "userData",
       JSON.stringify(userData)
-    );
-    window.dispatchEvent(new CustomEvent("e2e-auth-changed", { detail: { token } }));
-
-    const resourceResponse = await axiosInstance.get(
-      "/auth/me",
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    const resources = (resourceResponse.data.resources || [])
-      .filter((resource) => resource.permissions?.view);
+    );}catch(_error){}
+    notifySessionChanged();
 
     return {
       ...response.data,
-      firstRoute: resources.find((resource) => resource.route)?.route || "/dashboard",
+      firstRoute: SELF_PROFILE_PATH,
     };
   } catch (error) {
     throw error.response?.data || error;

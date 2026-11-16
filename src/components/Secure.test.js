@@ -1,0 +1,12 @@
+import {render,screen} from '@testing-library/react';
+import Secure from './Secure';
+let mockPath='/dashboard/employees',mockToken='saved',mockPermission;
+jest.mock('js-cookie',()=>({get:()=>mockToken}));
+jest.mock('../auth/PermissionContext',()=>({usePermissions:()=>mockPermission}));
+jest.mock('../auth/SessionEntry',()=>({SessionRetry:()=> <div>Retry session</div>}));
+jest.mock('react-router-dom',()=>({useLocation:()=>({pathname:mockPath}),Outlet:()=> <div>Protected page</div>,Navigate:({to})=><div>Redirect: {to}</div>}),{virtual:true});
+beforeEach(()=>{mockToken='saved';mockPath='/dashboard/employees';mockPermission={user:{id:7},loading:false,error:'',resources:[{route:'/dashboard',permissions:{view:true}}],can:()=>true};});
+test('dashboard access does not grant every child resource',()=>{render(<Secure/>);expect(screen.getByText('Redirect: /forbidden')).toBeInTheDocument();});
+test('verified own-profile access opens its nested profile route',()=>{mockPath='/dashboard/my-profile/7';mockPermission.resources=[{route:'/dashboard/my-profile',permissions:{view:true}}];render(<Secure/>);expect(screen.getByText('Protected page')).toBeInTheDocument();});
+test('missing sessions return to the login entry',()=>{mockToken=null;render(<Secure/>);expect(screen.getByText('Redirect: /')).toBeInTheDocument();});
+test('authorized dashboard record links remain available',()=>{mockPath='/dashboard/records/submissions/42';render(<Secure/>);expect(screen.getByText('Protected page')).toBeInTheDocument();});
